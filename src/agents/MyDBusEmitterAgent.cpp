@@ -9,6 +9,7 @@
 #include <dbus/MyPIDControllerServiceWrap.h>
 #include <events/MyYPRError.h>
 #include <iostream>
+#include "dbus/MyPIDState.h"
 
 MyDBusEmitterAgent::MyDBusEmitterAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
@@ -35,13 +36,28 @@ void MyDBusEmitterAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 			boost::shared_ptr<MyYPRError> outState =
 									boost::static_pointer_cast<MyYPRError>(event);
 
-			MyPIDControllerServiceWrap::emitStateChangedSignal(outState->getTimestampMillis(),
-					outState->getYawCurr(), outState->getPitchCurr(), outState->getRollCurr(),
-					outState->getYawTrg(), outState->getPitchTrg(), outState->getRollTrg(),
-					outState->getERoll(),outState->getEIRoll(),outState->getEDRoll(),
-					outState->getEPitch(),outState->getEIPitch(),outState->getEDPitch(),
-					outState->getEYaw(),outState->getEIYaw(),outState->getEDYaw()
-					);
+			MyPIDState pidState;
+			pidState.timestampMillis = outState->getTimestampMillis();
+			pidState.yawSample.current_value = outState->getYawCurr();
+			pidState.yawSample.target_value = outState->getYawTrg();
+			pidState.yawSample.error_ = outState->getEYaw();
+			pidState.yawSample.error_i = outState->getEIYaw();
+			pidState.yawSample.error_d = outState->getEDYaw();
+
+			pidState.pitchSample.current_value = outState->getPitchCurr();
+			pidState.pitchSample.target_value = outState->getPitchTrg();
+			pidState.pitchSample.error_ = outState->getEPitch();
+			pidState.pitchSample.error_i = outState->getEIPitch();
+			pidState.pitchSample.error_d = outState->getEDPitch();
+
+			pidState.rollSample.current_value = outState->getRollCurr();
+			pidState.rollSample.target_value = outState->getRollTrg();
+			pidState.rollSample.error_ = outState->getERoll();
+			pidState.rollSample.error_i = outState->getEIRoll();
+			pidState.rollSample.error_d = outState->getEDRoll();
+
+			MyPIDControllerServiceWrap::emitStateChangedSignal(pidState);
+
 		}
 	}
 }

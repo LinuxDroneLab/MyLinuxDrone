@@ -9,6 +9,7 @@
 #endif
 
 #include "MyPIDControllerService-generated.h"
+
 #include <string.h>
 #ifdef G_OS_UNIX
 #  include <gio/gunixfdlist.h>
@@ -162,237 +163,12 @@ _g_value_equal (const GValue *a, const GValue *b)
 
 /* ---- Introspection data for org.mydrone.MyPIDControllerService ---- */
 
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_method_info_set_pid_IN_ARG_pid =
+static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_imuSample =
 {
   {
     -1,
-    (gchar *) "pid",
-    (gchar *) "y",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_method_info_set_pid_IN_ARG_ypr =
-{
-  {
-    -1,
-    (gchar *) "ypr",
-    (gchar *) "y",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_method_info_set_pid_IN_ARG_value =
-{
-  {
-    -1,
-    (gchar *) "value",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo * const _my_pidcontroller_service_method_info_set_pid_IN_ARG_pointers[] =
-{
-  &_my_pidcontroller_service_method_info_set_pid_IN_ARG_pid,
-  &_my_pidcontroller_service_method_info_set_pid_IN_ARG_ypr,
-  &_my_pidcontroller_service_method_info_set_pid_IN_ARG_value,
-  NULL
-};
-
-static const _ExtendedGDBusMethodInfo _my_pidcontroller_service_method_info_set_pid =
-{
-  {
-    -1,
-    (gchar *) "setPID",
-    (GDBusArgInfo **) &_my_pidcontroller_service_method_info_set_pid_IN_ARG_pointers,
-    NULL,
-    NULL
-  },
-  "handle-set-pid",
-  FALSE
-};
-
-static const _ExtendedGDBusMethodInfo * const _my_pidcontroller_service_method_info_pointers[] =
-{
-  &_my_pidcontroller_service_method_info_set_pid,
-  NULL
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_timestampMillis =
-{
-  {
-    -1,
-    (gchar *) "timestampMillis",
-    (gchar *) "u",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_yawCurrent =
-{
-  {
-    -1,
-    (gchar *) "yawCurrent",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_pitchCurrent =
-{
-  {
-    -1,
-    (gchar *) "pitchCurrent",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_rollCurrent =
-{
-  {
-    -1,
-    (gchar *) "rollCurrent",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_yawTarget =
-{
-  {
-    -1,
-    (gchar *) "yawTarget",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_pitchTarget =
-{
-  {
-    -1,
-    (gchar *) "pitchTarget",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_rollTarget =
-{
-  {
-    -1,
-    (gchar *) "rollTarget",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_eYaw =
-{
-  {
-    -1,
-    (gchar *) "eYaw",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_eIYaw =
-{
-  {
-    -1,
-    (gchar *) "eIYaw",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_eDYaw =
-{
-  {
-    -1,
-    (gchar *) "eDYaw",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_ePitch =
-{
-  {
-    -1,
-    (gchar *) "ePitch",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_eIPitch =
-{
-  {
-    -1,
-    (gchar *) "eIPitch",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_eDPitch =
-{
-  {
-    -1,
-    (gchar *) "eDPitch",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_eRoll =
-{
-  {
-    -1,
-    (gchar *) "eRoll",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_eIRoll =
-{
-  {
-    -1,
-    (gchar *) "eIRoll",
-    (gchar *) "d",
-    NULL
-  },
-  FALSE
-};
-
-static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_changed_ARG_eDRoll =
-{
-  {
-    -1,
-    (gchar *) "eDRoll",
-    (gchar *) "d",
+    (gchar *) "imuSample",
+    (gchar *) "(u(ddddd)(ddddd)(ddddd))",
     NULL
   },
   FALSE
@@ -400,22 +176,21 @@ static const _ExtendedGDBusArgInfo _my_pidcontroller_service_signal_info_state_c
 
 static const _ExtendedGDBusArgInfo * const _my_pidcontroller_service_signal_info_state_changed_ARG_pointers[] =
 {
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_timestampMillis,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_yawCurrent,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_pitchCurrent,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_rollCurrent,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_yawTarget,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_pitchTarget,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_rollTarget,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_eYaw,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_eIYaw,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_eDYaw,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_ePitch,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_eIPitch,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_eDPitch,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_eRoll,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_eIRoll,
-  &_my_pidcontroller_service_signal_info_state_changed_ARG_eDRoll,
+  &_my_pidcontroller_service_signal_info_state_changed_ARG_imuSample,
+  NULL
+};
+
+static const GDBusAnnotationInfo _my_pidcontroller_service_signal_state_changed_annotation_info_0 =
+{
+  -1,
+  (gchar *) "org.qtproject.QtDBus.QtTypeName.In0",
+  (gchar *) "MyPIDState",
+  NULL
+};
+
+static const GDBusAnnotationInfo * const _my_pidcontroller_service_signal_state_changed_annotation_info_pointers[] =
+{
+  &_my_pidcontroller_service_signal_state_changed_annotation_info_0,
   NULL
 };
 
@@ -423,9 +198,9 @@ static const _ExtendedGDBusSignalInfo _my_pidcontroller_service_signal_info_stat
 {
   {
     -1,
-    (gchar *) "StateChanged",
+    (gchar *) "stateChanged",
     (GDBusArgInfo **) &_my_pidcontroller_service_signal_info_state_changed_ARG_pointers,
-    NULL
+    (GDBusAnnotationInfo **) &_my_pidcontroller_service_signal_state_changed_annotation_info_pointers
   },
   "state-changed"
 };
@@ -441,7 +216,7 @@ static const _ExtendedGDBusInterfaceInfo _my_pidcontroller_service_interface_inf
   {
     -1,
     (gchar *) "org.mydrone.MyPIDControllerService",
-    (GDBusMethodInfo **) &_my_pidcontroller_service_method_info_pointers,
+    NULL,
     (GDBusSignalInfo **) &_my_pidcontroller_service_signal_info_pointers,
     NULL,
     NULL
@@ -490,7 +265,6 @@ my_pidcontroller_service_override_properties (GObjectClass *klass, guint propert
 /**
  * MyPIDControllerServiceIface:
  * @parent_iface: The parent interface.
- * @handle_set_pid: Handler for the #MyPIDControllerService::handle-set-pid signal.
  * @state_changed: Handler for the #MyPIDControllerService::state-changed signal.
  *
  * Virtual table for the D-Bus interface <link linkend="gdbus-interface-org-mydrone-MyPIDControllerService.top_of_page">org.mydrone.MyPIDControllerService</link>.
@@ -502,54 +276,13 @@ G_DEFINE_INTERFACE (MyPIDControllerService, my_pidcontroller_service, G_TYPE_OBJ
 static void
 my_pidcontroller_service_default_init (MyPIDControllerServiceIface *iface)
 {
-  /* GObject signals for incoming D-Bus method calls: */
-  /**
-   * MyPIDControllerService::handle-set-pid:
-   * @object: A #MyPIDControllerService.
-   * @invocation: A #GDBusMethodInvocation.
-   * @arg_pid: Argument passed by remote caller.
-   * @arg_ypr: Argument passed by remote caller.
-   * @arg_value: Argument passed by remote caller.
-   *
-   * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-mydrone-MyPIDControllerService.setPID">setPID()</link> D-Bus method.
-   *
-   * If a signal handler returns %TRUE, it means the signal handler will handle the invocation (e.g. take a reference to @invocation and eventually call my_pidcontroller_service_complete_set_pid() or e.g. g_dbus_method_invocation_return_error() on it) and no order signal handlers will run. If no signal handler handles the invocation, the %G_DBUS_ERROR_UNKNOWN_METHOD error is returned.
-   *
-   * Returns: %TRUE if the invocation was handled, %FALSE to let other signal handlers run.
-   */
-  g_signal_new ("handle-set-pid",
-    G_TYPE_FROM_INTERFACE (iface),
-    G_SIGNAL_RUN_LAST,
-    G_STRUCT_OFFSET (MyPIDControllerServiceIface, handle_set_pid),
-    g_signal_accumulator_true_handled,
-    NULL,
-    g_cclosure_marshal_generic,
-    G_TYPE_BOOLEAN,
-    4,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_UCHAR, G_TYPE_UCHAR, G_TYPE_DOUBLE);
-
   /* GObject signals for received D-Bus signals: */
   /**
    * MyPIDControllerService::state-changed:
    * @object: A #MyPIDControllerService.
-   * @arg_timestampMillis: Argument.
-   * @arg_yawCurrent: Argument.
-   * @arg_pitchCurrent: Argument.
-   * @arg_rollCurrent: Argument.
-   * @arg_yawTarget: Argument.
-   * @arg_pitchTarget: Argument.
-   * @arg_rollTarget: Argument.
-   * @arg_eYaw: Argument.
-   * @arg_eIYaw: Argument.
-   * @arg_eDYaw: Argument.
-   * @arg_ePitch: Argument.
-   * @arg_eIPitch: Argument.
-   * @arg_eDPitch: Argument.
-   * @arg_eRoll: Argument.
-   * @arg_eIRoll: Argument.
-   * @arg_eDRoll: Argument.
+   * @arg_imuSample: Argument.
    *
-   * On the client-side, this signal is emitted whenever the D-Bus signal <link linkend="gdbus-signal-org-mydrone-MyPIDControllerService.StateChanged">"StateChanged"</link> is received.
+   * On the client-side, this signal is emitted whenever the D-Bus signal <link linkend="gdbus-signal-org-mydrone-MyPIDControllerService.stateChanged">"stateChanged"</link> is received.
    *
    * On the service-side, this signal can be used with e.g. g_signal_emit_by_name() to make the object emit the D-Bus signal.
    */
@@ -561,181 +294,23 @@ my_pidcontroller_service_default_init (MyPIDControllerServiceIface *iface)
     NULL,
     g_cclosure_marshal_generic,
     G_TYPE_NONE,
-    16, G_TYPE_UINT, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE, G_TYPE_DOUBLE);
+    1, G_TYPE_VARIANT);
 
 }
 
 /**
  * my_pidcontroller_service_emit_state_changed:
  * @object: A #MyPIDControllerService.
- * @arg_timestampMillis: Argument to pass with the signal.
- * @arg_yawCurrent: Argument to pass with the signal.
- * @arg_pitchCurrent: Argument to pass with the signal.
- * @arg_rollCurrent: Argument to pass with the signal.
- * @arg_yawTarget: Argument to pass with the signal.
- * @arg_pitchTarget: Argument to pass with the signal.
- * @arg_rollTarget: Argument to pass with the signal.
- * @arg_eYaw: Argument to pass with the signal.
- * @arg_eIYaw: Argument to pass with the signal.
- * @arg_eDYaw: Argument to pass with the signal.
- * @arg_ePitch: Argument to pass with the signal.
- * @arg_eIPitch: Argument to pass with the signal.
- * @arg_eDPitch: Argument to pass with the signal.
- * @arg_eRoll: Argument to pass with the signal.
- * @arg_eIRoll: Argument to pass with the signal.
- * @arg_eDRoll: Argument to pass with the signal.
+ * @arg_imuSample: Argument to pass with the signal.
  *
- * Emits the <link linkend="gdbus-signal-org-mydrone-MyPIDControllerService.StateChanged">"StateChanged"</link> D-Bus signal.
+ * Emits the <link linkend="gdbus-signal-org-mydrone-MyPIDControllerService.stateChanged">"stateChanged"</link> D-Bus signal.
  */
 void
 my_pidcontroller_service_emit_state_changed (
     MyPIDControllerService *object,
-    guint arg_timestampMillis,
-    gdouble arg_yawCurrent,
-    gdouble arg_pitchCurrent,
-    gdouble arg_rollCurrent,
-    gdouble arg_yawTarget,
-    gdouble arg_pitchTarget,
-    gdouble arg_rollTarget,
-    gdouble arg_eYaw,
-    gdouble arg_eIYaw,
-    gdouble arg_eDYaw,
-    gdouble arg_ePitch,
-    gdouble arg_eIPitch,
-    gdouble arg_eDPitch,
-    gdouble arg_eRoll,
-    gdouble arg_eIRoll,
-    gdouble arg_eDRoll)
+    GVariant *arg_imuSample)
 {
-  g_signal_emit_by_name (object, "state-changed", arg_timestampMillis, arg_yawCurrent, arg_pitchCurrent, arg_rollCurrent, arg_yawTarget, arg_pitchTarget, arg_rollTarget, arg_eYaw, arg_eIYaw, arg_eDYaw, arg_ePitch, arg_eIPitch, arg_eDPitch, arg_eRoll, arg_eIRoll, arg_eDRoll);
-}
-
-/**
- * my_pidcontroller_service_call_set_pid:
- * @proxy: A #MyPIDControllerServiceProxy.
- * @arg_pid: Argument to pass with the method invocation.
- * @arg_ypr: Argument to pass with the method invocation.
- * @arg_value: Argument to pass with the method invocation.
- * @cancellable: (allow-none): A #GCancellable or %NULL.
- * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
- * @user_data: User data to pass to @callback.
- *
- * Asynchronously invokes the <link linkend="gdbus-method-org-mydrone-MyPIDControllerService.setPID">setPID()</link> D-Bus method on @proxy.
- * When the operation is finished, @callback will be invoked in the <link linkend="g-main-context-push-thread-default">thread-default main loop</link> of the thread you are calling this method from.
- * You can then call my_pidcontroller_service_call_set_pid_finish() to get the result of the operation.
- *
- * See my_pidcontroller_service_call_set_pid_sync() for the synchronous, blocking version of this method.
- */
-void
-my_pidcontroller_service_call_set_pid (
-    MyPIDControllerService *proxy,
-    guchar arg_pid,
-    guchar arg_ypr,
-    gdouble arg_value,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data)
-{
-  g_dbus_proxy_call (G_DBUS_PROXY (proxy),
-    "setPID",
-    g_variant_new ("(yyd)",
-                   arg_pid,
-                   arg_ypr,
-                   arg_value),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    callback,
-    user_data);
-}
-
-/**
- * my_pidcontroller_service_call_set_pid_finish:
- * @proxy: A #MyPIDControllerServiceProxy.
- * @res: The #GAsyncResult obtained from the #GAsyncReadyCallback passed to my_pidcontroller_service_call_set_pid().
- * @error: Return location for error or %NULL.
- *
- * Finishes an operation started with my_pidcontroller_service_call_set_pid().
- *
- * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
- */
-gboolean
-my_pidcontroller_service_call_set_pid_finish (
-    MyPIDControllerService *proxy,
-    GAsyncResult *res,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_finish (G_DBUS_PROXY (proxy), res, error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
-}
-
-/**
- * my_pidcontroller_service_call_set_pid_sync:
- * @proxy: A #MyPIDControllerServiceProxy.
- * @arg_pid: Argument to pass with the method invocation.
- * @arg_ypr: Argument to pass with the method invocation.
- * @arg_value: Argument to pass with the method invocation.
- * @cancellable: (allow-none): A #GCancellable or %NULL.
- * @error: Return location for error or %NULL.
- *
- * Synchronously invokes the <link linkend="gdbus-method-org-mydrone-MyPIDControllerService.setPID">setPID()</link> D-Bus method on @proxy. The calling thread is blocked until a reply is received.
- *
- * See my_pidcontroller_service_call_set_pid() for the asynchronous version of this method.
- *
- * Returns: (skip): %TRUE if the call succeded, %FALSE if @error is set.
- */
-gboolean
-my_pidcontroller_service_call_set_pid_sync (
-    MyPIDControllerService *proxy,
-    guchar arg_pid,
-    guchar arg_ypr,
-    gdouble arg_value,
-    GCancellable *cancellable,
-    GError **error)
-{
-  GVariant *_ret;
-  _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
-    "setPID",
-    g_variant_new ("(yyd)",
-                   arg_pid,
-                   arg_ypr,
-                   arg_value),
-    G_DBUS_CALL_FLAGS_NONE,
-    -1,
-    cancellable,
-    error);
-  if (_ret == NULL)
-    goto _out;
-  g_variant_get (_ret,
-                 "()");
-  g_variant_unref (_ret);
-_out:
-  return _ret != NULL;
-}
-
-/**
- * my_pidcontroller_service_complete_set_pid:
- * @object: A #MyPIDControllerService.
- * @invocation: (transfer full): A #GDBusMethodInvocation.
- *
- * Helper function used in service implementations to finish handling invocations of the <link linkend="gdbus-method-org-mydrone-MyPIDControllerService.setPID">setPID()</link> D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
- *
- * This method will free @invocation, you cannot use it afterwards.
- */
-void
-my_pidcontroller_service_complete_set_pid (
-    MyPIDControllerService *object,
-    GDBusMethodInvocation *invocation)
-{
-  g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("()"));
+  g_signal_emit_by_name (object, "state-changed", arg_imuSample);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1296,22 +871,7 @@ my_pidcontroller_service_skeleton_dbus_interface_flush (GDBusInterfaceSkeleton *
 static void
 _my_pidcontroller_service_on_signal_state_changed (
     MyPIDControllerService *object,
-    guint arg_timestampMillis,
-    gdouble arg_yawCurrent,
-    gdouble arg_pitchCurrent,
-    gdouble arg_rollCurrent,
-    gdouble arg_yawTarget,
-    gdouble arg_pitchTarget,
-    gdouble arg_rollTarget,
-    gdouble arg_eYaw,
-    gdouble arg_eIYaw,
-    gdouble arg_eDYaw,
-    gdouble arg_ePitch,
-    gdouble arg_eIPitch,
-    gdouble arg_eDPitch,
-    gdouble arg_eRoll,
-    gdouble arg_eIRoll,
-    gdouble arg_eDRoll)
+    GVariant *arg_imuSample)
 {
   MyPIDControllerServiceSkeleton *skeleton = MY_PIDCONTROLLER_SERVICE_SKELETON (object);
 
@@ -1319,28 +879,13 @@ _my_pidcontroller_service_on_signal_state_changed (
   GVariant   *signal_variant;
   connections = g_dbus_interface_skeleton_get_connections (G_DBUS_INTERFACE_SKELETON (skeleton));
 
-  signal_variant = g_variant_ref_sink (g_variant_new ("(uddddddddddddddd)",
-                   arg_timestampMillis,
-                   arg_yawCurrent,
-                   arg_pitchCurrent,
-                   arg_rollCurrent,
-                   arg_yawTarget,
-                   arg_pitchTarget,
-                   arg_rollTarget,
-                   arg_eYaw,
-                   arg_eIYaw,
-                   arg_eDYaw,
-                   arg_ePitch,
-                   arg_eIPitch,
-                   arg_eDPitch,
-                   arg_eRoll,
-                   arg_eIRoll,
-                   arg_eDRoll));
+  signal_variant = g_variant_ref_sink (g_variant_new ("(@(u(ddddd)(ddddd)(ddddd)))",
+                   arg_imuSample));
   for (l = connections; l != NULL; l = l->next)
     {
       GDBusConnection *connection = l->data;
       g_dbus_connection_emit_signal (connection,
-        NULL, g_dbus_interface_skeleton_get_object_path (G_DBUS_INTERFACE_SKELETON (skeleton)), "org.mydrone.MyPIDControllerService", "StateChanged",
+        NULL, g_dbus_interface_skeleton_get_object_path (G_DBUS_INTERFACE_SKELETON (skeleton)), "org.mydrone.MyPIDControllerService", "stateChanged",
         signal_variant, NULL);
     }
   g_variant_unref (signal_variant);
