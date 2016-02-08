@@ -1,0 +1,167 @@
+
+#ifndef __MYPIDCONTROLLERSERVICE_GENERATED_H__
+#define __MYPIDCONTROLLERSERVICE_GENERATED_H__
+
+#include <gio/gio.h>
+
+
+G_BEGIN_DECLS
+
+#define TYPE_MY_PIDCONTROLLER_SERVICE (my_pidcontroller_service_get_type ())
+#define MY_PIDCONTROLLER_SERVICE(o) (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_MY_PIDCONTROLLER_SERVICE, MyPIDControllerService))
+#define IS_MY_PIDCONTROLLER_SERVICE(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_MY_PIDCONTROLLER_SERVICE))
+#define MY_PIDCONTROLLER_SERVICE_GET_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), TYPE_MY_PIDCONTROLLER_SERVICE, MyPIDControllerServiceIface))
+
+struct _MyPIDControllerService;
+typedef struct _MyPIDControllerService MyPIDControllerService;
+typedef struct _MyPIDControllerServiceIface MyPIDControllerServiceIface;
+
+struct _MyPIDControllerServiceIface
+{
+  GTypeInterface parent_iface;
+
+  gboolean (*handle_set_pid) (
+    MyPIDControllerService *object,
+    GDBusMethodInvocation *invocation,
+    guchar arg_pid,
+    guchar arg_ypr,
+    gdouble arg_value);
+
+};
+
+GType my_pidcontroller_service_get_type (void) G_GNUC_CONST;
+
+GDBusInterfaceInfo *my_pidcontroller_service_interface_info (void);
+guint my_pidcontroller_service_override_properties (GObjectClass *klass, guint property_id_begin);
+
+
+/* D-Bus method call completion functions: */
+void my_pidcontroller_service_complete_set_pid (
+    MyPIDControllerService *object,
+    GDBusMethodInvocation *invocation);
+
+
+
+/* D-Bus method calls: */
+void my_pidcontroller_service_call_set_pid (
+    MyPIDControllerService *proxy,
+    guchar arg_pid,
+    guchar arg_ypr,
+    gdouble arg_value,
+    GCancellable *cancellable,
+    GAsyncReadyCallback callback,
+    gpointer user_data);
+
+gboolean my_pidcontroller_service_call_set_pid_finish (
+    MyPIDControllerService *proxy,
+    GAsyncResult *res,
+    GError **error);
+
+gboolean my_pidcontroller_service_call_set_pid_sync (
+    MyPIDControllerService *proxy,
+    guchar arg_pid,
+    guchar arg_ypr,
+    gdouble arg_value,
+    GCancellable *cancellable,
+    GError **error);
+
+
+
+/* ---- */
+
+#define TYPE_MY_PIDCONTROLLER_SERVICE_PROXY (my_pidcontroller_service_proxy_get_type ())
+#define MY_PIDCONTROLLER_SERVICE_PROXY(o) (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_MY_PIDCONTROLLER_SERVICE_PROXY, MyPIDControllerServiceProxy))
+#define MY_PIDCONTROLLER_SERVICE_PROXY_CLASS(k) (G_TYPE_CHECK_CLASS_CAST ((k), TYPE_MY_PIDCONTROLLER_SERVICE_PROXY, MyPIDControllerServiceProxyClass))
+#define MY_PIDCONTROLLER_SERVICE_PROXY_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), TYPE_MY_PIDCONTROLLER_SERVICE_PROXY, MyPIDControllerServiceProxyClass))
+#define IS_MY_PIDCONTROLLER_SERVICE_PROXY(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_MY_PIDCONTROLLER_SERVICE_PROXY))
+#define IS_MY_PIDCONTROLLER_SERVICE_PROXY_CLASS(k) (G_TYPE_CHECK_CLASS_TYPE ((k), TYPE_MY_PIDCONTROLLER_SERVICE_PROXY))
+
+typedef struct _MyPIDControllerServiceProxy MyPIDControllerServiceProxy;
+typedef struct _MyPIDControllerServiceProxyClass MyPIDControllerServiceProxyClass;
+typedef struct _MyPIDControllerServiceProxyPrivate MyPIDControllerServiceProxyPrivate;
+
+struct _MyPIDControllerServiceProxy
+{
+  /*< private >*/
+  GDBusProxy parent_instance;
+  MyPIDControllerServiceProxyPrivate *priv;
+};
+
+struct _MyPIDControllerServiceProxyClass
+{
+  GDBusProxyClass parent_class;
+};
+
+GType my_pidcontroller_service_proxy_get_type (void) G_GNUC_CONST;
+
+void my_pidcontroller_service_proxy_new (
+    GDBusConnection     *connection,
+    GDBusProxyFlags      flags,
+    const gchar         *name,
+    const gchar         *object_path,
+    GCancellable        *cancellable,
+    GAsyncReadyCallback  callback,
+    gpointer             user_data);
+MyPIDControllerService *my_pidcontroller_service_proxy_new_finish (
+    GAsyncResult        *res,
+    GError             **error);
+MyPIDControllerService *my_pidcontroller_service_proxy_new_sync (
+    GDBusConnection     *connection,
+    GDBusProxyFlags      flags,
+    const gchar         *name,
+    const gchar         *object_path,
+    GCancellable        *cancellable,
+    GError             **error);
+
+void my_pidcontroller_service_proxy_new_for_bus (
+    GBusType             bus_type,
+    GDBusProxyFlags      flags,
+    const gchar         *name,
+    const gchar         *object_path,
+    GCancellable        *cancellable,
+    GAsyncReadyCallback  callback,
+    gpointer             user_data);
+MyPIDControllerService *my_pidcontroller_service_proxy_new_for_bus_finish (
+    GAsyncResult        *res,
+    GError             **error);
+MyPIDControllerService *my_pidcontroller_service_proxy_new_for_bus_sync (
+    GBusType             bus_type,
+    GDBusProxyFlags      flags,
+    const gchar         *name,
+    const gchar         *object_path,
+    GCancellable        *cancellable,
+    GError             **error);
+
+
+/* ---- */
+
+#define TYPE_MY_PIDCONTROLLER_SERVICE_SKELETON (my_pidcontroller_service_skeleton_get_type ())
+#define MY_PIDCONTROLLER_SERVICE_SKELETON(o) (G_TYPE_CHECK_INSTANCE_CAST ((o), TYPE_MY_PIDCONTROLLER_SERVICE_SKELETON, MyPIDControllerServiceSkeleton))
+#define MY_PIDCONTROLLER_SERVICE_SKELETON_CLASS(k) (G_TYPE_CHECK_CLASS_CAST ((k), TYPE_MY_PIDCONTROLLER_SERVICE_SKELETON, MyPIDControllerServiceSkeletonClass))
+#define MY_PIDCONTROLLER_SERVICE_SKELETON_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), TYPE_MY_PIDCONTROLLER_SERVICE_SKELETON, MyPIDControllerServiceSkeletonClass))
+#define IS_MY_PIDCONTROLLER_SERVICE_SKELETON(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), TYPE_MY_PIDCONTROLLER_SERVICE_SKELETON))
+#define IS_MY_PIDCONTROLLER_SERVICE_SKELETON_CLASS(k) (G_TYPE_CHECK_CLASS_TYPE ((k), TYPE_MY_PIDCONTROLLER_SERVICE_SKELETON))
+
+typedef struct _MyPIDControllerServiceSkeleton MyPIDControllerServiceSkeleton;
+typedef struct _MyPIDControllerServiceSkeletonClass MyPIDControllerServiceSkeletonClass;
+typedef struct _MyPIDControllerServiceSkeletonPrivate MyPIDControllerServiceSkeletonPrivate;
+
+struct _MyPIDControllerServiceSkeleton
+{
+  /*< private >*/
+  GDBusInterfaceSkeleton parent_instance;
+  MyPIDControllerServiceSkeletonPrivate *priv;
+};
+
+struct _MyPIDControllerServiceSkeletonClass
+{
+  GDBusInterfaceSkeletonClass parent_class;
+};
+
+GType my_pidcontroller_service_skeleton_get_type (void) G_GNUC_CONST;
+
+MyPIDControllerService *my_pidcontroller_service_skeleton_new (void);
+
+G_END_DECLS
+
+#endif /* __MYPIDCONTROLLERSERVICE_GENERATED_H__ */
