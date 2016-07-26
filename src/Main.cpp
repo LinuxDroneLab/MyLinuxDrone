@@ -19,6 +19,7 @@
 #include <agents/MyMotorsAgent.h>
 #include <agents/MyDBusEmitterAgent.h>
 #include <agents/MyClock.h>
+#include <agents/MyRCAgent.h>
 #include <bus/MyEventBus.h>
 #include <i2c/I2Cdev.h>
 #include <imu/MPU6050.h>
@@ -40,12 +41,14 @@ int main() {
 
 	MyClock myClock(eventBus, 5);
 	MyIMUAgent imuAgent(eventBus, {MyEvent::EventType::Tick});
-	MyPIDControllerAgent pidControlledAgent(eventBus, {MyEvent::EventType::IMUSample});
+	MyPIDControllerAgent pidControlledAgent(eventBus, {MyEvent::EventType::IMUSample, MyEvent::EventType::RCSample});
 	MyMotorsAgent motorsAgent(eventBus, {MyEvent::EventType::ArmMotorsCmd, MyEvent::EventType::DisarmMotorsCmd, MyEvent::EventType::OutMotors});
+    MyRCAgent rcAgent(eventBus, {MyEvent::EventType::Tick});
+
 	MyDBusEmitterAgent dbusAgent(eventBus, {MyEvent::EventType::YPRError});
 
-
 	boost::thread imuAgentThr(boost::ref(imuAgent));
+	boost::thread rcAgentThr(boost::ref(rcAgent));
 	boost::thread pidControllerAgentThr(boost::ref(pidControlledAgent));
 	boost::thread motorsAgentThr(boost::ref(motorsAgent));
 	boost::thread myDBusThread(boost::ref(dbusAgent));
@@ -60,6 +63,7 @@ int main() {
 
 	// wait for exit;
 	imuAgentThr.join();
+	rcAgentThr.join();
 	pidControllerAgentThr.join();
 	motorsAgentThr.join();
 	myDBusThread.join();

@@ -13,16 +13,16 @@
 
 class MyYPRError: public MyEvent {
 public:
-	MyYPRError(boost::uuids::uuid origin, float yawCurr,float pitchCurr,float rollCurr, float yawTrg,float pitchTrg,float rollTrg,float eRoll, float eIRoll, float eDRoll, float ePitch, float eIPitch, float eDPitch, float eYaw, float eIYaw, float eDYaw);
+	MyYPRError(boost::uuids::uuid origin, int16_t yawCurr,int16_t pitchCurr,int16_t rollCurr, int16_t yawTrg,int16_t pitchTrg,int16_t rollTrg,float eRoll, float eIRoll, float eDRoll, float ePitch, float eIPitch, float eDPitch, float eYaw, float eIYaw, float eDYaw);
 	virtual ~MyYPRError();
 	virtual MyEvent::EventType getType() const;
 
-	float getYawCurr() const;
-	float getPitchCurr() const;
-	float getRollCurr() const;
-	float getYawTrg() const;
-	float getPitchTrg() const;
-	float getRollTrg() const;
+	int16_t getYawCurr() const;
+	int16_t getPitchCurr() const;
+	int16_t getRollCurr() const;
+	int16_t getYawTrg() const;
+	int16_t getPitchTrg() const;
+	int16_t getRollTrg() const;
 	float getERoll() const;
 	float getEIRoll() const;
 	float getEDRoll() const;
@@ -33,13 +33,13 @@ public:
 	float getEIYaw() const;
 	float getEDYaw() const;
 private:
-	const float yawCurr;
-	const float pitchCurr;
-	const float rollCurr;
+	const int16_t yawCurr;
+	const int16_t pitchCurr;
+	const int16_t rollCurr;
 
-	const float yawTrg;
-	const float pitchTrg;
-	const float rollTrg;
+	const int16_t yawTrg;
+	const int16_t pitchTrg;
+	const int16_t rollTrg;
 
 	const float eRoll;
 	const float eIRoll;

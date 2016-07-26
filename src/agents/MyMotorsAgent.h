@@ -31,6 +31,8 @@ private:
 
 	MotorDriver front;
 	MotorDriver rear;
+	MotorDriver left;
+	MotorDriver right;
 };
 
 #endif /* AGENTS_MYMOTORSAGENT_H_ */
