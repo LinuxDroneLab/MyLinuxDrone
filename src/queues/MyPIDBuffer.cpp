@@ -42,7 +42,11 @@ float MyPIDBuffer::getMean() {
 float MyPIDBuffer::getIntegral() {
 	value_type result = 0.0f;
 	for(value_type val : this->m_meanBuff) {
-		result += val;
+		// per integrale considero solo errori grandi
+		// gli errori minori verranno corretti direttamente
+		if(val > 10.0f || val < -10.0f) {
+			result += val;
+		}
 	}
 	return result*this->m_period;
 }

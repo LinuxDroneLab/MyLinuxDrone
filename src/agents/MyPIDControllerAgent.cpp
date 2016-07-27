@@ -39,15 +39,15 @@ using namespace std;
 
 MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
-		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0), pitchCurr(0), rollCurr(0), yawErr(0.01f, 20, 10, 4), pitchErr(
-				0.01f, 10, 10, 4), rollErr(0.01f, 10, 10, 4) {
-	keRoll = 1.2f;
-	keIRoll = 0.5f;
-	keDRoll = 0.3f;
+		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0), pitchCurr(0), rollCurr(0), yawErr(1.0f, 20, 10, 4), pitchErr(
+				1.0f, 10, 1000, 10), rollErr(1.0f, 10, 1000, 10) {
+	keRoll = 0.0f;
+	keIRoll = 0.000f;
+	keDRoll = 0.000f;
 
-	kePitch = 1.2f;
-	keIPitch = 0.5f;
-	keDPitch = 0.3f;
+	kePitch = 1.7f;
+	keIPitch = 0.0060f;
+	keDPitch = 20.95f;
 
 	keYaw = 0.0f;
 	keIYaw = 0.00f;
@@ -70,20 +70,24 @@ void MyPIDControllerAgent::calcErr(boost::math::quaternion<float> q) {
 
 	yawCurr = std::rint((atan2(2.0f * (real * z + x * y), 1.0f - 2.0f * (y * y + z * z))
 			* 57.295779513f));
-	pitchCurr = std::rint((asin(2.0 * real * y - 2.0 * z * x) * 57.295779513));
-	rollCurr = std::rint((atan2(2.0 * (real * x + y * z), 1.0 - 2.0 * (x * x + y * y))
-			* 57.295779513));
+	pitchCurr = std::rint((asin(2.0f * real * y - 2.0 * z * x) * 57.295779513f));
+	rollCurr = std::rint((atan2(2.0f * (real * x + y * z), 1.0f - 2.0f * (x * x + y * y))
+			* 57.295779513f));
+
+//	yawCurr = uint16_t(std::rint(0.8f*float(yawCurr) + 0.2f*float(_yawCurr)));
+//	pitchCurr = uint16_t(std::rint(0.8f*float(pitchCurr) + 0.2f*float(_pitchCurr)));
+//	rollCurr = uint16_t(std::rint(0.8f*float(rollCurr) + 0.2f*float(_rollCurr)));
 
 	yawErr.push(yawCurr - MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue());
 	pitchErr.push(pitchCurr - MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue());
 	rollErr.push(rollCurr - MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue());
 }
 void MyPIDControllerAgent::calcCorrection() {
-	float eRoll = rollErr.getMean();
+	float eRoll = std::min(10.0f, std::max(-10.0f, rollErr.getMean()));
 	float eIRoll = rollErr.getIntegral();
 	float eDRoll = rollErr.getDerivate();
 
-	float ePitch = pitchErr.getMean();
+	float ePitch = std::min(10.0f, std::max(-10.0f, pitchErr.getMean()));
 	float eIPitch = pitchErr.getIntegral();
 	float eDPitch = pitchErr.getDerivate();
 
@@ -148,6 +152,8 @@ void MyPIDControllerAgent::calcCorrection() {
 	left = std::max(1000000, left - diff);
 	right = std::max(1000000, right - diff);
 
+//	printf("%6.3f, %6.3f, %d, %6.3f, %d \n", keIPitch, keDPitch, front, corrPitch, pitchCurr);
+
 	{ // out error event
 		boost::shared_ptr<MyYPRError> evOut(boost::make_shared<MyYPRError>(this->getUuid(), yawCurr, pitchCurr, rollCurr, MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue(), MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue(), MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue(), eRoll, eIRoll, eDRoll,
 				ePitch, eIPitch, eDPitch,
@@ -175,8 +181,8 @@ void MyPIDControllerAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 		} else if(event->getType() == MyEvent::EventType::RCSample) {
 			boost::shared_ptr<MyRCSample> rcSample =
 					boost::static_pointer_cast<MyRCSample>(event);
-			keIRoll = keIPitch = (1.0f + (*rcSample).getAux1Percent())/2.0f;
-			keDRoll = keDPitch = (1.0f + (*rcSample).getAux2Percent())/2.0f;
+//			keIRoll = keIPitch = (1.0f + (*rcSample).getAux1Percent());
+//			keDRoll = keDPitch = (1.0f + (*rcSample).getAux2Percent());
 
 			MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].setPercentValue((*rcSample).getRollPercent());
 			MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].setPercentValue((*rcSample).getPitchPercent());
