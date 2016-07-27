@@ -45,9 +45,9 @@ MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 	keIRoll = 0.000f;
 	keDRoll = 0.000f;
 
-	kePitch = 1.7f;
+	kePitch = 1.6f;
 	keIPitch = 0.0060f;
-	keDPitch = 20.95f;
+	keDPitch = 22.00f;
 
 	keYaw = 0.0f;
 	keIYaw = 0.00f;
