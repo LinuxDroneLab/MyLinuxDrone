@@ -15,6 +15,9 @@ test-output
 *.mdr
 bin
 consegne
-ARM
-Debug
-
+ARM/**/*.d
+Debug/**/*.d
+ARM/**/*.o
+Debug/**/*.o
+ARM/MyDrone
+Debug/MyDrone
