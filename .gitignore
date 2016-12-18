@@ -21,3 +21,4 @@ ARM/**/*.o
 Debug/**/*.o
 ARM/MyDrone
 Debug/MyDrone
+*.tmp
