@@ -7,9 +7,9 @@
 
 #include <queues/MyPIDBuffer.h>
 
-MyPIDBuffer::MyPIDBuffer() : m_period(0.01f), m_misureBuff(20), m_meanBuff(10), m_derivateBuff(4) {
+MyPIDBuffer::MyPIDBuffer() : m_period(0.01f), m_misureBuff(20), m_meanBuff(10), m_derivateBuff(4), m_integral(0.0f) {
 }
-MyPIDBuffer::MyPIDBuffer(float period, size_type meanDim, size_type integralDim, size_type derivateDim) : m_period(period), m_misureBuff(meanDim), m_meanBuff(integralDim), m_derivateBuff(derivateDim) {
+MyPIDBuffer::MyPIDBuffer(float period, size_type meanDim, size_type integralDim, size_type derivateDim) : m_period(period), m_misureBuff(meanDim), m_meanBuff(integralDim), m_derivateBuff(derivateDim), m_integral(0.0f) {
 }
 
 MyPIDBuffer::~MyPIDBuffer() {
@@ -22,7 +22,7 @@ void MyPIDBuffer::push(param_type item) {
 	value_type meanCurr = this->getMean();
 
 	this->m_meanBuff.push_front(meanCurr);
-
+	m_integral+= meanCurr*this->m_period;
 	this->m_derivateBuff.push_front(meanCurr - meanPrev);
 }
 
@@ -40,15 +40,16 @@ float MyPIDBuffer::getMean() {
 }
 
 float MyPIDBuffer::getIntegral() {
-	value_type result = 0.0f;
-	for(value_type val : this->m_meanBuff) {
+//	value_type result = 0.0f;
+//	for(value_type val : this->m_meanBuff) {
 		// per integrale considero solo errori grandi
 		// gli errori minori verranno corretti direttamente
-		if(val > 10.0f || val < -10.0f) {
-			result += val;
-		}
-	}
-	return result*this->m_period;
+		//if(val > 5.0f || val < -5.0f) {
+//			result += val;
+		//}
+//	}
+//	return result*this->m_period;
+	return m_integral;
 }
 
 float MyPIDBuffer::getDerivate() {

@@ -30,6 +30,7 @@ private:
 	container_type m_misureBuff;
 	container_type m_meanBuff;
 	container_type m_derivateBuff;
+	float m_integral;
 };
 
 #endif /* QUEUES_MYPIDBUFFER_H_ */
