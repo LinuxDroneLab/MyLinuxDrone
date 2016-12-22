@@ -41,13 +41,13 @@ MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
 		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0), pitchCurr(0), rollCurr(0), yawErr(1.0f, 20, 10, 3), pitchErr(
 				1.0f, 4, 10, 3), rollErr(1.0f, 4, 10, 3) {
-	keRoll = 0.0f;
-	keIRoll = 0.000f;
-	keDRoll = 0.000f;
+	keRoll = 1.587f;
+	keIRoll = 0.0186f;
+	keDRoll = 52.00f;
 
-	kePitch = 1.321f; // old 1.6f
+	kePitch = 1.587f; // old 1.321f
 	keIPitch = 0.0186f; // old 0.0060f
-	keDPitch = 30.00f; // old 22.00f
+	keDPitch = 52.00f; // old 30.00f
 
 	keYaw = 0.0f;
 	keIYaw = 0.00f;
@@ -97,8 +97,8 @@ void MyPIDControllerAgent::calcCorrection() {
 	float eIYaw = yawErr.getIntegral();
 	float eDYaw = yawErr.getDerivate();
 
-	float corrRoll = keRoll * eRoll + keIRoll*eIRoll + keDRoll * eDRoll;
-	float corrPitch = kePitch * ePitch + min(40.0f, max(-40.0f, keIPitch*eIPitch)) + keDPitch * eDPitch;
+	float corrRoll = keRoll * eRoll + min(60.0f, max(-60.0f, keIRoll*eIRoll)) + keDRoll * eDRoll;
+	float corrPitch = kePitch * ePitch + min(60.0f, max(-60.0f, keIPitch*eIPitch)) + keDPitch * eDPitch;
 	float corrYaw = keYaw * eYaw + keIYaw*eIYaw + keDYaw * eDYaw;
 
 	int32_t front = std::rint((float(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) + corrPitch - corrYaw)*1000.0f);
@@ -157,9 +157,9 @@ void MyPIDControllerAgent::calcCorrection() {
 //	printf("%6.3f, %6.3f, %d, %6.3f, %d \n", keIPitch, keDPitch, front, corrPitch, pitchCurr);
 
 	{ // out error event
-		boost::shared_ptr<MyYPRError> evOut(boost::make_shared<MyYPRError>(this->getUuid(), yawCurr, pitchCurr, rollCurr, MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue(), MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue(), MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue(), eRoll, eIRoll, eDRoll,
+		boost::shared_ptr<MyYPRError> evOut(boost::make_shared<MyYPRError>(this->getUuid(), yawCurr, pitchCurr, rollCurr, MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue(), MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue(), MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue(), keRoll*eRoll, keIRoll*eIRoll, keDRoll*eDRoll,
 				kePitch*ePitch, keIPitch*eIPitch, keDPitch*eDPitch,
-				eYaw, eIYaw, eDYaw));
+				keYaw*eYaw, keIYaw*eIYaw, keDYaw*eDYaw));
 		m_signal(evOut);
 	}
 	{// out state motors
