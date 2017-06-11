@@ -37,13 +37,6 @@ ValueInt16 MyRCReader::PRU_VALUES[] = { ValueInt16(0,
 		MyRCReader::PRU_RANGES[CHAN_YAW]), ValueInt16(0,
 		MyRCReader::PRU_RANGES[CHAN_AUX1]), ValueInt16(0,
 		MyRCReader::PRU_RANGES[CHAN_AUX2]) };
-ValueInt16 MyRCReader::PRU_VALUES_PREV[] = { ValueInt16(0,
-		MyRCReader::PRU_RANGES[CHAN_ROLL]), ValueInt16(0,
-		MyRCReader::PRU_RANGES[CHAN_THRUST]), ValueInt16(0,
-		MyRCReader::PRU_RANGES[CHAN_PITCH]), ValueInt16(0,
-		MyRCReader::PRU_RANGES[CHAN_YAW]), ValueInt16(0,
-		MyRCReader::PRU_RANGES[CHAN_AUX1]), ValueInt16(0,
-		MyRCReader::PRU_RANGES[CHAN_AUX2]) };
 ValueInt16 MyRCReader::CHAN_VALUES[] = { ValueInt16(0,
 		MyRCReader::CHAN_RANGES[CHAN_ROLL]), ValueInt16(0,
 		MyRCReader::CHAN_RANGES[CHAN_THRUST]), ValueInt16(0,

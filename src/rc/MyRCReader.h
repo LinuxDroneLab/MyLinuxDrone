@@ -33,7 +33,6 @@ private:
     static RangeInt16 PRU_RANGES[];
     static RangeInt16 CHAN_RANGES[];
     static ValueInt16 PRU_VALUES[];
-    static ValueInt16 PRU_VALUES_PREV[];
     static ValueInt16 CHAN_VALUES[];
     static ValueTableType valueTable[];
 
