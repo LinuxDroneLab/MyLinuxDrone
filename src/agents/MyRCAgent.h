@@ -11,6 +11,7 @@
 #include <agents/MyAgent.h>
 #include <rc/MyRCReader.h>
 #include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 class MyRCAgent: public MyAgent {
 public:
@@ -26,6 +27,7 @@ private:
 	MyRCReader rcReader;
 	boost::thread* readerThread;
 
+    boost::mutex m_mutex;
 	float thrust;
 	float roll;
 	float pitch;

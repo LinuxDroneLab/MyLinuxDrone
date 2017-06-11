@@ -18,8 +18,10 @@ MyMotorsAgent::MyMotorsAgent(boost::shared_ptr<MyEventBus> bus,
 		MyAgent(bus, acceptedEventTypes), initialized(false), armed(false),
 		front("/sys/devices/platform/ocp/ocp:P9_22_pinmux", "/sys/class/pwm/pwmchip0", 0),
 		rear("/sys/devices/platform/ocp/ocp:P9_21_pinmux", "/sys/class/pwm/pwmchip0", 1),
-        left("/sys/devices/platform/ocp/ocp:P9_14_pinmux", "/sys/class/pwm/pwmchip2", 0),
-        right("/sys/devices/platform/ocp/ocp:P9_16_pinmux", "/sys/class/pwm/pwmchip2", 1)
+//		left("/sys/devices/platform/ocp/ocp:P9_14_pinmux", "/sys/class/pwm/pwmchip2", 0),
+//		right("/sys/devices/platform/ocp/ocp:P9_16_pinmux", "/sys/class/pwm/pwmchip2", 1)
+		left("/sys/devices/platform/ocp/ocp:P8_19_pinmux", "/sys/class/pwm/pwmchip4", 0),
+		right("/sys/devices/platform/ocp/ocp:P8_13_pinmux", "/sys/class/pwm/pwmchip4", 1)
 {
 }
 
@@ -64,7 +66,7 @@ void MyMotorsAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 }
 
 void MyMotorsAgent::writeMotors(boost::shared_ptr<MyOutMotors> event) {
-//	cout << "Armed: MF: " << event->getFront() << ", MR: " << event->getRear() << ", ML: " << event->getLeft() << ", MR: " << event->getRight() << endl;
+	// cout << "Armed: MF: " << event->getFront() << ", MR: " << event->getRear() << ", ML: " << event->getLeft() << ", MR: " << event->getRight() << endl;
 	front.setDutyCycleNanos(event->getFront());
 	rear.setDutyCycleNanos(event->getRear());
 	left.setDutyCycleNanos(event->getLeft());

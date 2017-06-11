@@ -40,12 +40,14 @@ void MyRCAgent::initialize() {
 }
 
 void MyRCAgent::setRCSample(float thrust, float roll, float pitch, float yaw, float aux1, float aux2) {
+//	boost::lock_guard<boost::mutex> lock(m_mutex);
 	this->thrust=thrust;
 	this->roll=roll;
 	this->pitch=pitch;
 	this->yaw=yaw;
 	this->aux1=aux1;
 	this->aux2=aux2;
+
 }
 
 void MyRCAgent::processEvent(boost::shared_ptr<MyEvent> event) {
@@ -54,8 +56,11 @@ void MyRCAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 	}
 	if(this->getState() == MyAgentState::Active) {
 		if(event->getType() == MyEvent::EventType::Tick) {
+//			boost::lock_guard<boost::mutex> lock(m_mutex);
 			boost::shared_ptr<MyEvent> evOut(boost::make_shared<MyRCSample>(this->getUuid(), thrust, roll, pitch, yaw, aux1, aux2));
 			m_signal(evOut);
+	//		cout << "RcSample: " << thrust << ", r: " << roll << ", p: " << pitch << ", y: " << yaw << ", a1: "  << aux1 << ", a2: " << aux2 << endl;
+
 			// TODO:
 			//  1) check if m_signal is threadsafe ...
 			//  2) interpret signals from RC as commands (ARM/DISARM etc ...) and emit correspondent events

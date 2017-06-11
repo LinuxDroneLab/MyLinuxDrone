@@ -154,7 +154,7 @@ void MyPIDControllerAgent::calcCorrection() {
 	left = std::max(1000000, left - diff);
 	right = std::max(1000000, right - diff);
 
-//	printf("%6.3f, %6.3f, %d, %6.3f, %d \n", keIPitch, keDPitch, front, corrPitch, pitchCurr);
+	// printf("%6.3f, %6.3f, %6.3f, %d, %6.3f, %d, %d \n", ePitch, eIPitch, eDPitch, front, corrPitch, pitchCurr, MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue());
 
 	{ // out error event
 		boost::shared_ptr<MyYPRError> evOut(boost::make_shared<MyYPRError>(this->getUuid(), yawCurr, pitchCurr, rollCurr, MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue(), MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue(), MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue(), keRoll*eRoll, keIRoll*eIRoll, keDRoll*eDRoll,
@@ -189,7 +189,7 @@ void MyPIDControllerAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 			MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].setPercentValue((*rcSample).getPitchPercent());
 			MyPIDControllerAgent::TARGET_VALUES[YAW_POS].setPercentValue((*rcSample).getYawPercent());
 			MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].setPercentValue((*rcSample).getThrustPercent());
-
+//			cout << "PitchSample: " << (*rcSample).getPitchPercent() << endl;
 		}
 	}
 }
