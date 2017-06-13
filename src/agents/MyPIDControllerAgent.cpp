@@ -39,7 +39,7 @@ using namespace std;
 
 MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
-		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0), pitchCurr(0), rollCurr(0), yawErr(1.0f, 20, 10, 3), pitchErr(
+		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0), pitchCurr(0), rollCurr(0), yawErr(1.0f, 4, 10, 3), pitchErr(
 				1.0f, 4, 10, 3), rollErr(1.0f, 4, 10, 3) {
 	keRoll = 1.587f;
 	keIRoll = 0.0186f;
@@ -49,9 +49,9 @@ MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 	keIPitch = 0.0186f; // old 0.0060f
 	keDPitch = 52.00f; // old 30.00f
 
-	keYaw = 0.0f;
-	keIYaw = 0.00f;
-	keDYaw = 0.000f;
+	keYaw = 1.687f;
+	keIYaw = 0.156f;
+	keDYaw = 65.000f;
 
 }
 
@@ -78,7 +78,7 @@ void MyPIDControllerAgent::calcErr(boost::math::quaternion<float> q) {
 //	pitchCurr = uint16_t(std::rint(0.8f*float(pitchCurr) + 0.2f*float(_pitchCurr)));
 //	rollCurr = uint16_t(std::rint(0.8f*float(rollCurr) + 0.2f*float(_rollCurr)));
 
-	yawErr.push(std::min(30.0f, std::max(-30.0f, float(yawCurr - MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue()))));
+	yawErr.push(std::min(60.0f, std::max(-60.0f, float(yawCurr - MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue()))));
 	pitchErr.push(std::min(30.0f, std::max(-30.0f, float(pitchCurr - MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue()))));
 	rollErr.push(std::min(30.0f, std::max(-30.0f, float(rollCurr - MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue()))));
 }
@@ -99,7 +99,7 @@ void MyPIDControllerAgent::calcCorrection() {
 
 	float corrRoll = keRoll * eRoll + min(60.0f, max(-60.0f, keIRoll*eIRoll)) + keDRoll * eDRoll;
 	float corrPitch = kePitch * ePitch + min(60.0f, max(-60.0f, keIPitch*eIPitch)) + keDPitch * eDPitch;
-	float corrYaw = keYaw * eYaw + keIYaw*eIYaw + keDYaw * eDYaw;
+	float corrYaw = keYaw * eYaw + min(20.0f, max(-20.0f, keIYaw*eIYaw)) + keDYaw * eDYaw;
 
 	int32_t front = std::rint((float(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) + corrPitch - corrYaw)*1000.0f);
 	int32_t rear = std::rint((float(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) - corrPitch - corrYaw)*1000.0f);
