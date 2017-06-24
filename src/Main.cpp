@@ -25,16 +25,62 @@
 #include <imu/MPU6050.h>
 #include <dbus/MyPIDControllerServiceWrap.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <syslog.h>
+#include <string.h>
+#include <cfenv>
 using namespace std;
+
+#define DAEMON_NAME "mydrone"
 
 typedef boost::signals2::signal<void(boost::shared_ptr<MyEvent>)> SignalType;
 boost::uuids::uuid uuid;
 
 int main() {
+#pragma STDC FENV_ACCESS ON
+    std::fesetround(FE_TONEAREST);
+    openlog(DAEMON_NAME, LOG_CONS | LOG_NDELAY | LOG_PERROR | LOG_PID, LOG_USER);
+
+    syslog(LOG_INFO, "Entering Daemon");
+
+    pid_t pid, sid;
+
+   //Fork the Parent Process
+    pid = fork();
+
+    if (pid < 0) { exit(EXIT_FAILURE); }
+
+    //We got a good pid, Close the Parent Process
+    if (pid > 0) { exit(EXIT_SUCCESS); }
+
+    //Change File Mask
+    umask(0);
+
+    //Create a new Signature Id for our child
+    sid = setsid();
+    if (sid < 0) { exit(EXIT_FAILURE); }
+
+    //Change Directory
+    //If we cant find the directory we exit with failure.
+    // if ((chdir("/")) < 0) { exit(EXIT_FAILURE); }
+
+    //Close Standard File Descriptors
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    syslog(LOG_INFO, "mydrone Daemon started");
+
 	boost::uuids::uuid uuidMain;
 	uuid = uuidMain;
-	cout << "Start Agent Application" << endl;
-	cout << "long: " << sizeof(long long) << ", int: " << sizeof(int) << ", short: " << sizeof(short) << endl;
+//	cout << "Start Agent Application" << endl;
+//	cout << "long: " << sizeof(long long) << ", int: " << sizeof(int) << ", short: " << sizeof(short) << endl;
 	// create eventBus
 	boost::shared_ptr<MyEventBus> eventBus(boost::make_shared<MyEventBus>());
 
@@ -59,7 +105,7 @@ int main() {
 	eventBus->doEvent(armMotors);
 
 	MyPIDControllerServiceWrap::initialize();
-	cout << "Initialized: org.mydrone.MyPIDControllerService" << endl;
+//	cout << "Initialized: org.mydrone.MyPIDControllerService" << endl;
 
 	// wait for exit;
 	imuAgentThr.join();
@@ -68,5 +114,9 @@ int main() {
 	motorsAgentThr.join();
 	myDBusThread.join();
 	myClockThread.join();
+
+    syslog(LOG_INFO, "mydrone Daemon bye bye");
+
+	closelog();
 	return 0;
 }

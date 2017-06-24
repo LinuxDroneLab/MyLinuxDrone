@@ -41,17 +41,17 @@ MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
 		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0), pitchCurr(0), rollCurr(0), yawErr(1.0f, 4, 10, 3), pitchErr(
 				1.0f, 4, 10, 3), rollErr(1.0f, 4, 10, 3) {
-	keRoll = 1.587f;
-	keIRoll = 0.0186f;
-	keDRoll = 52.00f;
+	keRoll = 5.0f;      // local tests: 1.587f
+	keIRoll = 0.0128f; //= 1.5186f;    // local tests: 0.0186f
+	keDRoll = 125.0f; //= 62.00f;     // local tests: 52.00f
 
-	kePitch = 1.587f; // old 1.321f
-	keIPitch = 0.0186f; // old 0.0060f
-	keDPitch = 52.00f; // old 30.00f
+	kePitch = 5.0f;     // local tests: 1.587f
+	keIPitch = 0.0128f; //= 1.5186f;   // local tests: 0.0186f
+	keDPitch = 125.0f; //= 62.00f;    // local tests: 52.00f
 
-	keYaw = 1.687f;
-	keIYaw = 0.156f;
-	keDYaw = 65.000f;
+	keYaw = 0.687f;       // local tests:  1.687f
+	keIYaw = 0.0f; //= 0.056f;      // local tests:  0.156f
+	keDYaw = 0.0f; //= 10.000f;     // local tests:  65.00f
 
 }
 
@@ -78,9 +78,10 @@ void MyPIDControllerAgent::calcErr(boost::math::quaternion<float> q) {
 //	pitchCurr = uint16_t(std::rint(0.8f*float(pitchCurr) + 0.2f*float(_pitchCurr)));
 //	rollCurr = uint16_t(std::rint(0.8f*float(rollCurr) + 0.2f*float(_rollCurr)));
 
-	yawErr.push(std::min(60.0f, std::max(-60.0f, float(yawCurr - MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue()))));
-	pitchErr.push(std::min(30.0f, std::max(-30.0f, float(pitchCurr - MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue()))));
-	rollErr.push(std::min(30.0f, std::max(-30.0f, float(rollCurr - MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue()))));
+	// considero errore limitato a 50 deg. more less for yaw
+	yawErr.push(std::min(10.0f, std::max(-10.0f, float(yawCurr - MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue()))));
+	pitchErr.push(std::min(60.0f, std::max(-60.0f, float(pitchCurr - MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue()))));
+	rollErr.push(std::min(60.0f, std::max(-60.0f, float(rollCurr - MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue()))));
 }
 void MyPIDControllerAgent::calcCorrection() {
 //	float eRoll = std::min(10.0f, std::max(-10.0f, rollErr.getMean()));
@@ -97,62 +98,67 @@ void MyPIDControllerAgent::calcCorrection() {
 	float eIYaw = yawErr.getIntegral();
 	float eDYaw = yawErr.getDerivate();
 
-	float corrRoll = keRoll * eRoll + min(60.0f, max(-60.0f, keIRoll*eIRoll)) + keDRoll * eDRoll;
-	float corrPitch = kePitch * ePitch + min(60.0f, max(-60.0f, keIPitch*eIPitch)) + keDPitch * eDPitch;
-	float corrYaw = keYaw * eYaw + min(20.0f, max(-20.0f, keIYaw*eIYaw)) + keDYaw * eDYaw;
+	// integrale limitato
+//	float corrRoll = keRoll * eRoll + min(50.0f, max(-50.0f, keIRoll*eIRoll)) + keDRoll * eDRoll;
+//	float corrPitch = kePitch * ePitch + min(50.0f, max(-50.0f, keIPitch*eIPitch)) + keDPitch * eDPitch;
+//	float corrYaw = keYaw * eYaw + min(10.0f, max(-10.0f, keIYaw*eIYaw)) + keDYaw * eDYaw;
 
-	int32_t front = std::rint((float(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) + corrPitch - corrYaw)*1000.0f);
-	int32_t rear = std::rint((float(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) - corrPitch - corrYaw)*1000.0f);
-	int32_t left = std::rint((float(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) - corrRoll + corrYaw)*1000.0f);
-	int32_t right = std::rint((float(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) + corrRoll + corrYaw)*1000.0f);
+	float corrRoll = keRoll * eRoll + keIRoll*eIRoll + keDRoll * eDRoll;
+	float corrPitch = kePitch * ePitch + keIPitch*eIPitch + keDPitch * eDPitch;
+	float corrYaw = keYaw * eYaw + min(10.0f, max(-10.0f, keIYaw*eIYaw)) + keDYaw * eDYaw;
+
+	int32_t front = std::lrint(std::max(double(1000000), std::min(double(2000000), double(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) + corrPitch - corrYaw)*1000.0));
+	int32_t rear = std::lrint(std::max(double(1000000), std::min(double(2000000), double(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) - corrPitch - corrYaw)*1000.0));
+	int32_t left = std::lrint(std::max(double(1000000), std::min(double(2000000), double(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) - corrRoll + corrYaw)*1000.0));
+	int32_t right = std::lrint(std::max(double(1000000), std::min(double(2000000), double(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) + corrRoll + corrYaw)*1000.0));
 
 //	printf("corrRoll:%5.5f, corrPitch:%5.5f, corrYaw:%5.5f, keIR/P=%2.2f, keDR/P=%2.2f, eRoll=%2.2f, ePitch=%2.2f, eIRoll=%2.2f, eIPitch=%2.2f, eDRoll=%2.2f, eDPitch=%2.2f \n",
 //			corrRoll, corrPitch, corrYaw, keIRoll, keDRoll, eRoll, ePitch, eIRoll, eIPitch, eDRoll, eDPitch);
 
 	// level motors on [1000000, 2000000]
-	int32_t minMotors = 9999999;
-	if(front < minMotors) {
-		minMotors = front;
-	}
-	if(rear < minMotors) {
-		minMotors = rear;
-	}
-	if(left < minMotors) {
-		minMotors = left;
-	}
-	if(right < minMotors) {
-		minMotors = right;
-	}
-	int32_t diff = 0;
-	if(minMotors < 1000000) {
-		diff = 1000000 - minMotors;
-	}
-	front = std::min(2000000, front + diff);
-	rear = std::min(2000000, rear + diff);
-	left = std::min(2000000, left + diff);
-	right = std::min(2000000, right + diff);
-
-	int32_t maxMotors = 0;
-	if(front > maxMotors) {
-		maxMotors = front;
-	}
-	if(rear > maxMotors) {
-		maxMotors = rear;
-	}
-	if(left > maxMotors) {
-		maxMotors = left;
-	}
-	if(right > maxMotors) {
-		maxMotors = right;
-	}
-	diff = 0;
-	if(maxMotors > 2000000) {
-		diff = maxMotors - 2000000;
-	}
-	front = std::max(1000000, front - diff);
-	rear = std::max(1000000, rear - diff);
-	left = std::max(1000000, left - diff);
-	right = std::max(1000000, right - diff);
+//	int32_t minMotors = 9999999;
+//	if(front < minMotors) {
+//		minMotors = front;
+//	}
+//	if(rear < minMotors) {
+//		minMotors = rear;
+//	}
+//	if(left < minMotors) {
+//		minMotors = left;
+//	}
+//	if(right < minMotors) {
+//		minMotors = right;
+//	}
+//	int32_t diff = 0;
+//	if(minMotors < 1000000) {
+//		diff = 1000000 - minMotors;
+//	}
+//	front = std::min(2000000, front + diff);
+//	rear = std::min(2000000, rear + diff);
+//	left = std::min(2000000, left + diff);
+//	right = std::min(2000000, right + diff);
+//
+//	int32_t maxMotors = 0;
+//	if(front > maxMotors) {
+//		maxMotors = front;
+//	}
+//	if(rear > maxMotors) {
+//		maxMotors = rear;
+//	}
+//	if(left > maxMotors) {
+//		maxMotors = left;
+//	}
+//	if(right > maxMotors) {
+//		maxMotors = right;
+//	}
+//	diff = 0;
+//	if(maxMotors > 2000000) {
+//		diff = maxMotors - 2000000;
+//	}
+//	front = std::max(1000000, front - diff);
+//	rear = std::max(1000000, rear - diff);
+//	left = std::max(1000000, left - diff);
+//	right = std::max(1000000, right - diff);
 
 	// printf("%6.3f, %6.3f, %6.3f, %d, %6.3f, %d, %d \n", ePitch, eIPitch, eDPitch, front, corrPitch, pitchCurr, MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue());
 
