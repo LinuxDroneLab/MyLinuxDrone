@@ -12,6 +12,7 @@
 #include <events/MyOutMotors.h>
 #include <events/MyMotorsDisarmed.h>
 #include <events/MyMotorsArmed.h>
+#include <syslog.h>
 
 MyMotorsAgent::MyMotorsAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
@@ -46,7 +47,7 @@ void MyMotorsAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 			if (event->getType() == MyEvent::EventType::OutMotors) {
 				boost::shared_ptr<MyOutMotors> outMotors =
 						boost::static_pointer_cast<MyOutMotors>(event);
-
+//				syslog(LOG_INFO, "mydrone: motors: f=%d, rr=%d, l=%d, r=%d", outMotors->getFront(), outMotors->getRear(), outMotors->getLeft(), outMotors->getRight());
 //				printf("Front:%d, Rear=%d, Left=%d, Right=%d \n", outMotors->getFront(), outMotors->getRear(), outMotors->getLeft(), outMotors->getRight());
 				this->writeMotors(outMotors);
 			} else if (event->getType()

@@ -17,6 +17,7 @@
 #include <events/MyYPRError.h>
 #include <events/MyRCSample.h>
 #include <iostream>
+#include <syslog.h>
 
 #define ROLL_POS 0
 #define PITCH_POS 1
@@ -41,15 +42,15 @@ MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
 		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0), pitchCurr(0), rollCurr(0), yawErr(1.0f, 4, 10, 3), pitchErr(
 				1.0f, 4, 10, 3), rollErr(1.0f, 4, 10, 3) {
-	keRoll = 5.0f;      // local tests: 1.587f
-	keIRoll = 0.0128f; //= 1.5186f;    // local tests: 0.0186f
-	keDRoll = 125.0f; //= 62.00f;     // local tests: 52.00f
+	keRoll = 8.75f;      // local tests: 1.587f
+	keIRoll = 0.0053f; //0.0353f; //= 1.5186f;    // local tests: 0.0186f
+	keDRoll = 90.0125f; //112.0186f; //= 62.00f;     // local tests: 52.00f
 
-	kePitch = 5.0f;     // local tests: 1.587f
-	keIPitch = 0.0128f; //= 1.5186f;   // local tests: 0.0186f
-	keDPitch = 125.0f; //= 62.00f;    // local tests: 52.00f
+	kePitch = 8.75f;     // local tests: 1.587f
+	keIPitch = 0.0053f; //0.0353f; //= 1.5186f;   // local tests: 0.0186f
+	keDPitch = 90.0125f; //112.0186f; //= 62.00f;    // local tests: 52.00f
 
-	keYaw = 0.687f;       // local tests:  1.687f
+	keYaw = 0.0f;       // local tests:  1.687f
 	keIYaw = 0.0f; //= 0.056f;      // local tests:  0.156f
 	keDYaw = 0.0f; //= 10.000f;     // local tests:  65.00f
 
@@ -112,8 +113,10 @@ void MyPIDControllerAgent::calcCorrection() {
 	int32_t left = std::lrint(std::max(double(1000000), std::min(double(2000000), double(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) - corrRoll + corrYaw)*1000.0));
 	int32_t right = std::lrint(std::max(double(1000000), std::min(double(2000000), double(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()) + corrRoll + corrYaw)*1000.0));
 
-//	printf("corrRoll:%5.5f, corrPitch:%5.5f, corrYaw:%5.5f, keIR/P=%2.2f, keDR/P=%2.2f, eRoll=%2.2f, ePitch=%2.2f, eIRoll=%2.2f, eIPitch=%2.2f, eDRoll=%2.2f, eDPitch=%2.2f \n",
-//			corrRoll, corrPitch, corrYaw, keIRoll, keDRoll, eRoll, ePitch, eIRoll, eIPitch, eDRoll, eDPitch);
+//    syslog(LOG_INFO, "mydrone Thrust: %f", double(MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].getValue()));
+
+//	syslog(LOG_INFO, "errRoll: %5.5f, eRoll:%5.5f, eIRoll: %5.5f, eDRoll: %5.5f, totCorrRoll:%5.5f. left: %d, right: %d \n",
+//			eRoll, keRoll * eRoll, keIRoll*eIRoll, keDRoll * eDRoll, corrRoll, left, right);
 
 	// level motors on [1000000, 2000000]
 //	int32_t minMotors = 9999999;
