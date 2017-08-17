@@ -50,7 +50,7 @@ MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 	keIPitch = 0.0053f; //0.0353f; //= 1.5186f;   // local tests: 0.0186f
 	keDPitch = 90.0125f; //112.0186f; //= 62.00f;    // local tests: 52.00f
 
-	keYaw = 0.0f;       // local tests:  1.687f
+	keYaw = 1.687f;       // local tests:  1.687f
 	keIYaw = 0.0f; //= 0.056f;      // local tests:  0.156f
 	keDYaw = 0.0f; //= 10.000f;     // local tests:  65.00f
 
