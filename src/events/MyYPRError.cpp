@@ -8,7 +8,7 @@
 #include <commons/MyPriority.h>
 #include <events/MyYPRError.h>
 
-MyYPRError::MyYPRError(boost::uuids::uuid origin, int16_t yawCurr,int16_t pitchCurr,int16_t rollCurr, int16_t yawTrg,int16_t pitchTrg,int16_t rollTrg, float eRoll, float eIRoll,
+MyYPRError::MyYPRError(boost::uuids::uuid origin, float yawCurr,float pitchCurr,float rollCurr, float yawTrg,float pitchTrg,float rollTrg, float eRoll, float eIRoll,
 		float eDRoll, float ePitch, float eIPitch, float eDPitch, float eYaw,
 		float eIYaw, float eDYaw) :
 		MyEvent(origin), yawCurr(yawCurr), pitchCurr(pitchCurr), rollCurr(rollCurr), yawTrg(yawTrg), pitchTrg(pitchTrg), rollTrg(rollTrg), eRoll(eRoll), eIRoll(eIRoll), eDRoll(eDRoll),
@@ -23,23 +23,23 @@ MyYPRError::~MyYPRError() {
 MyEvent::EventType MyYPRError::getType() const {
 	return MyEvent::EventType::YPRError;
 }
-int16_t MyYPRError::getYawCurr() const {
+float MyYPRError::getYawCurr() const {
 	return yawCurr;
 }
-int16_t MyYPRError::getPitchCurr() const {
+float MyYPRError::getPitchCurr() const {
 	return pitchCurr;
 }
-int16_t MyYPRError::getRollCurr() const {
+float MyYPRError::getRollCurr() const {
 	return rollCurr;
 }
 
-int16_t MyYPRError::getYawTrg() const {
+float MyYPRError::getYawTrg() const {
 	return yawTrg;
 }
-int16_t MyYPRError::getPitchTrg() const {
+float MyYPRError::getPitchTrg() const {
 	return pitchTrg;
 }
-int16_t MyYPRError::getRollTrg() const {
+float MyYPRError::getRollTrg() const {
 	return rollTrg;
 }
 float MyYPRError::getERoll() const {

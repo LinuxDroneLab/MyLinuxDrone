@@ -11,8 +11,8 @@
 #include <agents/MyAgent.h>
 #include <boost/math/quaternion.hpp>
 #include <queues/MyPIDBuffer.h>
-#include <commons/RangeInt16.h>
-#include <commons/ValueInt16.h>
+#include <commons/RangeFloat.h>
+#include <commons/ValueFloat.h>
 
 class MyPIDControllerAgent: public MyAgent {
 public:
@@ -27,9 +27,9 @@ private:
 	void calcErr(boost::math::quaternion<float> q);
 	void calcCorrection();
 
-	int16_t yawCurr;
-	int16_t pitchCurr;
-	int16_t rollCurr;
+	float yawCurr;
+	float pitchCurr;
+	float rollCurr;
 
 	MyPIDBuffer yawErr;
 	MyPIDBuffer pitchErr;
@@ -48,8 +48,8 @@ private:
 	float keIYaw;
 	float keDYaw;
 
-	static RangeInt16 TARGET_RANGES[];
-	static ValueInt16 TARGET_VALUES[];
+	static RangeFloat TARGET_RANGES[];
+	static ValueFloat TARGET_VALUES[];
 };
 
 #endif /* AGENTS_MYPIDCONTROLLERAGENT_H_ */

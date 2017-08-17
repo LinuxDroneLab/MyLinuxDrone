@@ -25,22 +25,22 @@
 #define THRUST_POS 3
 
 
-RangeInt16 MyPIDControllerAgent::TARGET_RANGES[] = {RangeInt16(-62, 62), // roll
-		                                            RangeInt16(-62, 62), // pitch
-		                                            RangeInt16(-125, 125), // yaw
-		                                            RangeInt16(1000, 2000) // thrust
+RangeFloat MyPIDControllerAgent::TARGET_RANGES[] = {RangeFloat(-62.0f, 62.0f), // roll
+		                                            RangeFloat(-62.0f, 62.0f), // pitch
+		                                            RangeFloat(-125.0f, 125.0f), // yaw
+		                                            RangeFloat(1000.0f, 2000.0f) // thrust
 };
-ValueInt16 MyPIDControllerAgent::TARGET_VALUES[] = {ValueInt16(0, MyPIDControllerAgent::TARGET_RANGES[ROLL_POS]),
-													ValueInt16(0, MyPIDControllerAgent::TARGET_RANGES[PITCH_POS]),
-													ValueInt16(0, MyPIDControllerAgent::TARGET_RANGES[YAW_POS]),
-													ValueInt16(0, MyPIDControllerAgent::TARGET_RANGES[THRUST_POS]),
+ValueFloat MyPIDControllerAgent::TARGET_VALUES[] = {ValueFloat(0.0f, MyPIDControllerAgent::TARGET_RANGES[ROLL_POS]),
+													ValueFloat(0.0f, MyPIDControllerAgent::TARGET_RANGES[PITCH_POS]),
+													ValueFloat(0.0f, MyPIDControllerAgent::TARGET_RANGES[YAW_POS]),
+													ValueFloat(0.0f, MyPIDControllerAgent::TARGET_RANGES[THRUST_POS])
 };
 
 using namespace std;
 
 MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
-		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0), pitchCurr(0), rollCurr(0), yawErr(1.0f, 4, 10, 3), pitchErr(
+		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0.0f), pitchCurr(0.0f), rollCurr(0.0f), yawErr(1.0f, 4, 10, 3), pitchErr(
 				1.0f, 4, 10, 3), rollErr(1.0f, 4, 10, 3) {
 	keRoll = 8.75f;      // local tests: 1.587f
 	keIRoll = 0.0053f; //0.0353f; //= 1.5186f;    // local tests: 0.0186f
@@ -69,20 +69,20 @@ void MyPIDControllerAgent::calcErr(boost::math::quaternion<float> q) {
 	float z = q.R_component_4();
 
 
-	yawCurr = std::rint((atan2(2.0f * (real * z + x * y), 1.0f - 2.0f * (y * y + z * z))
-			* 57.295779513f));
-	pitchCurr = std::rint((asin(2.0f * real * y - 2.0 * z * x) * 57.295779513f));
-	rollCurr = std::rint((atan2(2.0f * (real * x + y * z), 1.0f - 2.0f * (x * x + y * y))
-			* 57.295779513f));
+	yawCurr = atan2(2.0f * (real * z + x * y), 1.0f - 2.0f * (y * y + z * z))
+			* 57.295779513f;
+	pitchCurr = asin(2.0f * real * y - 2.0 * z * x) * 57.295779513f;
+	rollCurr = atan2(2.0f * (real * x + y * z), 1.0f - 2.0f * (x * x + y * y))
+			* 57.295779513f;
 
 //	yawCurr = uint16_t(std::rint(0.8f*float(yawCurr) + 0.2f*float(_yawCurr)));
 //	pitchCurr = uint16_t(std::rint(0.8f*float(pitchCurr) + 0.2f*float(_pitchCurr)));
 //	rollCurr = uint16_t(std::rint(0.8f*float(rollCurr) + 0.2f*float(_rollCurr)));
 
-	// considero errore limitato a 50 deg. more less for yaw
-	yawErr.push(std::min(10.0f, std::max(-10.0f, float(yawCurr - MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue()))));
-	pitchErr.push(std::min(60.0f, std::max(-60.0f, float(pitchCurr - MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue()))));
-	rollErr.push(std::min(60.0f, std::max(-60.0f, float(rollCurr - MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue()))));
+	// considero errore limitato a 10 deg. more less for yaw an 60deg for pitch and roll
+	yawErr.push(std::min(10.0f, std::max(-10.0f, yawCurr - MyPIDControllerAgent::TARGET_VALUES[YAW_POS].getValue())));
+	pitchErr.push(std::min(60.0f, std::max(-60.0f, pitchCurr - MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].getValue())));
+	rollErr.push(std::min(60.0f, std::max(-60.0f, rollCurr - MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].getValue())));
 }
 void MyPIDControllerAgent::calcCorrection() {
 //	float eRoll = std::min(10.0f, std::max(-10.0f, rollErr.getMean()));
