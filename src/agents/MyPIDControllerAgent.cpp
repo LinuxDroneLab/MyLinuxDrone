@@ -42,12 +42,12 @@ MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
 		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0.0f), pitchCurr(0.0f), rollCurr(0.0f), yawErr(1.0f, 4, 10, 3), pitchErr(
 				1.0f, 4, 10, 3), rollErr(1.0f, 4, 10, 3) {
-	keRoll = 8.75f;      // local tests: 1.587f
-	keIRoll = 0.0053f; //0.0353f; //= 1.5186f;    // local tests: 0.0186f
+	keRoll = 8.55f;      // local tests: 1.587f
+	keIRoll = 0.0073f; //0.0353f; //= 1.5186f;    // local tests: 0.0186f
 	keDRoll = 90.0125f; //112.0186f; //= 62.00f;     // local tests: 52.00f
 
-	kePitch = 8.75f;     // local tests: 1.587f
-	keIPitch = 0.0053f; //0.0353f; //= 1.5186f;   // local tests: 0.0186f
+	kePitch = 8.55f;     // local tests: 1.587f
+	keIPitch = 0.0073f; //0.0353f; //= 1.5186f;   // local tests: 0.0186f
 	keDPitch = 90.0125f; //112.0186f; //= 62.00f;    // local tests: 52.00f
 
 	keYaw = 1.687f;       // local tests:  1.687f
