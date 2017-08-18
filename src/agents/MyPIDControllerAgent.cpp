@@ -209,7 +209,7 @@ void MyPIDControllerAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 		} else if(event->getType() == MyEvent::EventType::BaroSample) {
 			boost::shared_ptr<MyBaroSample> baroSample =
 					boost::static_pointer_cast<MyBaroSample>(event);
-			syslog(LOG_INFO, "BaroSample: press=%d, alt=%5.5f, temp=%5.5f, seeLevelPress=%d", baroSample->getPressure(), baroSample->getAltitude(), baroSample->getTemperature(), baroSample->getSeeLevelPressure());
+			// syslog(LOG_INFO, "BaroSample: press=%d, alt=%5.5f, temp=%5.5f, seeLevelPress=%d", baroSample->getPressure(), baroSample->getAltitude(), baroSample->getTemperature(), baroSample->getSeeLevelPressure());
 		}
         else {
 			// skip events
