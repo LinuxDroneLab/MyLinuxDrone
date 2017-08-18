@@ -14,6 +14,8 @@
 #include <boost/log/trivial.hpp>
 #include <boost/math/quaternion.hpp>
 #include <pthread.h>
+#include <events/MinThrustMinPitch.h>
+#include <events/MinThrustMaxPitch.h>
 
 
 
@@ -56,14 +58,18 @@ void MyRCAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 	}
 	if(this->getState() == MyAgentState::Active) {
 		if(event->getType() == MyEvent::EventType::Tick) {
-//			boost::lock_guard<boost::mutex> lock(m_mutex);
-			boost::shared_ptr<MyEvent> evOut(boost::make_shared<MyRCSample>(this->getUuid(), thrust, roll, pitch, yaw, aux1, aux2));
-			m_signal(evOut);
-	//		cout << "RcSample: " << thrust << ", r: " << roll << ", p: " << pitch << ", y: " << yaw << ", a1: "  << aux1 << ", a2: " << aux2 << endl;
-
+			if(thrust <= -0.98f && pitch >= 0.98f) {
+				boost::shared_ptr<MinThrustMaxPitch> armMotors(boost::make_shared<MinThrustMaxPitch>(uuid));
+				m_signal(armMotors);
+			} else if(thrust <= -0.98f && pitch <= -0.98f) {
+				boost::shared_ptr<MinThrustMinPitch> disarmMotors(boost::make_shared<MinThrustMinPitch>(uuid));
+				m_signal(disarmMotors);
+			} else {
+				boost::shared_ptr<MyEvent> evOut(boost::make_shared<MyRCSample>(this->getUuid(), thrust, roll, pitch, yaw, aux1, aux2));
+				m_signal(evOut);
+			}
 			// TODO:
 			//  1) check if m_signal is threadsafe ...
-			//  2) interpret signals from RC as commands (ARM/DISARM etc ...) and emit correspondent events
 		}
 	}
 }

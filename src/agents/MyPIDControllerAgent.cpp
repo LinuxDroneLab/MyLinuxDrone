@@ -16,6 +16,8 @@
 #include <events/MyOutMotors.h>
 #include <events/MyYPRError.h>
 #include <events/MyRCSample.h>
+#include <events/MyMotorsDisarmed.h>
+#include <events/MyMotorsArmed.h>
 #include <iostream>
 #include <syslog.h>
 
@@ -40,7 +42,7 @@ using namespace std;
 
 MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
-		MyAgent(bus, acceptedEventTypes), initialized(false), yawCurr(0.0f), pitchCurr(0.0f), rollCurr(0.0f), yawErr(1.0f, 4, 10, 3), pitchErr(
+		MyAgent(bus, acceptedEventTypes), initialized(false), armed(false), yawCurr(0.0f), pitchCurr(0.0f), rollCurr(0.0f), yawErr(1.0f, 4, 10, 3), pitchErr(
 				1.0f, 4, 10, 3), rollErr(1.0f, 4, 10, 3) {
 	keRoll = 8.55f;      // local tests: 1.587f
 	keIRoll = 0.0073f; //0.0353f; //= 1.5186f;    // local tests: 0.0186f
@@ -181,24 +183,30 @@ void MyPIDControllerAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 		initialize();
 	}
 	if (this->getState() == MyAgentState::Active) {
-		if (event->getType() == MyEvent::EventType::IMUSample) {
+		if(event->getType() == MyEvent::EventType::MotorsDisarmed) {
+			syslog(LOG_INFO, "Motors Disarmed");
+			this->armed = false;
+		} else
+		if(event->getType() == MyEvent::EventType::MotorsArmed) {
+			syslog(LOG_INFO, "Motors Armed");
+			this->armed = true;
+		} else
+		if (event->getType() == MyEvent::EventType::IMUSample && this->armed) {
 			boost::shared_ptr<MyIMUSample> imuSample =
 					boost::static_pointer_cast<MyIMUSample>(event);
 
 			boost::math::quaternion<float> q = imuSample->getQuaternion();
 			calcErr(q);
 			calcCorrection();
-		} else if(event->getType() == MyEvent::EventType::RCSample) {
+		} else if(event->getType() == MyEvent::EventType::RCSample && this->armed) {
 			boost::shared_ptr<MyRCSample> rcSample =
 					boost::static_pointer_cast<MyRCSample>(event);
-//			keIRoll = keIPitch = (1.0f + (*rcSample).getAux1Percent());
-//			keDRoll = keDPitch = (1.0f + (*rcSample).getAux2Percent());
-
 			MyPIDControllerAgent::TARGET_VALUES[ROLL_POS].setPercentValue((*rcSample).getRollPercent());
 			MyPIDControllerAgent::TARGET_VALUES[PITCH_POS].setPercentValue((*rcSample).getPitchPercent());
 			MyPIDControllerAgent::TARGET_VALUES[YAW_POS].setPercentValue((*rcSample).getYawPercent());
 			MyPIDControllerAgent::TARGET_VALUES[THRUST_POS].setPercentValue((*rcSample).getThrustPercent());
-//			cout << "PitchSample: " << (*rcSample).getPitchPercent() << endl;
+		} else {
+			// skip events
 		}
 	}
 }

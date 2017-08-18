@@ -16,6 +16,8 @@ CPP_SRCS += \
 ../src/events/MyEndGyroCalCmd.cpp \
 ../src/events/MyEvent.cpp \
 ../src/events/MyIMUSample.cpp \
+../src/events/MinThrustMinPitch.cpp \
+../src/events/MinThrustMaxPitch.cpp \
 ../src/events/MyMotorsArmed.cpp \
 ../src/events/MyMotorsDisarmed.cpp \
 ../src/events/MyOutMotors.cpp \
@@ -47,6 +49,8 @@ OBJS += \
 ./src/events/MyEndGyroCalCmd.o \
 ./src/events/MyEvent.o \
 ./src/events/MyIMUSample.o \
+./src/events/MinThrustMinPitch.o \
+./src/events/MinThrustMaxPitch.o \
 ./src/events/MyMotorsArmed.o \
 ./src/events/MyMotorsDisarmed.o \
 ./src/events/MyOutMotors.o \
@@ -78,6 +82,8 @@ CPP_DEPS += \
 ./src/events/MyEndGyroCalCmd.d \
 ./src/events/MyEvent.d \
 ./src/events/MyIMUSample.d \
+./src/events/MinThrustMinPitch.d \
+./src/events/MinThrustMaxPitch.d \
 ./src/events/MyMotorsArmed.d \
 ./src/events/MyMotorsDisarmed.d \
 ./src/events/MyOutMotors.d \

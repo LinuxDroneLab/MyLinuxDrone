@@ -91,7 +91,7 @@ void MyRCReader::operator()() {
 				int16_t((*(pru0DataMemory_int + CHAN_THRUST)) / 100));
 
 		if (cycle == 0) {
-			// save PRU values in micorseconds
+			// save PRU values in microseconds
 			MyRCReader::PRU_VALUES[CHAN_ROLL].setValue(getValue(CHAN_ROLL));
 			MyRCReader::PRU_VALUES[CHAN_PITCH].setValue(getValue(CHAN_PITCH));
 			MyRCReader::PRU_VALUES[CHAN_YAW].setValue(getValue(CHAN_YAW));
@@ -113,7 +113,7 @@ void MyRCReader::operator()() {
 			MyRCReader::CHAN_VALUES[CHAN_AUX2].setValue(
 					MyRCReader::PRU_VALUES[CHAN_AUX2]);
 
-			// send CHAN values as int16 to agent
+			// send CHAN values as percent to agent
 			((MyRCAgent*) agent)->setRCSample(
 					MyRCReader::CHAN_VALUES[CHAN_THRUST].getValueAsPercent(),
 					MyRCReader::CHAN_VALUES[CHAN_ROLL].getValueAsPercent(),

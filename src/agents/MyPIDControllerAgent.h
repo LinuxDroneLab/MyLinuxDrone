@@ -24,6 +24,7 @@ protected:
 private:
 	bool initialized;
 	void initialize();
+	bool armed;
 	void calcErr(boost::math::quaternion<float> q);
 	void calcCorrection();
 

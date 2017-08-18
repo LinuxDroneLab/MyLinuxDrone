@@ -87,8 +87,8 @@ int main() {
 
 	MyClock myClock(eventBus, 5);
 	MyIMUAgent imuAgent(eventBus, {MyEvent::EventType::Tick});
-	MyPIDControllerAgent pidControlledAgent(eventBus, {MyEvent::EventType::IMUSample, MyEvent::EventType::RCSample});
-	MyMotorsAgent motorsAgent(eventBus, {MyEvent::EventType::ArmMotorsCmd, MyEvent::EventType::DisarmMotorsCmd, MyEvent::EventType::OutMotors});
+	MyPIDControllerAgent pidControlledAgent(eventBus, {MyEvent::EventType::MotorsArmed, MyEvent::EventType::MotorsDisarmed, MyEvent::EventType::IMUSample, MyEvent::EventType::RCSample});
+	MyMotorsAgent motorsAgent(eventBus, {MyEvent::EventType::MinThrustMaxPitch, MyEvent::EventType::MinThrustMinPitch, MyEvent::EventType::OutMotors});
     MyRCAgent rcAgent(eventBus, {MyEvent::EventType::Tick});
 
 	MyDBusEmitterAgent dbusAgent(eventBus, {MyEvent::EventType::YPRError});

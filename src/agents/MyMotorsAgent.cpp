@@ -12,6 +12,8 @@
 #include <events/MyOutMotors.h>
 #include <events/MyMotorsDisarmed.h>
 #include <events/MyMotorsArmed.h>
+#include <events/MinThrustMaxPitch.h>
+#include <events/MinThrustMinPitch.h>
 #include <syslog.h>
 
 MyMotorsAgent::MyMotorsAgent(boost::shared_ptr<MyEventBus> bus,
@@ -19,8 +21,6 @@ MyMotorsAgent::MyMotorsAgent(boost::shared_ptr<MyEventBus> bus,
 		MyAgent(bus, acceptedEventTypes), initialized(false), armed(false),
 		front("/sys/devices/platform/ocp/ocp:P9_22_pinmux", "/sys/class/pwm/pwmchip0", 0),
 		rear("/sys/devices/platform/ocp/ocp:P9_21_pinmux", "/sys/class/pwm/pwmchip0", 1),
-//		left("/sys/devices/platform/ocp/ocp:P9_14_pinmux", "/sys/class/pwm/pwmchip2", 0),
-//		right("/sys/devices/platform/ocp/ocp:P9_16_pinmux", "/sys/class/pwm/pwmchip2", 1)
 		left("/sys/devices/platform/ocp/ocp:P8_19_pinmux", "/sys/class/pwm/pwmchip4", 0),
 		right("/sys/devices/platform/ocp/ocp:P8_13_pinmux", "/sys/class/pwm/pwmchip4", 1)
 {
@@ -34,6 +34,7 @@ void MyMotorsAgent::initialize() {
 	rear.initialize();
 	left.initialize();
 	right.initialize();
+    this->disarmMotors();
 
 	// TODO: inviare pwm min
 	initialized = true;
@@ -51,16 +52,14 @@ void MyMotorsAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 //				printf("Front:%d, Rear=%d, Left=%d, Right=%d \n", outMotors->getFront(), outMotors->getRear(), outMotors->getLeft(), outMotors->getRight());
 				this->writeMotors(outMotors);
 			} else if (event->getType()
-					== MyEvent::EventType::DisarmMotorsCmd) {
+					== MyEvent::EventType::MinThrustMinPitch) {
 				disarmMotors();
 			}
 		} else {
-			if (event->getType() == MyEvent::EventType::ArmMotorsCmd) {
+			if (event->getType() == MyEvent::EventType::MinThrustMaxPitch) {
 				armMotors();
 			} else if (event->getType() == MyEvent::EventType::OutMotors) {
-//				boost::shared_ptr<MyOutMotors> outMotors =
-//						boost::static_pointer_cast<MyOutMotors>(event);
-//				cout << "Disarmed: MF: " << outMotors->getFront() << ", MR: " << outMotors->getRear() << ", ML: " << outMotors->getLeft() << ", MR: " << outMotors->getRight() << endl;
+				// skip event
 			}
 		}
 	}
