@@ -22,12 +22,6 @@
 #include <iostream>
 #include <syslog.h>
 
-#define ROLL_POS 0
-#define PITCH_POS 1
-#define YAW_POS 2
-#define THRUST_POS 3
-
-
 RangeFloat MyPIDControllerAgent::TARGET_RANGES[] = {RangeFloat(-62.0f, 62.0f), // roll
 		                                            RangeFloat(-62.0f, 62.0f), // pitch
 		                                            RangeFloat(-125.0f, 125.0f), // yaw

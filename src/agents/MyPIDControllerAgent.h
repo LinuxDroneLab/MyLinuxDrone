@@ -9,6 +9,7 @@
 #define AGENTS_MYPIDCONTROLLERAGENT_H_
 
 #include <agents/MyAgent.h>
+#include <commons/MyGlobalDefs.h>
 #include <boost/math/quaternion.hpp>
 #include <queues/MyPIDBuffer.h>
 #include <commons/RangeFloat.h>

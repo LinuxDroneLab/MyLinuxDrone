@@ -25,6 +25,7 @@ public:
 	float getMean();
 	float getIntegral();
 	float getDerivate();
+	void clean();
 private:
 	float m_period;
 	container_type m_misureBuff;

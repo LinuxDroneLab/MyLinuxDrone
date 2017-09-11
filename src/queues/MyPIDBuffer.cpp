@@ -14,7 +14,12 @@ MyPIDBuffer::MyPIDBuffer(float period, size_type meanDim, size_type integralDim,
 
 MyPIDBuffer::~MyPIDBuffer() {
 }
-
+void MyPIDBuffer::clean() {
+	this->m_misureBuff.clear();
+	this->m_meanBuff.clear();
+	this->m_derivateBuff.clear();
+	this->m_integral = 0.0f;
+}
 void MyPIDBuffer::push(param_type item) {
 	value_type meanPrev = this->getMean();
 
