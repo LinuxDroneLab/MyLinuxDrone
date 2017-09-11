@@ -6,22 +6,22 @@
 CPP_SRCS += \
 ../src/commons/MyUuid.cpp \
 ../src/commons/RangeFloat.cpp \
-../src/commons/ValueFloat.cpp \
 ../src/commons/RangeInt16.cpp \
+../src/commons/ValueFloat.cpp \
 ../src/commons/ValueInt16.cpp 
 
 OBJS += \
 ./src/commons/MyUuid.o \
 ./src/commons/RangeFloat.o \
-./src/commons/ValueFloat.o \
 ./src/commons/RangeInt16.o \
+./src/commons/ValueFloat.o \
 ./src/commons/ValueInt16.o 
 
 CPP_DEPS += \
 ./src/commons/MyUuid.d \
 ./src/commons/RangeFloat.d \
-./src/commons/ValueFloat.d \
 ./src/commons/RangeInt16.d \
+./src/commons/ValueFloat.d \
 ./src/commons/ValueInt16.d 
 
 

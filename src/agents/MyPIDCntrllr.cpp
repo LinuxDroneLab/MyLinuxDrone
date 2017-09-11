@@ -81,7 +81,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcYPRData(boost::math::quaternion<float> q) {
 	return result;
 }
 
-void MyPIDCntrllr::calcErr(MyPIDCntrllr::YPRT &yprtReq, MyPIDCntrllr::YPRT &yprtReal) {
+void MyPIDCntrllr::calcErr(YPRT &yprtReq, YPRT &yprtReal) {
 	// considero errore limitato a 10 deg. more less for yaw and 60deg for pitch and roll
 	yawErr.push(std::min<float>(10.0f, std::max<float>(-10.0f, yprtReal.yaw - yprtReq.yaw)));
 	pitchErr.push(std::min<float>(60.0f, std::max<float>(-60.0f, yprtReal.pitch - yprtReq.pitch)));
@@ -90,7 +90,7 @@ void MyPIDCntrllr::calcErr(MyPIDCntrllr::YPRT &yprtReq, MyPIDCntrllr::YPRT &yprt
 
 // The YPR input is the distance from real to target data with PID correction.
 // the thrust is absolute value
-MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(MyPIDCntrllr::YPRT &yprt) {
+MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt) {
 	YPRT result = {0.0f, 0.0f, 0.0f, 0.0f};
 	result.yaw = yprt.yaw + yawErr.getMean()*keYaw + yawErr.getIntegral()*keIYaw + yawErr.getDerivate()*keDYaw;
 	result.pitch = yprt.pitch + pitchErr.getMean()*kePitch + pitchErr.getIntegral()*keIPitch + pitchErr.getDerivate()*keDPitch;
@@ -99,12 +99,12 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(MyPIDCntrllr::YPRT &yprt) {
 	return result;
 }
 
-MyPIDCntrllr::YPRT  MyPIDCntrllr::calcDelta(MyPIDCntrllr::YPRT  &yprt1, MyPIDCntrllr::YPRT  &yprt2) {
+MyPIDCntrllr::YPRT  MyPIDCntrllr::calcDelta(YPRT  &yprt1, YPRT  &yprt2) {
 	YPRT result = yprt1 - yprt2;
 	return result;
 }
 
-MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(MyPIDCntrllr::YPRT &data) {
+MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(YPRT &data) {
 	// Transform input (delta attitude and thrust) to output (nanoseconds for motors)
 	long front = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + (data.pitch - data.yaw)*deg2MillisFactor)*1000.0f)));
 	long rear = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust - (data.pitch + data.yaw)*deg2MillisFactor)*1000.0f)));
@@ -118,7 +118,7 @@ MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(MyPIDCntrllr::YPRT &data) {
 	result.right = right;
 	return result;
 }
-void MyPIDCntrllr::sendOutput(MyPIDCntrllr::PIDOutput &data) {
+void MyPIDCntrllr::sendOutput(PIDOutput &data) {
 	{ // out error event
 		boost::shared_ptr<MyYPRError> evOut(boost::make_shared<MyYPRError>(this->getUuid(), realData.yaw, realData.pitch, realData.roll,
 				                                                                            targetData.yaw,
@@ -169,7 +169,7 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ) {
     PIDOutput output = calcOutput(input);
 
     // send to motors
-    sendOutput(output);
+    this->sendOutput(output);
 }
 void MyPIDCntrllr::clean() {
 	yawErr.clean();

@@ -25,6 +25,7 @@ protected:
 private:
 	// espressi in gradi
 	class YPRT {
+	public:
 		float yaw;
 		float pitch;
 		float roll;
@@ -91,10 +92,10 @@ private:
 	void processImuSample(boost::math::quaternion<float> sample);
 	YPRT getYPRTFromRcData();
 	YPRT calcYPRData(boost::math::quaternion<float> q);
-	YPRT calcCorrection(MyPIDCntrllr::YPRT &delta);
-	YPRT calcDelta(MyPIDCntrllr::YPRT &yprt1, MyPIDCntrllr::YPRT &yprt2);
+	YPRT calcCorrection(YPRT &delta);
+	YPRT calcDelta(YPRT &yprt1, YPRT &yprt2);
 
-	void calcErr(MyPIDCntrllr::YPRT &yprtReq, MyPIDCntrllr::YPRT &yprtReal);
+	void calcErr(YPRT &yprtReq, YPRT &yprtReal);
 	PIDOutput calcOutput(YPRT &data);
 	void sendOutput(PIDOutput &data);
 

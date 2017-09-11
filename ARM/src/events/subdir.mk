@@ -4,6 +4,8 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../src/events/MinThrustMaxPitch.cpp \
+../src/events/MinThrustMinPitch.cpp \
 ../src/events/MyAgentChangeState.cpp \
 ../src/events/MyAlarm.cpp \
 ../src/events/MyArmMotorsCmd.cpp \
@@ -16,8 +18,6 @@ CPP_SRCS += \
 ../src/events/MyEndGyroCalCmd.cpp \
 ../src/events/MyEvent.cpp \
 ../src/events/MyIMUSample.cpp \
-../src/events/MinThrustMinPitch.cpp \
-../src/events/MinThrustMaxPitch.cpp \
 ../src/events/MyMotorsArmed.cpp \
 ../src/events/MyMotorsDisarmed.cpp \
 ../src/events/MyOutMotors.cpp \
@@ -37,6 +37,8 @@ CPP_SRCS += \
 ../src/events/MyYPRError.cpp 
 
 OBJS += \
+./src/events/MinThrustMaxPitch.o \
+./src/events/MinThrustMinPitch.o \
 ./src/events/MyAgentChangeState.o \
 ./src/events/MyAlarm.o \
 ./src/events/MyArmMotorsCmd.o \
@@ -49,8 +51,6 @@ OBJS += \
 ./src/events/MyEndGyroCalCmd.o \
 ./src/events/MyEvent.o \
 ./src/events/MyIMUSample.o \
-./src/events/MinThrustMinPitch.o \
-./src/events/MinThrustMaxPitch.o \
 ./src/events/MyMotorsArmed.o \
 ./src/events/MyMotorsDisarmed.o \
 ./src/events/MyOutMotors.o \
@@ -70,6 +70,8 @@ OBJS += \
 ./src/events/MyYPRError.o 
 
 CPP_DEPS += \
+./src/events/MinThrustMaxPitch.d \
+./src/events/MinThrustMinPitch.d \
 ./src/events/MyAgentChangeState.d \
 ./src/events/MyAlarm.d \
 ./src/events/MyArmMotorsCmd.d \
@@ -82,8 +84,6 @@ CPP_DEPS += \
 ./src/events/MyEndGyroCalCmd.d \
 ./src/events/MyEvent.d \
 ./src/events/MyIMUSample.d \
-./src/events/MinThrustMinPitch.d \
-./src/events/MinThrustMaxPitch.d \
 ./src/events/MyMotorsArmed.d \
 ./src/events/MyMotorsDisarmed.d \
 ./src/events/MyOutMotors.d \
