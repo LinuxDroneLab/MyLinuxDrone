@@ -122,6 +122,7 @@ private:
 	float keDYaw;
 
 	float deg2MicrosFactor;
+	float deg2MicrosYawFactor;
 
 	static RangeFloat TARGET_RANGES[];
 	static ValueFloat TARGET_VALUES[];
