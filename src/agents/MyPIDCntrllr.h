@@ -39,6 +39,11 @@ private:
 		bool isZero() {
 			return yaw == 0.0f && pitch == 0.0f && roll == 0.0f && thrust == 0.0f;
 		}
+		void divideYPR(float divisor){
+			yaw /= divisor;
+			pitch /= divisor;
+			roll /= divisor;
+		}
 		friend const YPRT operator-(const YPRT& lhs, const YPRT& rhs) {
 			    YPRT r = {};
 			    r.yaw = lhs.yaw - rhs.yaw;
@@ -116,10 +121,13 @@ private:
 	float keIYaw;
 	float keDYaw;
 
-	float deg2MillisFactor;
+	float deg2MicrosFactor;
 
 	static RangeFloat TARGET_RANGES[];
 	static ValueFloat TARGET_VALUES[];
+	static int8_t QUATERNION_DIRECTION_RPY[];
+	static int8_t RC_DIRECTION_RPY[];
+    static float FREQUENCY;
 };
 
 #endif /* AGENTS_MYPIDCNTRLLR_H_ */
