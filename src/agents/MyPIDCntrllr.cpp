@@ -34,7 +34,7 @@ ValueFloat MyPIDCntrllr::TARGET_VALUES[] = {ValueFloat(0.0f, MyPIDCntrllr::TARGE
 int8_t MyPIDCntrllr::QUATERNION_DIRECTION_RPY[] = {-1, -1, 1};
 int8_t MyPIDCntrllr::RC_DIRECTION_RPY[] = {1, -1, 1};
 float  MyPIDCntrllr::FREQUENCY = 100.0f;
-
+RangeFloat MyPIDCntrllr::INTEGRAL_RANGE = RangeFloat(-20.3f, 20.3f);
 using namespace std;
 
 
@@ -42,26 +42,28 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::E
    MyAgent(bus, acceptedEventTypes),
    initialized(false),
    armed(false),
-   yawErr(1.0f, 4, 10, 3),
-   pitchErr(1.0f, 4, 10, 3),
-   rollErr(1.0f, 4, 10, 3)
+   yawErr(1.0f, 4, 10, 3, INTEGRAL_RANGE),
+   pitchErr(1.0f, 4, 10, 10, INTEGRAL_RANGE),
+   rollErr(1.0f, 4, 10, 10, INTEGRAL_RANGE)
 {
-	keRoll = 0.48f;
-	keIRoll = 0.005;
-	keDRoll = 2.5f;
+	keRoll = 1.2f; //0.45f;
+	keIRoll = 0.04f; //0.000523f;
+	keDRoll = 0.0f; //0.012f; //2.0f;
 
-	kePitch = 0.48f;
-	keIPitch = 0.005f;
-	keDPitch = 2.5f;
+	kePitch = 1.2f; //0.45f;
+	keIPitch = 0.04f; //0.000523f;
+	keDPitch = 0.0f; //0.012f; //2.0f;
 
-	keYaw = 0.15f;
+	keYaw = 0.0f; //0.05f;
 	keIYaw = 0.0f;
 	keDYaw = 0.0f;
 
+	count = 0;
+
 	// TODO: usare parametro diverso per yaw. La rotazione richiede molti più giri
 	// modificare di conseguenza la funzione calcOutput
-	deg2MicrosFactor = 350.0f;
-	deg2MicrosYawFactor = 60.0f;
+	deg2MicrosFactor = 100.0f; //350.0f;
+	deg2MicrosYawFactor = 1.0f; //60.0f;
 }
 
 MyPIDCntrllr::~MyPIDCntrllr() {
@@ -99,6 +101,7 @@ void MyPIDCntrllr::calcErr(YPRT &yprtReq, YPRT &yprtReal) {
 // The YPR input is the distance from real to target data with PID correction.
 // the thrust is absolute value
 MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt) {
+	count++;
 	YPRT result = {0.0f, 0.0f, 0.0f, 0.0f};
 	float yawCorr = yawErr.getMean()*keYaw + yawErr.getIntegral()*keIYaw + yawErr.getDerivate()*keDYaw;
 	float pitchCorr = pitchErr.getMean()*kePitch + pitchErr.getIntegral()*keIPitch + pitchErr.getDerivate()*keDPitch;
@@ -109,6 +112,8 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt) {
 	result.thrust = yprt.thrust;
 //	syslog(LOG_INFO, "CYPRT: y(%3.5f, %3.5f), p(%3.5f, %3.5f), r(%3.5f, %3.5f), t(%5.5f)", yprt.yaw, yawCorr, yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
 //	syslog(LOG_INFO, "CYPRT: y(%3.5f), p(%3.5f), r(%3.5f), t(%5.5f)", yawCorr, pitchCorr, rollCorr, yprt.thrust);
+//TRG(1)=0; VAL(1)=45; E(1)=10; EI(1)=44935; ED(1)=0;
+	syslog(LOG_INFO, "P(%u)=%3.5f; PR(%u)=%3.5f; E(%u)=%3.5f; EI(%u)=%3.5f; ED(%u)=%3.5f; T(%u)=%3.5f;", count, this->targetData.pitch, count, realData.pitch, count, pitchErr.getMean()*kePitch, count, pitchErr.getIntegral()*keIPitch, count, pitchErr.getDerivate()*keDPitch, count, yprt.thrust);
 
 	return result;
 }
@@ -150,12 +155,21 @@ void MyPIDCntrllr::sendOutput(PIDOutput &data) {
 	}
 }
 
-MyPIDCntrllr::YPRT MyPIDCntrllr::getYPRTFromRcData() {
+MyPIDCntrllr::YPRT MyPIDCntrllr::getYPRTFromRcData(YPRT &prev) {
 	YPRT result = {};
-	result.yaw = RC_DIRECTION_RPY[YAW_POS]*MyPIDCntrllr::TARGET_VALUES[YAW_POS].getValue();
-	result.pitch = RC_DIRECTION_RPY[PITCH_POS]*MyPIDCntrllr::TARGET_VALUES[PITCH_POS].getValue();
-	result.roll = RC_DIRECTION_RPY[ROLL_POS]*MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue();
-	result.thrust = MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue();
+	result.yaw = prev.yaw * 0.96 + 0.04 * float(std::trunc(RC_DIRECTION_RPY[YAW_POS]*MyPIDCntrllr::TARGET_VALUES[YAW_POS].getValue()));
+	result.pitch = prev.pitch * 0.96 + 0.04 * float(std::trunc(RC_DIRECTION_RPY[PITCH_POS]*MyPIDCntrllr::TARGET_VALUES[PITCH_POS].getValue()));
+	result.roll = prev.roll * 0.96 + 0.04 * float(std::trunc(RC_DIRECTION_RPY[ROLL_POS]*MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue()));
+	result.thrust = float(std::round(MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue()));
+	if((result.yaw >= -1.1f) && (result.yaw <= 1.1f)) {
+		result.yaw = 0.0f;
+	}
+	if((result.pitch >= -1.1f) && (result.pitch <= 1.1f)) {
+		result.pitch = 0.0f;
+	}
+	if((result.roll >= -1.1f) && (result.roll <= 1.1f)) {
+		result.roll = 0.0f;
+	}
 	return result;
 }
 
@@ -168,26 +182,32 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ) {
 		realData = sample;
 	}
 
+	// Kalman filter. Non sono convinto di volerlo usare qui.
+//	sample.yaw = 0.96 * realData.yaw + 0.04 * sample.yaw;
+//	sample.pitch = 0.96 * realData.pitch + 0.04 * sample.pitch;
+//	sample.roll = 0.96 * realData.roll + 0.04 * sample.roll;
+
 	/* CALCOLO ERRORE
 	 * l'errore è dato dalla differenza tra la variazione avvenuta e quella richiesta nel ciclo precedente
 	 * deltaReal - deltaRequested = (sample - realData) - (targetData - realData) = sample - targetData
 	 */
-	YPRT deltaRequested = (targetData - realData);
-	deltaRequested.divideYPR(FREQUENCY);
+	YPRT deltaRequested = (targetData - sample);
+	deltaRequested.divideYPR(60.0f);
 	YPRT deltaReal = sample - realData;
+
 	calcErr(deltaRequested, deltaReal);
 
-	targetData = this->getYPRTFromRcData();
+	targetData = this->getYPRTFromRcData(targetData);
 	realData = sample;
 
 	/* CALCOLO INPUT
 	 * calculate input data for transformation function
-	 * La correzione è data dalla variazione richiesta (espressa in gradi) in un ciclo di frequenza e compensata con l'errore (gained)
+	 * La correzione è data dal target richiesto (espresso in gradi) in un ciclo di frequenza e compensata con l'errore (gained)
 	 */
-	YPRT newDeltaRequested = (targetData - sample);
-	newDeltaRequested.divideYPR(FREQUENCY);
-	newDeltaRequested.thrust = sample.thrust;
-    YPRT input = calcCorrection(newDeltaRequested);
+	YPRT input2Correct = (targetData - sample);
+	input2Correct.divideYPR(60.0f);
+	input2Correct.thrust = sample.thrust;
+    YPRT input = calcCorrection(input2Correct);
 
     // calculate transformation function
     PIDOutput output = calcOutput(input);
@@ -209,6 +229,7 @@ void MyPIDCntrllr::disarm() {
 void MyPIDCntrllr::arm() {
 	this->clean();
 	this->armed = true;
+	this->count = 0;
 }
 void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event) {
 	if (!initialized) {

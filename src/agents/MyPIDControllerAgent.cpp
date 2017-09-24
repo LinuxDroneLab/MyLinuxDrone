@@ -32,13 +32,14 @@ ValueFloat MyPIDControllerAgent::TARGET_VALUES[] = {ValueFloat(0.0f, MyPIDContro
 													ValueFloat(0.0f, MyPIDControllerAgent::TARGET_RANGES[YAW_POS]),
 													ValueFloat(0.0f, MyPIDControllerAgent::TARGET_RANGES[THRUST_POS])
 };
+RangeFloat MyPIDControllerAgent::INTEGRAL_RANGE = RangeFloat(-200.0f, 200.0f);
 
 using namespace std;
 
 MyPIDControllerAgent::MyPIDControllerAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
-		MyAgent(bus, acceptedEventTypes), initialized(false), armed(false), yawCurr(0.0f), pitchCurr(0.0f), rollCurr(0.0f), yawErr(1.0f, 4, 10, 3), pitchErr(
-				1.0f, 4, 10, 3), rollErr(1.0f, 4, 10, 3) {
+		MyAgent(bus, acceptedEventTypes), initialized(false), armed(false), yawCurr(0.0f), pitchCurr(0.0f), rollCurr(0.0f), yawErr(1.0f, 4, 10, 3, INTEGRAL_RANGE), pitchErr(
+				1.0f, 4, 10, 3, INTEGRAL_RANGE), rollErr(1.0f, 4, 10, 3, INTEGRAL_RANGE) {
 	keRoll = 8.55f;      // local tests: 1.587f
 	keIRoll = 0.0073f; //0.0353f; //= 1.5186f;    // local tests: 0.0186f
 	keDRoll = 90.0125f; //112.0186f; //= 62.00f;     // local tests: 52.00f

@@ -44,6 +44,11 @@ private:
 			pitch /= divisor;
 			roll /= divisor;
 		}
+		void multiplyYPR(float multiplier){
+			yaw *= multiplier;
+			pitch *= multiplier;
+			roll *= multiplier;
+		}
 		friend const YPRT operator-(const YPRT& lhs, const YPRT& rhs) {
 			    YPRT r = {};
 			    r.yaw = lhs.yaw - rhs.yaw;
@@ -95,7 +100,7 @@ private:
 	void clean();
 
 	void processImuSample(boost::math::quaternion<float> sample);
-	YPRT getYPRTFromRcData();
+	YPRT getYPRTFromRcData(YPRT &prev);
 	YPRT calcYPRData(boost::math::quaternion<float> q);
 	YPRT calcCorrection(YPRT &delta);
 	YPRT calcDelta(YPRT &yprt1, YPRT &yprt2);
@@ -123,12 +128,14 @@ private:
 
 	float deg2MicrosFactor;
 	float deg2MicrosYawFactor;
+	uint16_t count;
 
 	static RangeFloat TARGET_RANGES[];
 	static ValueFloat TARGET_VALUES[];
 	static int8_t QUATERNION_DIRECTION_RPY[];
 	static int8_t RC_DIRECTION_RPY[];
     static float FREQUENCY;
+    static RangeFloat INTEGRAL_RANGE;
 };
 
 #endif /* AGENTS_MYPIDCNTRLLR_H_ */

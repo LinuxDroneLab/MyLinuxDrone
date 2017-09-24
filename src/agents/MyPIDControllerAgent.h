@@ -52,6 +52,7 @@ private:
 
 	static RangeFloat TARGET_RANGES[];
 	static ValueFloat TARGET_VALUES[];
+    static RangeFloat INTEGRAL_RANGE;
 };
 
 #endif /* AGENTS_MYPIDCONTROLLERAGENT_H_ */
