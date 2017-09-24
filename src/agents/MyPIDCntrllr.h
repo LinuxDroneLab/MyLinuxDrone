@@ -51,9 +51,24 @@ private:
 		}
 		friend const YPRT operator-(const YPRT& lhs, const YPRT& rhs) {
 			    YPRT r = {};
-			    r.yaw = lhs.yaw - rhs.yaw;
-			    r.pitch = lhs.pitch - rhs.pitch;
-			    r.roll = lhs.roll - rhs.roll;
+			    float appL = lhs.yaw * 1000.0f;
+			    float appR = rhs.yaw * 1000.0f;
+			    float app = appL - appR;
+			    app = app/1000.0f;
+			    r.yaw = app;
+
+			    appL = lhs.pitch * 1000.0f;
+			    appR = rhs.pitch * 1000.0f;
+			    app = appL - appR;
+			    app = app/1000.0f;
+			    r.pitch = app;
+
+			    appL = lhs.roll * 1000.0f;
+			    appR = rhs.roll * 1000.0f;
+			    app = appL - appR;
+			    app = app/1000.0f;
+			    r.roll = app;
+
 			    r.thrust = lhs.thrust - rhs.thrust;
 		        return r;
 		}

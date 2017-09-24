@@ -46,13 +46,13 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::E
    pitchErr(1.0f, 4, 10, 10, INTEGRAL_RANGE),
    rollErr(1.0f, 4, 10, 10, INTEGRAL_RANGE)
 {
-	keRoll = 1.2f; //0.45f;
-	keIRoll = 0.04f; //0.000523f;
-	keDRoll = 0.0f; //0.012f; //2.0f;
+	keRoll = 1.45f; //0.45f;
+	keIRoll = 0.028f; //0.000523f;
+	keDRoll = 3.0f; //0.012f; //2.0f;
 
-	kePitch = 1.2f; //0.45f;
-	keIPitch = 0.04f; //0.000523f;
-	keDPitch = 0.0f; //0.012f; //2.0f;
+	kePitch = 1.45f; //0.45f;
+	keIPitch = 0.028f; //0.000523f;
+	keDPitch = 3.0f; //0.012f; //2.0f;
 
 	keYaw = 0.0f; //0.05f;
 	keIYaw = 0.0f;
@@ -113,7 +113,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt) {
 //	syslog(LOG_INFO, "CYPRT: y(%3.5f, %3.5f), p(%3.5f, %3.5f), r(%3.5f, %3.5f), t(%5.5f)", yprt.yaw, yawCorr, yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
 //	syslog(LOG_INFO, "CYPRT: y(%3.5f), p(%3.5f), r(%3.5f), t(%5.5f)", yawCorr, pitchCorr, rollCorr, yprt.thrust);
 //TRG(1)=0; VAL(1)=45; E(1)=10; EI(1)=44935; ED(1)=0;
-	syslog(LOG_INFO, "P(%u)=%3.5f; PR(%u)=%3.5f; E(%u)=%3.5f; EI(%u)=%3.5f; ED(%u)=%3.5f; T(%u)=%3.5f;", count, this->targetData.pitch, count, realData.pitch, count, pitchErr.getMean()*kePitch, count, pitchErr.getIntegral()*keIPitch, count, pitchErr.getDerivate()*keDPitch, count, yprt.thrust);
+	syslog(LOG_INFO, "P(%u)=%3.5f; PR(%u)=%3.5f; F(%u)=%3.5f; E(%u)=%3.5f; EI(%u)=%3.5f; ED(%u)=%3.5f; T(%u)=%3.5f;", count, this->targetData.pitch, count, realData.pitch, count, yprt.pitch, count, pitchErr.getMean()*kePitch, count, pitchErr.getIntegral()*keIPitch, count, pitchErr.getDerivate()*keDPitch, count, yprt.thrust);
 
 	return result;
 }
@@ -192,10 +192,14 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ) {
 	 * deltaReal - deltaRequested = (sample - realData) - (targetData - realData) = sample - targetData
 	 */
 	YPRT deltaRequested = (targetData - sample);
-	deltaRequested.divideYPR(60.0f);
+	deltaRequested.divideYPR(50.0f);
 	YPRT deltaReal = sample - realData;
 
-	calcErr(deltaRequested, deltaReal);
+	// Calcolo errore solo se sono in volo
+	// TODO: trovare un modo migliore ...
+	if(sample.thrust > 1450.0f) {
+		calcErr(deltaRequested, deltaReal);
+	}
 
 	targetData = this->getYPRTFromRcData(targetData);
 	realData = sample;
@@ -205,7 +209,7 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ) {
 	 * La correzione è data dal target richiesto (espresso in gradi) in un ciclo di frequenza e compensata con l'errore (gained)
 	 */
 	YPRT input2Correct = (targetData - sample);
-	input2Correct.divideYPR(60.0f);
+	input2Correct.divideYPR(50.0f);
 	input2Correct.thrust = sample.thrust;
     YPRT input = calcCorrection(input2Correct);
 
