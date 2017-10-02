@@ -126,18 +126,51 @@ MyPIDCntrllr::YPRT  MyPIDCntrllr::calcDelta(YPRT  &yprt1, YPRT  &yprt2) {
 }
 
 MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(YPRT &data) {
+	// 3      1
+	//   \  /
+	//    \/
+	//    /\
+	//   /  \
+	// 2      4
+
+	// F3 e F4 girano in senso orario (CW)
+	// F1 + F3 - F2 - F4 = pitch
+	// F2 + F3 - F1 - F4 = roll
+	// F3 + F4 - F1 - F2 = yaw
+	// F1 + F2 + F3 + F4 = thrust
+    // +--+--+--+--+   +--+   +--+
+	// |-1|-1| 1| 1|   |F1|   |Y |
+    // +--+--+--+--+   +--+   +--+
+	// | 1|-1| 1|-1|   |F2|   |P |
+    // +--+--+--+--+ * +--+ = +--+
+	// |-1| 1| 1|-1|   |F3|   |R |
+    // +--+--+--+--+   +--+   +--+
+	// | 1| 1| 1| 1|   |F4|   |T |
+    // +--+--+--+--+   +--+   +--+
+    /*
+	-->inv(M)
+	   +-----+-----+-----+-----+   +---+   +----+
+ 	   |-0.25| 0.25|-0.25| 0.25|   | Y |   | F1 |
+	   +-----+-----+-----+-----+   +---+   +----+
+	   |-0.25|-0.25| 0.25| 0.25|   | P |   | F2 |
+	   +-----+-----+-----+-----+ * +---+ = +----+
+	   | 0.25| 0.25| 0.25| 0.25|   | R |   | F3 |
+	   +-----+-----+-----+-----+   +---+   +----+
+	   | 0.25|-0.25|-0.25| 0.25|   | T |   | F4 |
+	   +-----+-----+-----+-----+   +---+   +----+
+    */
 	// Transform input (delta attitude and thrust) to output (nanoseconds for motors)
-	long front = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + (data.pitch*deg2MicrosFactor - data.yaw*deg2MicrosYawFactor))*1000.0f)));
-	long rear = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust - (data.pitch*deg2MicrosFactor + data.yaw*deg2MicrosYawFactor))*1000.0f)));
-	long left = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust - (data.roll*deg2MicrosFactor - data.yaw*deg2MicrosYawFactor))*1000.0f)));
-	long right = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + (data.roll*deg2MicrosFactor + data.yaw*deg2MicrosYawFactor))*1000.0f)));
+	long f1 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((0.25)*data.pitch*deg2MicrosFactor + (-0.25)*data.roll*deg2MicrosFactor + (-0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
+	long f2 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((-0.25)*data.pitch*deg2MicrosFactor + (0.25)*data.roll*deg2MicrosFactor + (-0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
+	long f3 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((0.25)*data.pitch*deg2MicrosFactor + (0.25)*data.roll*deg2MicrosFactor + (0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
+	long f4 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((-0.25)*data.pitch*deg2MicrosFactor + (-0.25)*data.roll*deg2MicrosFactor + (0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
 
 	MyPIDCntrllr::PIDOutput result = {};
-	result.front = front;
-	result.rear = rear;
-	result.left = left;
-	result.right = right;
-	//syslog(LOG_INFO, "MOT: f(%d), r(%d), l(%d), r(%d), y(%5.5f), p(%5.5f), r(%5.5f)", front, rear, left, right, data.yaw, data.pitch, data.roll);
+	result.front = f1;
+	result.rear = f2;
+	result.left = f3;
+	result.right = f4;
+	//syslog(LOG_INFO, "MOT: f(%d), r(%d), l(%d), r(%d), y(%5.5f), p(%5.5f), r(%5.5f)", f1, f2, f3, f4, data.yaw, data.pitch, data.roll);
 	return result;
 }
 void MyPIDCntrllr::sendOutput(PIDOutput &data) {
