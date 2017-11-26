@@ -31,7 +31,7 @@ ValueFloat MyPIDCntrllr::TARGET_VALUES[] = {ValueFloat(0.0f, MyPIDCntrllr::TARGE
 													ValueFloat(0.0f, MyPIDCntrllr::TARGET_RANGES[YAW_POS]),
 													ValueFloat(0.0f, MyPIDCntrllr::TARGET_RANGES[THRUST_POS])
 };
-int8_t MyPIDCntrllr::QUATERNION_DIRECTION_RPY[] = {-1, -1, 1};
+int8_t MyPIDCntrllr::QUATERNION_DIRECTION_RPY[] = {1, -1, 1};
 int8_t MyPIDCntrllr::RC_DIRECTION_RPY[] = {1, -1, 1};
 float  MyPIDCntrllr::FREQUENCY = 100.0f;
 RangeFloat MyPIDCntrllr::INTEGRAL_RANGE = RangeFloat(-20.3f, 20.3f);
@@ -46,13 +46,13 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::E
    pitchErr(1.0f, 4, 10, 10, INTEGRAL_RANGE),
    rollErr(1.0f, 4, 10, 10, INTEGRAL_RANGE)
 {
-	keRoll = 1.45f; //0.45f;
-	keIRoll = 0.028f; //0.000523f;
-	keDRoll = 3.0f; //0.012f; //2.0f;
+	keRoll = 5.35f; //0.45f;
+	keIRoll = 0.000523f; //0.028f; //0.000523f;
+	keDRoll = 5.5f; // 4.0f; //0.012f; //2.0f;
 
-	kePitch = 1.45f; //0.45f;
-	keIPitch = 0.028f; //0.000523f;
-	keDPitch = 3.0f; //0.012f; //2.0f;
+	kePitch = 5.35f; //0.45f;
+	keIPitch = 0.000523f; //0.028f; //0.000523f;
+	keDPitch = 5.5f; //4.0f; //0.012f; //2.0f;
 
 	keYaw = 0.0f; //0.05f;
 	keIYaw = 0.0f;
@@ -113,8 +113,9 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt) {
 //	syslog(LOG_INFO, "CYPRT: y(%3.5f, %3.5f), p(%3.5f, %3.5f), r(%3.5f, %3.5f), t(%5.5f)", yprt.yaw, yawCorr, yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
 //	syslog(LOG_INFO, "CYPRT: y(%3.5f), p(%3.5f), r(%3.5f), t(%5.5f)", yawCorr, pitchCorr, rollCorr, yprt.thrust);
 //TRG(1)=0; VAL(1)=45; E(1)=10; EI(1)=44935; ED(1)=0;
-	if(result.thrust > 1500.0f) {
-		syslog(LOG_INFO, "P(%u)=%3.5f; PR(%u)=%3.5f; F(%u)=%3.5f; E(%u)=%3.5f; EI(%u)=%3.5f; ED(%u)=%3.5f; T(%u)=%3.5f;", count, this->targetData.pitch, count, realData.pitch, count, yprt.pitch, count, pitchErr.getMean()*kePitch, count, pitchErr.getIntegral()*keIPitch, count, pitchErr.getDerivate()*keDPitch, count, yprt.thrust);
+	if(result.thrust > 1200.0f) {
+//		syslog(LOG_INFO, "P(%u)=%3.5f; PR(%u)=%3.5f; F(%u)=%3.5f; E(%u)=%3.5f; EI(%u)=%3.5f; ED(%u)=%3.5f; T(%u)=%3.5f;", count, this->targetData.pitch, count, realData.pitch, count, yprt.pitch, count, pitchErr.getMean()*kePitch, count, pitchErr.getIntegral()*keIPitch, count, pitchErr.getDerivate()*keDPitch, count, yprt.thrust);
+	   syslog(LOG_INFO, "R(%u)=%3.5f; P(%u)=%3.5f; Y(%u)=%3.5f; T(%u)=%3.5f", count, this->realData.roll, count, realData.pitch, count, realData.yaw, count, yprt.thrust);
 	}
 
 	return result;
@@ -170,7 +171,7 @@ MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(YPRT &data) {
 	result.rear = f2;
 	result.left = f3;
 	result.right = f4;
-	//syslog(LOG_INFO, "MOT: f(%d), r(%d), l(%d), r(%d), y(%5.5f), p(%5.5f), r(%5.5f)", f1, f2, f3, f4, data.yaw, data.pitch, data.roll);
+	// syslog(LOG_INFO, "MOT: f(%d), r(%d), l(%d), r(%d), y(%5.5f), p(%5.5f), r(%5.5f)", f1, f2, f3, f4, data.yaw, data.pitch, data.roll);
 	return result;
 }
 void MyPIDCntrllr::sendOutput(PIDOutput &data) {

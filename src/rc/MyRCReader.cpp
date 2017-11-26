@@ -13,6 +13,7 @@
 #include <pruss_intc_mapping.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
+#include <syslog.h>
 
 #define PRU_NUM 0
 #define CHAN_THRUST 1
@@ -24,8 +25,8 @@
 
 static void *pru0DataMemory;
 static unsigned int *pru0DataMemory_int;
-RangeInt16 MyRCReader::PRU_RANGES[] = { RangeInt16(599, 1587), RangeInt16(619,
-		1582), RangeInt16(642, 1540), RangeInt16(595, 1589), RangeInt16(596,
+RangeInt16 MyRCReader::PRU_RANGES[] = { RangeInt16(602, 1584), RangeInt16(620,
+		1578), RangeInt16(642, 1531), RangeInt16(595, 1581), RangeInt16(596,
 		1589), RangeInt16(596, 1589) };
 RangeInt16 MyRCReader::CHAN_RANGES[] = { RangeInt16(-500, 500), RangeInt16(-500,
 		500), RangeInt16(-500, 500), RangeInt16(-500, 500), RangeInt16(-500,
@@ -123,6 +124,8 @@ void MyRCReader::operator()() {
 					MyRCReader::CHAN_VALUES[CHAN_AUX2].getValueAsPercent());
 
 		}
+		// syslog(LOG_INFO, "mydrone: PRU: roll=%d, pitch=%d, yaw=%d, aux1=%d, aux2=%d, thr=%d", MyRCReader::PRU_VALUES[CHAN_ROLL].getValue(), MyRCReader::PRU_VALUES[CHAN_PITCH].getValue(), MyRCReader::PRU_VALUES[CHAN_YAW].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX1].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX2].getValue(), MyRCReader::PRU_VALUES[CHAN_THRUST].getValue());
+
 		// if(MyRCReader::CHAN_VALUES[CHAN_PITCH].getValueAsPercent() < 0) {
 //		  	  cout << "PS: P: " << currPitch << ", "<< MyRCReader::PRU_VALUES[CHAN_PITCH].getValue() << " - C: " << MyRCReader::CHAN_VALUES[CHAN_PITCH].getValue() << endl;
 		//}

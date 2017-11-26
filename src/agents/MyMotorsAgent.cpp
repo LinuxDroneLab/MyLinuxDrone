@@ -19,8 +19,8 @@
 MyMotorsAgent::MyMotorsAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
 		MyAgent(bus, acceptedEventTypes), initialized(false), armed(false),
-		front("/sys/devices/platform/ocp/ocp:P9_22_pinmux", "/sys/class/pwm/pwmchip0", 0),
-		rear("/sys/devices/platform/ocp/ocp:P9_21_pinmux", "/sys/class/pwm/pwmchip0", 1),
+		front("/sys/devices/platform/ocp/ocp:P9_22_pinmux", "/sys/class/pwm/pwmchip0", 1),
+		rear("/sys/devices/platform/ocp/ocp:P9_21_pinmux", "/sys/class/pwm/pwmchip0", 0),
 		left("/sys/devices/platform/ocp/ocp:P8_19_pinmux", "/sys/class/pwm/pwmchip4", 0),
 		right("/sys/devices/platform/ocp/ocp:P8_13_pinmux", "/sys/class/pwm/pwmchip4", 1)
 {
