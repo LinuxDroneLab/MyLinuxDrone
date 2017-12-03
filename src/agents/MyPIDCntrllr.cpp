@@ -46,13 +46,13 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::E
    pitchErr(1.0f, 4, 10, 10, INTEGRAL_RANGE),
    rollErr(1.0f, 4, 10, 10, INTEGRAL_RANGE)
 {
-	keRoll = 5.35f; //0.45f;
-	keIRoll = 0.000523f; //0.028f; //0.000523f;
-	keDRoll = 5.5f; // 4.0f; //0.012f; //2.0f;
+	keRoll = 3.00f; //0.45f;
+	keIRoll = 0.016f; //0.000523f; //0.028f; //0.000523f;
+	keDRoll = 4.0f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
 
-	kePitch = 5.35f; //0.45f;
-	keIPitch = 0.000523f; //0.028f; //0.000523f;
-	keDPitch = 5.5f; //4.0f; //0.012f; //2.0f;
+	kePitch = 3.00f; //0.45f;
+	keIPitch = 0.016f; //0.000523f; //0.028f; //0.000523f;
+	keDPitch = 4.0f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
 
 	keYaw = 0.0f; //0.05f;
 	keIYaw = 0.0f;
@@ -115,7 +115,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt) {
 //TRG(1)=0; VAL(1)=45; E(1)=10; EI(1)=44935; ED(1)=0;
 	if(result.thrust > 1200.0f) {
 //		syslog(LOG_INFO, "P(%u)=%3.5f; PR(%u)=%3.5f; F(%u)=%3.5f; E(%u)=%3.5f; EI(%u)=%3.5f; ED(%u)=%3.5f; T(%u)=%3.5f;", count, this->targetData.pitch, count, realData.pitch, count, yprt.pitch, count, pitchErr.getMean()*kePitch, count, pitchErr.getIntegral()*keIPitch, count, pitchErr.getDerivate()*keDPitch, count, yprt.thrust);
-	   syslog(LOG_INFO, "R(%u)=%3.5f; P(%u)=%3.5f; Y(%u)=%3.5f; T(%u)=%3.5f", count, this->realData.roll, count, realData.pitch, count, realData.yaw, count, yprt.thrust);
+//	   syslog(LOG_INFO, "R(%u)=%3.5f; P(%u)=%3.5f; Y(%u)=%3.5f; RR(%u)=%3.5f; RP(%u)=%3.5f; RY(%u)=%3.5f; T(%u)=%3.5f", count, this->realData.roll, count, realData.pitch, count, realData.yaw, count, this->targetData.roll, count, targetData.pitch, count, targetData.yaw,count, yprt.thrust);
 	}
 
 	return result;
@@ -161,7 +161,7 @@ MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(YPRT &data) {
 	   +-----+-----+-----+-----+   +---+   +----+
     */
 	// Transform input (delta attitude and thrust) to output (nanoseconds for motors)
-	long f1 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((0.25)*data.pitch*deg2MicrosFactor + (-0.25)*data.roll*deg2MicrosFactor + (-0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
+	long f1 = 100000L + std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((0.25)*data.pitch*deg2MicrosFactor + (-0.25)*data.roll*deg2MicrosFactor + (-0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
 	long f2 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((-0.25)*data.pitch*deg2MicrosFactor + (0.25)*data.roll*deg2MicrosFactor + (-0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
 	long f3 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((0.25)*data.pitch*deg2MicrosFactor + (0.25)*data.roll*deg2MicrosFactor + (0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
 	long f4 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((-0.25)*data.pitch*deg2MicrosFactor + (-0.25)*data.roll*deg2MicrosFactor + (0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
@@ -228,7 +228,8 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ) {
 	 * deltaReal - deltaRequested = (sample - realData) - (targetData - realData) = sample - targetData
 	 */
 	YPRT deltaRequested = (targetData - sample);
-	deltaRequested.divideYPR(52.0f);
+	deltaRequested.divideYPR(22.0f);
+//	deltaRequested.limitYPR(0.6f, 0.1f);
 	YPRT deltaReal = sample - realData;
 
 	// Calcolo errore solo se sono in volo
@@ -245,7 +246,8 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ) {
 	 * La correzione è data dal target richiesto (espresso in gradi) in un ciclo di frequenza e compensata con l'errore (gained)
 	 */
 	YPRT input2Correct = (targetData - sample);
-	input2Correct.divideYPR(52.0f);
+	input2Correct.divideYPR(22.0f);
+//	input2Correct.limitYPR(0.6f, 0.1f);
 	input2Correct.thrust = sample.thrust;
     YPRT input = calcCorrection(input2Correct);
 

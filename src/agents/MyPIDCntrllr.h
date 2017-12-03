@@ -39,6 +39,17 @@ private:
 		bool isZero() {
 			return yaw == 0.0f && pitch == 0.0f && roll == 0.0f && thrust == 0.0f;
 		}
+		void limitYPR(float PRLimit, float YLimit){
+			if(PRLimit < 0.0f) {
+				PRLimit = -PRLimit;
+			}
+			if(YLimit < 0.0f) {
+				YLimit = -YLimit;
+			}
+			yaw = max(std::min(yaw, YLimit), -YLimit);
+			pitch = max(std::min(pitch, PRLimit), -PRLimit);
+			roll = max(std::min(roll, PRLimit), -PRLimit);
+		}
 		void divideYPR(float divisor){
 			yaw /= divisor;
 			pitch /= divisor;
