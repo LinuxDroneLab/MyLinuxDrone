@@ -124,7 +124,7 @@ void MyRCReader::operator()() {
 					MyRCReader::CHAN_VALUES[CHAN_AUX2].getValueAsPercent());
 
 		}
-		// syslog(LOG_INFO, "mydrone: PRU: roll=%d, pitch=%d, yaw=%d, aux1=%d, aux2=%d, thr=%d", MyRCReader::PRU_VALUES[CHAN_ROLL].getValue(), MyRCReader::PRU_VALUES[CHAN_PITCH].getValue(), MyRCReader::PRU_VALUES[CHAN_YAW].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX1].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX2].getValue(), MyRCReader::PRU_VALUES[CHAN_THRUST].getValue());
+		syslog(LOG_INFO, "mydrone: PRU: roll=%d, pitch=%d, yaw=%d, aux1=%d, aux2=%d, thr=%d", MyRCReader::PRU_VALUES[CHAN_ROLL].getValue(), MyRCReader::PRU_VALUES[CHAN_PITCH].getValue(), MyRCReader::PRU_VALUES[CHAN_YAW].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX1].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX2].getValue(), MyRCReader::PRU_VALUES[CHAN_THRUST].getValue());
 
 		// if(MyRCReader::CHAN_VALUES[CHAN_PITCH].getValueAsPercent() < 0) {
 //		  	  cout << "PS: P: " << currPitch << ", "<< MyRCReader::PRU_VALUES[CHAN_PITCH].getValue() << " - C: " << MyRCReader::CHAN_VALUES[CHAN_PITCH].getValue() << endl;
@@ -215,7 +215,7 @@ bool MyRCReader::initPRU() {
 	}
 
 	// Load and execute binary on PRU
-	prussdrv_exec_program(PRU_NUM, "./provaPRU.bin");
+	prussdrv_exec_program(PRU_NUM, "/root/MyDrone/provaPRU.bin");
 
 	return true;
 }

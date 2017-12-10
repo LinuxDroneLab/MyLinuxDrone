@@ -26,6 +26,7 @@ private:
 	void initialize();
 	bool armed;
 	void writeMotors(boost::shared_ptr<MyOutMotors> event) ;
+	void setThrottleRange();
 	void disarmMotors();
 	void armMotors();
 

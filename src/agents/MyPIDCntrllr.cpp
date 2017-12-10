@@ -46,13 +46,13 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::E
    pitchErr(1.0f, 4, 10, 10, INTEGRAL_RANGE),
    rollErr(1.0f, 4, 10, 10, INTEGRAL_RANGE)
 {
-	keRoll = 3.00f; //0.45f;
-	keIRoll = 0.016f; //0.000523f; //0.028f; //0.000523f;
-	keDRoll = 4.0f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
+	keRoll = 3.20f; //0.45f;
+	keIRoll = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
+	keDRoll = 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
 
-	kePitch = 3.00f; //0.45f;
-	keIPitch = 0.016f; //0.000523f; //0.028f; //0.000523f;
-	keDPitch = 4.0f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
+	kePitch = 3.20f; //0.45f;
+	keIPitch = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
+	keDPitch = 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
 
 	keYaw = 0.0f; //0.05f;
 	keIYaw = 0.0f;
@@ -161,7 +161,7 @@ MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(YPRT &data) {
 	   +-----+-----+-----+-----+   +---+   +----+
     */
 	// Transform input (delta attitude and thrust) to output (nanoseconds for motors)
-	long f1 = 100000L + std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((0.25)*data.pitch*deg2MicrosFactor + (-0.25)*data.roll*deg2MicrosFactor + (-0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
+	long f1 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((0.25)*data.pitch*deg2MicrosFactor + (-0.25)*data.roll*deg2MicrosFactor + (-0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
 	long f2 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((-0.25)*data.pitch*deg2MicrosFactor + (0.25)*data.roll*deg2MicrosFactor + (-0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
 	long f3 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((0.25)*data.pitch*deg2MicrosFactor + (0.25)*data.roll*deg2MicrosFactor + (0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
 	long f4 = std::max<long>(1000000L, std::min<long>(2000000L, std::lrint((data.thrust + ((-0.25)*data.pitch*deg2MicrosFactor + (-0.25)*data.roll*deg2MicrosFactor + (0.25)*data.yaw*deg2MicrosYawFactor))*1000.0f)));
@@ -171,7 +171,7 @@ MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(YPRT &data) {
 	result.rear = f2;
 	result.left = f3;
 	result.right = f4;
-	// syslog(LOG_INFO, "MOT: f(%d), r(%d), l(%d), r(%d), y(%5.5f), p(%5.5f), r(%5.5f)", f1, f2, f3, f4, data.yaw, data.pitch, data.roll);
+//	syslog(LOG_INFO, "MOT: f(%ld), r(%ld), l(%ld), r(%ld), y(%5.5f), p(%5.5f), r(%5.5f), t(%5.5f), tt(%5.5f)", f1, f2, f3, f4, data.yaw, data.pitch, data.roll, data.thrust, targetData.thrust);
 	return result;
 }
 void MyPIDCntrllr::sendOutput(PIDOutput &data) {

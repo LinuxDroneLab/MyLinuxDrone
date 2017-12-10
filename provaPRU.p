@@ -1,7 +1,7 @@
 .origin 0               // offset of start of program in PRU memory
 .entrypoint START       // program entry point used by the debugger
 
-#define CHAN_PERIOD_US        1700
+#define CHAN_PERIOD_US        5700
 #define INS_PER_US            200
 #define INS_PER_LOOP          2
 #define MAX_CHAN_PERIOD_COUNT (CHAN_PERIOD_US * INS_PER_US) / INS_PER_LOOP
@@ -18,8 +18,6 @@
 
 START:
 
-   MOV    r2, 0 // initialize curr_channel
-
    // set MAX_CHAN_PERIOD_COUNT to r1
    MOV    r1.w0, (MAX_CHAN_PERIOD_COUNT) & 0xFFFF
    MOV    r1.w2, (MAX_CHAN_PERIOD_COUNT) >> 16
@@ -35,7 +33,7 @@ INITCOUNT:
    WBS    r31.t5
 COUNTHIGH:
    ADD    r0, r0, 1             // increment counter
-   QBBS   COUNTHIGH, r31.t5     // loop until signal is low
+   QBBS   COUNTHIGH, r31.t5     // loop until signal is high
 SIGLOW:
    ADD    r2, r2, 1             // CURR_CHANNEL++
    QBLT   SAVECHANNEL, r1, r0   // save channel if it's not a sync signal
@@ -43,13 +41,8 @@ SIGLOW:
    JMP INITCURRCHAN
 SENDEV:
    MOV    R31.b0, PRU0_R31_VEC_VALID | PRU_EVTOUT_1  // generate interrupt for linux host
-   MOV    r0, 0
-CYCLE: // wait 
-   ADD    r0, r0, 1
-   QBLT   CYCLE, r1, r0
    JMP    INITCURRCHAN
 SAVECHANNEL:
-   QBBC   INITCOUNT, r3.t0      // does not save if r3.t0=0
    // save data and increment address
    SBBO   r0, r4, 0, 4          // store the counter at r4 address
    ADD r4, r4, 4                // next address

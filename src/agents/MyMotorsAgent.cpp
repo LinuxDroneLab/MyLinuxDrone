@@ -15,6 +15,8 @@
 #include <events/MinThrustMaxPitch.h>
 #include <events/MinThrustMinPitch.h>
 #include <syslog.h>
+#include <thread>
+#include <chrono>
 
 MyMotorsAgent::MyMotorsAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
@@ -34,6 +36,7 @@ void MyMotorsAgent::initialize() {
 	rear.initialize();
 	left.initialize();
 	right.initialize();
+	this->setThrottleRange();
     this->disarmMotors();
 
 	// TODO: inviare pwm min
@@ -72,6 +75,19 @@ void MyMotorsAgent::writeMotors(boost::shared_ptr<MyOutMotors> event) {
 	left.setDutyCycleNanos(event->getLeft());
 	right.setDutyCycleNanos(event->getRight());
 }
+void MyMotorsAgent::setThrottleRange() {
+	front.setDutyCycleNanos(2000000);
+	rear.setDutyCycleNanos(2000000);
+	left.setDutyCycleNanos(2000000);
+	right.setDutyCycleNanos(2000000);
+	std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+	front.setDutyCycleNanos(1000000);
+	rear.setDutyCycleNanos(1000000);
+	left.setDutyCycleNanos(1000000);
+	right.setDutyCycleNanos(1000000);
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+}
+
 void MyMotorsAgent::disarmMotors() {
 	front.setDutyCycleNanos(1000000);
 	rear.setDutyCycleNanos(1000000);
