@@ -22,3 +22,8 @@ Debug/**/*.o
 ARM/MyDrone
 Debug/MyDrone
 *.tmp
+syslog
+syslog.*
+ARM
+*.dtb
+*.dtbo
