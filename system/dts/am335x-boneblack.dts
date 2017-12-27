@@ -2127,7 +2127,7 @@
 		pinctrl-names = "default", "off";
 		pinctrl-0 = <0x44>;
 		pinctrl-1 = <0x45>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	__symbols__ {

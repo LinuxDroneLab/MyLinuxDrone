@@ -25,9 +25,9 @@
 
 static void *pru0DataMemory;
 static unsigned int *pru0DataMemory_int;
-RangeInt16 MyRCReader::PRU_RANGES[] = { RangeInt16(602, 1584), RangeInt16(620,
-		1578), RangeInt16(642, 1531), RangeInt16(595, 1581), RangeInt16(596,
-		1589), RangeInt16(596, 1589) };
+RangeInt16 MyRCReader::PRU_RANGES[] = { RangeInt16(602, 1584), RangeInt16(611,
+		1578), RangeInt16(665, 1535), RangeInt16(612, 1572), RangeInt16(597,
+		1589), RangeInt16(597, 1588) };
 RangeInt16 MyRCReader::CHAN_RANGES[] = { RangeInt16(-500, 500), RangeInt16(-500,
 		500), RangeInt16(-500, 500), RangeInt16(-500, 500), RangeInt16(-500,
 		500), RangeInt16(-500, 500) };
@@ -91,7 +91,6 @@ void MyRCReader::operator()() {
 		setValue(CHAN_THRUST,
 				int16_t((*(pru0DataMemory_int + CHAN_THRUST)) / 100));
 
-		if (cycle == 0) {
 			// save PRU values in microseconds
 			MyRCReader::PRU_VALUES[CHAN_ROLL].setValue(getValue(CHAN_ROLL));
 			MyRCReader::PRU_VALUES[CHAN_PITCH].setValue(getValue(CHAN_PITCH));
@@ -123,8 +122,9 @@ void MyRCReader::operator()() {
 					MyRCReader::CHAN_VALUES[CHAN_AUX1].getValueAsPercent(),
 					MyRCReader::CHAN_VALUES[CHAN_AUX2].getValueAsPercent());
 
+		if (cycle == 0) {
+			syslog(LOG_INFO, "mydrone: PRU: roll=%d, pitch=%d, yaw=%d, aux1=%d, aux2=%d, thr=%d", MyRCReader::PRU_VALUES[CHAN_ROLL].getValue(), MyRCReader::PRU_VALUES[CHAN_PITCH].getValue(), MyRCReader::PRU_VALUES[CHAN_YAW].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX1].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX2].getValue(), MyRCReader::PRU_VALUES[CHAN_THRUST].getValue());
 		}
-		syslog(LOG_INFO, "mydrone: PRU: roll=%d, pitch=%d, yaw=%d, aux1=%d, aux2=%d, thr=%d", MyRCReader::PRU_VALUES[CHAN_ROLL].getValue(), MyRCReader::PRU_VALUES[CHAN_PITCH].getValue(), MyRCReader::PRU_VALUES[CHAN_YAW].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX1].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX2].getValue(), MyRCReader::PRU_VALUES[CHAN_THRUST].getValue());
 
 		// if(MyRCReader::CHAN_VALUES[CHAN_PITCH].getValueAsPercent() < 0) {
 //		  	  cout << "PS: P: " << currPitch << ", "<< MyRCReader::PRU_VALUES[CHAN_PITCH].getValue() << " - C: " << MyRCReader::CHAN_VALUES[CHAN_PITCH].getValue() << endl;
@@ -132,10 +132,8 @@ void MyRCReader::operator()() {
 
 		int pruclear = prussdrv_pru_clear_event(PRU_EVTOUT_1,
 				PRU0_ARM_INTERRUPT);
-//	       boost::posix_time::ptime mst2 = boost::posix_time::microsec_clock::local_time();
-//	       boost::posix_time::time_duration msdiff = mst2 - mst1;
-//	       std::cout << msdiff.total_milliseconds() << " - " << notimes << std::endl;
-		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+
+		// boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 		cycle++;
 		cycle %= 10;
 
