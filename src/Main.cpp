@@ -84,36 +84,60 @@ int main() {
 //	cout << "long: " << sizeof(long long) << ", int: " << sizeof(int) << ", short: " << sizeof(short) << endl;
 	// create eventBus
 	boost::shared_ptr<MyEventBus> eventBus(boost::make_shared<MyEventBus>());
+    syslog(LOG_INFO, "mydrone Event Bus created");
 
 
 	MyClock myClock(eventBus, 5);
+    syslog(LOG_INFO, "mydrone MyClock created");
+
 	MyIMUAgent imuAgent(eventBus, {MyEvent::EventType::Tick});
+    syslog(LOG_INFO, "mydrone MyIMUAgent created");
+
 	MyPIDCntrllr pidControlledAgent(eventBus, {MyEvent::EventType::MotorsArmed, MyEvent::EventType::MotorsDisarmed, MyEvent::EventType::IMUSample, MyEvent::EventType::RCSample, MyEvent::EventType::BaroSample});
-	MyMotorsAgent motorsAgent(eventBus, {MyEvent::EventType::MinThrustMaxPitch, MyEvent::EventType::MinThrustMinPitch, MyEvent::EventType::OutMotors});
+    syslog(LOG_INFO, "mydrone MyPIDCntrllr created");
+
+    MyMotorsAgent motorsAgent(eventBus, {MyEvent::EventType::Tick, MyEvent::EventType::MinThrustMaxPitch, MyEvent::EventType::MinThrustMinPitch, MyEvent::EventType::OutMotors});
+    syslog(LOG_INFO, "mydrone MyMotorsAgent created");
+
     MyRCAgent rcAgent(eventBus, {MyEvent::EventType::Tick});
+    syslog(LOG_INFO, "mydrone MyRCAgent created");
 
-	MyDBusEmitterAgent dbusAgent(eventBus, {MyEvent::EventType::YPRError});
+//	MyDBusEmitterAgent dbusAgent(eventBus, {MyEvent::EventType::YPRError});
+//    syslog(LOG_INFO, "mydrone MyDBusEmitterAgent created");
 
-	boost::thread imuAgentThr(boost::ref(imuAgent));
-	boost::thread rcAgentThr(boost::ref(rcAgent));
-	boost::thread pidControllerAgentThr(boost::ref(pidControlledAgent));
+    // ---- Start agents ---------------------------------------------------
 	boost::thread motorsAgentThr(boost::ref(motorsAgent));
-	boost::thread myDBusThread(boost::ref(dbusAgent));
+	syslog(LOG_INFO, "mydrone MyMotorsAgent thread started");
+
+	boost::thread rcAgentThr(boost::ref(rcAgent));
+    syslog(LOG_INFO, "mydrone MyRCAgent thread started");
+
+    boost::thread imuAgentThr(boost::ref(imuAgent));
+	syslog(LOG_INFO, "mydrone MyIMUAgent thread started");
+
+	boost::thread pidControllerAgentThr(boost::ref(pidControlledAgent));
+	syslog(LOG_INFO, "mydrone MyPIDCntrllrAgent thread started");
+
+//	boost::thread myDBusThread(boost::ref(dbusAgent));
+//	syslog(LOG_INFO, "mydrone MyDBusEmitterAgent thread started");
+
 	boost::thread myClockThread(boost::ref(myClock));
+	syslog(LOG_INFO, "mydrone MyClockAgent thread started");
 
 	// arm motors
-	boost::shared_ptr<MyArmMotorsCmd> armMotors(boost::make_shared<MyArmMotorsCmd>(uuid, motorsAgent.getUuid()));
-	eventBus->doEvent(armMotors);
+	// boost::shared_ptr<MyArmMotorsCmd> armMotors(boost::make_shared<MyArmMotorsCmd>(uuid, motorsAgent.getUuid()));
+	// eventBus->doEvent(armMotors);
 
 	MyPIDControllerServiceWrap::initialize();
 //	cout << "Initialized: org.mydrone.MyPIDControllerService" << endl;
 
 	// wait for exit;
+	syslog(LOG_INFO, "mydrone Daemon waiting for end signal ...");
 	imuAgentThr.join();
 	rcAgentThr.join();
 	pidControllerAgentThr.join();
 	motorsAgentThr.join();
-	myDBusThread.join();
+//	myDBusThread.join();
 	myClockThread.join();
 
     syslog(LOG_INFO, "mydrone Daemon bye bye");

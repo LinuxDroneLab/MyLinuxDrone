@@ -76,28 +76,29 @@ bool MyRCReader::isActive() {
 	return this->active;
 }
 void MyRCReader::operator()() {
-
+	syslog(LOG_INFO, "mydrone: PRU: thread MyRCReader started");
 	uint8_t cycle = 0;
 	do {
 //		   boost::posix_time::ptime mst1 = boost::posix_time::microsec_clock::local_time();
 
 		int notimes = prussdrv_pru_wait_event(PRU_EVTOUT_1);
-		setValue(CHAN_ROLL, int16_t((*(pru0DataMemory_int + CHAN_ROLL)) / 100));
-		setValue(CHAN_PITCH,
-				int16_t((*(pru0DataMemory_int + CHAN_PITCH)) / 100));
-		setValue(CHAN_YAW, int16_t((*(pru0DataMemory_int + CHAN_YAW)) / 100));
-		setValue(CHAN_AUX1, int16_t((*(pru0DataMemory_int + CHAN_AUX1)) / 100));
-		setValue(CHAN_AUX2, int16_t((*(pru0DataMemory_int + CHAN_AUX2)) / 100));
-		setValue(CHAN_THRUST,
-				int16_t((*(pru0DataMemory_int + CHAN_THRUST)) / 100));
+		uint16_t chanRollValue = uint16_t((*(pru0DataMemory_int + CHAN_ROLL)) / 100);
+		uint16_t chanThrustValue = uint16_t((*(pru0DataMemory_int + CHAN_THRUST)) / 100);
+		uint16_t chanPitchValue = uint16_t((*(pru0DataMemory_int + CHAN_PITCH)) / 100);
+		uint16_t chanYawValue = uint16_t((*(pru0DataMemory_int + CHAN_YAW)) / 100);
+		uint16_t chanAux1Value = uint16_t((*(pru0DataMemory_int + CHAN_AUX1)) / 100);
+		uint16_t chanAux2Value = uint16_t((*(pru0DataMemory_int + CHAN_AUX2)) / 100);
+
+		int pruclear = prussdrv_pru_clear_event(PRU_EVTOUT_1,
+				PRU0_ARM_INTERRUPT);
 
 			// save PRU values in microseconds
-			MyRCReader::PRU_VALUES[CHAN_ROLL].setValue(getValue(CHAN_ROLL));
-			MyRCReader::PRU_VALUES[CHAN_PITCH].setValue(getValue(CHAN_PITCH));
-			MyRCReader::PRU_VALUES[CHAN_YAW].setValue(getValue(CHAN_YAW));
-			MyRCReader::PRU_VALUES[CHAN_THRUST].setValue(getValue(CHAN_THRUST));
-			MyRCReader::PRU_VALUES[CHAN_AUX1].setValue(getValue(CHAN_AUX1));
-			MyRCReader::PRU_VALUES[CHAN_AUX2].setValue(getValue(CHAN_AUX2));
+			MyRCReader::PRU_VALUES[CHAN_ROLL].setValue(chanRollValue);
+			MyRCReader::PRU_VALUES[CHAN_PITCH].setValue(chanPitchValue);
+			MyRCReader::PRU_VALUES[CHAN_YAW].setValue(chanYawValue);
+			MyRCReader::PRU_VALUES[CHAN_THRUST].setValue(chanThrustValue);
+			MyRCReader::PRU_VALUES[CHAN_AUX1].setValue(chanAux1Value);
+			MyRCReader::PRU_VALUES[CHAN_AUX2].setValue(chanAux2Value);
 
 			// convert PRU values to CHAN values ([-500, 500]
 			MyRCReader::CHAN_VALUES[CHAN_ROLL].setValue(
@@ -123,15 +124,13 @@ void MyRCReader::operator()() {
 					MyRCReader::CHAN_VALUES[CHAN_AUX2].getValueAsPercent());
 
 		if (cycle == 0) {
-			syslog(LOG_INFO, "mydrone: PRU: roll=%d, pitch=%d, yaw=%d, aux1=%d, aux2=%d, thr=%d", MyRCReader::PRU_VALUES[CHAN_ROLL].getValue(), MyRCReader::PRU_VALUES[CHAN_PITCH].getValue(), MyRCReader::PRU_VALUES[CHAN_YAW].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX1].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX2].getValue(), MyRCReader::PRU_VALUES[CHAN_THRUST].getValue());
+//			syslog(LOG_INFO, "mydrone: PRU: roll=%d, pitch=%d, yaw=%d, aux1=%d, aux2=%d, thr=%d", MyRCReader::PRU_VALUES[CHAN_ROLL].getValue(), MyRCReader::PRU_VALUES[CHAN_PITCH].getValue(), MyRCReader::PRU_VALUES[CHAN_YAW].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX1].getValue(), MyRCReader::PRU_VALUES[CHAN_AUX2].getValue(), MyRCReader::PRU_VALUES[CHAN_THRUST].getValue());
+//			syslog(LOG_INFO, "mydrone: PRU: roll=%d, pitch=%d, yaw=%d, aux1=%d, aux2=%d, thr=%d", chanRollValue, chanPitchValue, chanYawValue, chanAux1Value, chanAux2Value, chanThrustValue);
 		}
 
 		// if(MyRCReader::CHAN_VALUES[CHAN_PITCH].getValueAsPercent() < 0) {
 //		  	  cout << "PS: P: " << currPitch << ", "<< MyRCReader::PRU_VALUES[CHAN_PITCH].getValue() << " - C: " << MyRCReader::CHAN_VALUES[CHAN_PITCH].getValue() << endl;
 		//}
-
-		int pruclear = prussdrv_pru_clear_event(PRU_EVTOUT_1,
-				PRU0_ARM_INTERRUPT);
 
 		// boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 		cycle++;
@@ -187,6 +186,8 @@ int16_t MyRCReader::getValue(int8_t chan) {
 	return selectedValue;
 }
 bool MyRCReader::initPRU() {
+	syslog(LOG_INFO, "mydrone: PRU: initializing ...");
+
 	if (getuid() != 0) {
 		printf("You must run this program as root. Exiting.\n");
 		exit(EXIT_FAILURE);
@@ -213,7 +214,11 @@ bool MyRCReader::initPRU() {
 	}
 
 	// Load and execute binary on PRU
+	syslog(LOG_INFO, "mydrone: PRU: loading program ...");
 	prussdrv_exec_program(PRU_NUM, "/root/MyDrone/provaPRU.bin");
+	syslog(LOG_INFO, "mydrone: PRU: program loaded");
+	prussdrv_pru_enable(PRU_NUM);
+	syslog(LOG_INFO, "mydrone: PRU: initialized");
 
 	return true;
 }

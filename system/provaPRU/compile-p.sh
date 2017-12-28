@@ -1,0 +1,1 @@
+pasm -b provaPRU.p

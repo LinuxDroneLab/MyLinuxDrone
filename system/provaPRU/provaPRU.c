@@ -24,11 +24,7 @@ void *threadFunction(void *value){
       unsigned int chan4 = *(pru0DataMemory_int + 3);
       unsigned int chan5 = *(pru0DataMemory_int + 4);
       unsigned int chan6 = *(pru0DataMemory_int + 5);
-      unsigned int mux = *(pru0DataMemory_int + 9);
-      if(mux != 0) {
-        printf("M=%d, 1=%d, 2=%d, 3=%d, 4=%d, 5=%d, 6=%d \n", mux, chan1, chan2, chan3, chan4, chan5, chan6);
-        *(pru0DataMemory_int + 9) = 0;
-      }
+      printf("1=%d, 2=%d, 3=%d, 4=%d, 5=%d, 6=%d \n", chan1, chan2, chan3, chan4, chan5, chan6);
       prussdrv_pru_clear_event (PRU_EVTOUT_1, PRU0_ARM_INTERRUPT);
    } while (1);
 }

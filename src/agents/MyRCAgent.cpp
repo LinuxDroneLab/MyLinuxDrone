@@ -16,7 +16,7 @@
 #include <pthread.h>
 #include <events/MinThrustMinPitch.h>
 #include <events/MinThrustMaxPitch.h>
-
+#include <syslog.h>
 
 
 MyRCAgent::MyRCAgent(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::EventType> acceptedEventTypes)  : MyAgent(bus, acceptedEventTypes), initialized(false), readerThread(NULL) {
@@ -33,10 +33,14 @@ MyRCAgent::~MyRCAgent() {
 
 void MyRCAgent::initialize() {
 	if(!initialized) {
+		syslog(LOG_INFO, "mydrone: MyRCAgent: initializing ...");
 		if(this->rcReader.initialize((void*)this)) {
 			// TODO: refactoring for circular reference with rcReader ...
 			readerThread = new boost::thread(boost::ref(rcReader));
 			initialized = true;
+			syslog(LOG_INFO, "mydrone: MyRCAgent: initialization OK");
+		} else {
+			syslog(LOG_INFO, "mydrone: MyRCAgent: initialization failed");
 		}
 	}
 }

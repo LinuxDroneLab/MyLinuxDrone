@@ -32,15 +32,22 @@ MyMotorsAgent::~MyMotorsAgent() {
 }
 
 void MyMotorsAgent::initialize() {
-	front.initialize();
-	rear.initialize();
-	left.initialize();
-	right.initialize();
-	this->setThrottleRange();
-    this->disarmMotors();
+	syslog(LOG_INFO, "mydrone: MotorsAgent: initializing motor drivers");
+	bool result = true;
+	result &= front.initialize();
+	result &= rear.initialize();
+	result &= left.initialize();
+	result &= right.initialize();
+	if(result) {
+		this->setThrottleRange();
+	    this->disarmMotors();
+		syslog(LOG_INFO, "mydrone: MotorsAgent: initialization OK");
+	} else {
+		syslog(LOG_ERR, "mydrone: MotorsAgent: initialization failed");
+	}
 
 	// TODO: inviare pwm min
-	initialized = true;
+	initialized = result;
 }
 void MyMotorsAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 	if (!initialized) {

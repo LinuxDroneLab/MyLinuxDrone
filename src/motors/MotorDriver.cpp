@@ -6,6 +6,7 @@
  */
 
 #include <motors/MotorDriver.h>
+#include <syslog.h>
 
 MotorDriver::MotorDriver(std::string pinmuxPath, std::string pwmchipPath, uint8_t deviceNum) : initialized(false), pinmuxPath(pinmuxPath), pwmchipPath(pwmchipPath), deviceNum(deviceNum){
 }
@@ -19,12 +20,14 @@ MotorDriver::~MotorDriver() {
 }
 
 bool MotorDriver::initialize() {
+	syslog(LOG_INFO, "mydrone: MotorDriver: initializing pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 	{ // set pinmux as 'pwm'
 		ofstream fout(pinmuxPath + "/state",ios::out);
 		if(fout.is_open()) {
 			fout << "pwm";
 			fout.close();
 		} else {
+			syslog(LOG_ERR, "mydrone: MotorDriver: cannot open pwm stream. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 			return false;
 		}
 	}
@@ -33,7 +36,9 @@ bool MotorDriver::initialize() {
 		if(fout.is_open()) {
 			fout << std::to_string(deviceNum);
 			fout.close();
+			syslog(LOG_INFO, "mydrone: MotorDriver: pwm pin exported. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 		} else {
+			syslog(LOG_ERR, "mydrone: MotorDriver: cannot export pwm pin. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 			return false;
 		}
 	}
@@ -43,7 +48,9 @@ bool MotorDriver::initialize() {
 		if(fout.is_open()) {
 			fout << std::to_string(20000000);
 			fout.close();
+			syslog(LOG_INFO, "mydrone: MotorDriver: pwm period initialized. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 		} else {
+			syslog(LOG_ERR, "mydrone: MotorDriver: cannot set pwm period. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 			return false;
 		}
 	}
@@ -54,7 +61,9 @@ bool MotorDriver::initialize() {
 		if(duty.is_open()) {
 			duty << std::to_string(1000000);
 			duty.close();
+			syslog(LOG_INFO, "mydrone: MotorDriver: pwm duty cycle initialized. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 		} else {
+			syslog(LOG_ERR, "mydrone: MotorDriver: cannot set initilize pwm duty cycle. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 			return false;
 		}
 
@@ -64,7 +73,9 @@ bool MotorDriver::initialize() {
 		if(fout.is_open()) {
 			fout << std::to_string(1);
 			fout.close();
+			syslog(LOG_INFO, "mydrone: MotorDriver: pwm enabled. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 		} else {
+			syslog(LOG_ERR, "mydrone: MotorDriver: cannot enable pwm. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
 			return false;
 		}
 	}

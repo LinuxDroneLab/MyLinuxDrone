@@ -72,6 +72,8 @@ MyPIDCntrllr::~MyPIDCntrllr() {
 
 void MyPIDCntrllr::initialize() {
 	initialized = true;
+	syslog(LOG_INFO, "mydrone: MyPIDCntrllr: initialization OK");
+
 }
 
 MyPIDCntrllr::YPRT MyPIDCntrllr::calcYPRData(boost::math::quaternion<float> q) {
