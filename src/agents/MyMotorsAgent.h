@@ -26,11 +26,14 @@ private:
 	void initialize();
 	bool armed;
 	void writeMotors(boost::shared_ptr<MyOutMotors> event) ;
+	void setThrottleRange();
 	void disarmMotors();
 	void armMotors();
 
 	MotorDriver front;
 	MotorDriver rear;
+	MotorDriver left;
+	MotorDriver right;
 };
 
 #endif /* AGENTS_MYMOTORSAGENT_H_ */

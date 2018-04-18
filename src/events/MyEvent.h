@@ -43,6 +43,8 @@ public:
 		YPRError,
 		ArmMotorsCmd,
 		DisarmMotorsCmd,
+		MinThrustMinPitch,
+		MinThrustMaxPitch,
 		MotorsArmed,
 		MotorsDisarmed
 	} ;

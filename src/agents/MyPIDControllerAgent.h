@@ -9,8 +9,11 @@
 #define AGENTS_MYPIDCONTROLLERAGENT_H_
 
 #include <agents/MyAgent.h>
+#include <commons/MyGlobalDefs.h>
 #include <boost/math/quaternion.hpp>
 #include <queues/MyPIDBuffer.h>
+#include <commons/RangeFloat.h>
+#include <commons/ValueFloat.h>
 
 class MyPIDControllerAgent: public MyAgent {
 public:
@@ -22,17 +25,14 @@ protected:
 private:
 	bool initialized;
 	void initialize();
-	boost::math::quaternion<float> qtrg; // target quaternion
-	unsigned int thrust; // thrust target
+	bool armed;
+	void calcErr(boost::math::quaternion<float> q);
+	void calcCorrection();
+
 	float yawCurr;
 	float pitchCurr;
 	float rollCurr;
-	float yawTrg;
-	float pitchTrg;
-	float rollTrg;
-	void mockTarget(boost::math::quaternion<float> q);
-	void calcErr(boost::math::quaternion<float> q);
-	void calcCorrection();
+
 	MyPIDBuffer yawErr;
 	MyPIDBuffer pitchErr;
 	MyPIDBuffer rollErr;
@@ -49,6 +49,10 @@ private:
 	float keYaw;
 	float keIYaw;
 	float keDYaw;
+
+	static RangeFloat TARGET_RANGES[];
+	static ValueFloat TARGET_VALUES[];
+    static RangeFloat INTEGRAL_RANGE;
 };
 
 #endif /* AGENTS_MYPIDCONTROLLERAGENT_H_ */

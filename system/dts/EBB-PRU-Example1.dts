@@ -1,0 +1,20 @@
+/dts-v1/; 
+/plugin/; 
+
+/ { 
+    compatible = "ti,beaglebone", "ti,beaglebone-black"; 
+
+    /* identification */ 
+    part-number = "BB-ENABLE-PRU"; 
+
+    /* version */ 
+    version = "00A0"; 
+
+        fragment@1 {         // Enable the PRUSS 
+                target = <&pruss>; 
+                __overlay__ { 
+                    status = "okay"; 
+                }; 
+        }; 
+}; 
+

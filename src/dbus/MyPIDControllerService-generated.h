@@ -28,32 +28,9 @@ struct _MyPIDControllerServiceIface
 {
   GTypeInterface parent_iface;
 
-
-  gboolean (*handle_set_pid) (
-    MyPIDControllerService *object,
-    GDBusMethodInvocation *invocation,
-    guchar arg_pid,
-    guchar arg_ypr,
-    gdouble arg_value);
-
   void (*state_changed) (
     MyPIDControllerService *object,
-    guint arg_timestampMillis,
-    gdouble arg_yawCurrent,
-    gdouble arg_pitchCurrent,
-    gdouble arg_rollCurrent,
-    gdouble arg_yawTarget,
-    gdouble arg_pitchTarget,
-    gdouble arg_rollTarget,
-    gdouble arg_eYaw,
-    gdouble arg_eIYaw,
-    gdouble arg_eDYaw,
-    gdouble arg_ePitch,
-    gdouble arg_eIPitch,
-    gdouble arg_eDPitch,
-    gdouble arg_eRoll,
-    gdouble arg_eIRoll,
-    gdouble arg_eDRoll);
+    GVariant *arg_imuSample);
 
 };
 
@@ -63,57 +40,10 @@ GDBusInterfaceInfo *my_pidcontroller_service_interface_info (void);
 guint my_pidcontroller_service_override_properties (GObjectClass *klass, guint property_id_begin);
 
 
-/* D-Bus method call completion functions: */
-void my_pidcontroller_service_complete_set_pid (
-    MyPIDControllerService *object,
-    GDBusMethodInvocation *invocation);
-
-
-
 /* D-Bus signal emissions functions: */
 void my_pidcontroller_service_emit_state_changed (
     MyPIDControllerService *object,
-    guint arg_timestampMillis,
-    gdouble arg_yawCurrent,
-    gdouble arg_pitchCurrent,
-    gdouble arg_rollCurrent,
-    gdouble arg_yawTarget,
-    gdouble arg_pitchTarget,
-    gdouble arg_rollTarget,
-    gdouble arg_eYaw,
-    gdouble arg_eIYaw,
-    gdouble arg_eDYaw,
-    gdouble arg_ePitch,
-    gdouble arg_eIPitch,
-    gdouble arg_eDPitch,
-    gdouble arg_eRoll,
-    gdouble arg_eIRoll,
-    gdouble arg_eDRoll);
-
-
-
-/* D-Bus method calls: */
-void my_pidcontroller_service_call_set_pid (
-    MyPIDControllerService *proxy,
-    guchar arg_pid,
-    guchar arg_ypr,
-    gdouble arg_value,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean my_pidcontroller_service_call_set_pid_finish (
-    MyPIDControllerService *proxy,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean my_pidcontroller_service_call_set_pid_sync (
-    MyPIDControllerService *proxy,
-    guchar arg_pid,
-    guchar arg_ypr,
-    gdouble arg_value,
-    GCancellable *cancellable,
-    GError **error);
+    GVariant *arg_imuSample);
 
 
 

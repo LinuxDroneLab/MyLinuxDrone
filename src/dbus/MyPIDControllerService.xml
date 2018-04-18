@@ -1,32 +1,10 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
         "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
-<!--
-<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
--->
-<node name="/">
+ <node name="/" >
  <interface name="org.mydrone.MyPIDControllerService">
-   <method name="setPID">
-     <arg name="pid" type="y" direction="in" />
-     <arg name="ypr" type="y" direction="in" />
-     <arg name="value" type="d" direction="in" />
-   </method>
-   <signal name="StateChanged">
-     <arg name="timestampMillis" type="u" />
-     <arg name="yawCurrent" type="d" />
-     <arg name="pitchCurrent" type="d" />
-     <arg name="rollCurrent" type="d" />
-     <arg name="yawTarget" type="d" />
-     <arg name="pitchTarget" type="d" />
-     <arg name="rollTarget" type="d" />
-     <arg name="eYaw" type="d" />
-     <arg name="eIYaw" type="d" />
-     <arg name="eDYaw" type="d" />
-     <arg name="ePitch" type="d" />
-     <arg name="eIPitch" type="d" />
-     <arg name="eDPitch" type="d" />
-     <arg name="eRoll" type="d" />
-     <arg name="eIRoll" type="d" />
-     <arg name="eDRoll" type="d" />   	
+   <signal name="stateChanged">
+    <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="MyPIDState"/>
+    <arg name="imuSample" type="(u(ddddd)(ddddd)(ddddd))" />
    </signal>
  </interface>
 </node>

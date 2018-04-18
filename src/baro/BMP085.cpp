@@ -73,7 +73,7 @@ bool BMP085::pulse() {
 		case waitStartup: {
 			// 10 millis
 			if (calcMillisFrom(statusAtTime) >= 10) {
-				begin();
+				begin(BMP085_ULTRAHIGHRES);
 				startCycle();
 				changeStatus(sndTempCmd);
 			}

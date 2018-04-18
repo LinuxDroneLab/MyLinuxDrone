@@ -15,6 +15,17 @@ test-output
 *.mdr
 bin
 consegne
+ARM/**/*.d
+Debug/**/*.d
+ARM/**/*.o
+Debug/**/*.o
+ARM/MyDrone
+Debug/MyDrone
+*.tmp
+syslog
+syslog.*
 ARM
 Debug
 *.tmp
+*.dtb
+*.dtbo
