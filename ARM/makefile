@@ -27,9 +27,6 @@ ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(strip $(CC_DEPS)),)
 -include $(CC_DEPS)
 endif
-ifneq ($(strip $(CLA_DEPS)),)
--include $(CLA_DEPS)
-endif
 ifneq ($(strip $(C++_DEPS)),)
 -include $(C++_DEPS)
 endif
@@ -38,15 +35,6 @@ ifneq ($(strip $(C_UPPER_DEPS)),)
 endif
 ifneq ($(strip $(CXX_DEPS)),)
 -include $(CXX_DEPS)
-endif
-ifneq ($(strip $(INO_DEPS)),)
--include $(INO_DEPS)
-endif
-ifneq ($(strip $(PDE_DEPS)),)
--include $(PDE_DEPS)
-endif
-ifneq ($(strip $(K_DEPS)),)
--include $(K_DEPS)
 endif
 ifneq ($(strip $(C_DEPS)),)
 -include $(C_DEPS)
@@ -67,13 +55,13 @@ all: MyDrone
 MyDrone: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	arm-linux-gnueabihf-g++ -L/BBBchroot/lib/arm-linux-gnueabihf -L/BBBchroot/usr/lib/arm-linux-gnueabihf -L/BBBchroot/usr/local/lib -L/BBBchroot/usr/lib/arm-linux-gnueabihf -o "MyDrone" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-linux-gnueabihf-g++ --sysroot=/hd/BBBchroot -Xlinker -rpath=/hd/BBBchroot/usr/lib/arm-linux-gnueabihf -o "MyDrone" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CC_DEPS)$(CLA_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(INO_DEPS)$(PDE_DEPS)$(K_DEPS)$(C_DEPS)$(CPP_DEPS) MyDrone
+	-$(RM) $(CC_DEPS)$(C++_DEPS)$(EXECUTABLES)$(OBJS)$(C_UPPER_DEPS)$(CXX_DEPS)$(C_DEPS)$(CPP_DEPS) MyDrone
 	-@echo ' '
 
 .PHONY: all clean dependents

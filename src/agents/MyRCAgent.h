@@ -9,9 +9,8 @@
 #define AGENTS_MYRCAGENT_H_
 
 #include <agents/MyAgent.h>
-#include <rc/MyRCReader.h>
 #include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include <commons/ValueInt16.h>
 
 class MyRCAgent: public MyAgent {
 public:
@@ -22,12 +21,14 @@ protected:
 	virtual void processEvent(boost::shared_ptr<MyEvent> event);
 
 private:
+    static RangeInt16 PRU_RANGES[];
+    static RangeInt16 CHAN_RANGES[];
+    static ValueInt16 PRU_VALUES[];
+    static ValueInt16 CHAN_VALUES[];
+    static unsigned char readBuf[];
+
 	bool initialized;
 	void initialize();
-	MyRCReader rcReader;
-	boost::thread* readerThread;
-
-    boost::mutex m_mutex;
 	float thrust;
 	float roll;
 	float pitch;

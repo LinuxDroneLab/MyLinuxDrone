@@ -216,12 +216,11 @@
 									<listOptionValue builtIn="false" value="prussdrv"/>
 									<listOptionValue builtIn="false" value="prussdrvd"/>
 								</option>
-								<option id="gnu.cpp.link.option.paths.443595810" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="/BBBchroot/lib/arm-linux-gnueabihf"/>
-									<listOptionValue builtIn="false" value="/BBBchroot/usr/lib/arm-linux-gnueabihf"/>
-									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/lib"/>
-									<listOptionValue builtIn="false" value="/BBBchroot/usr/lib/arm-linux-gnueabihf"/>
+								<option id="gnu.cpp.link.option.paths.443595810" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths"/>
+								<option id="gnu.cpp.link.option.other.1314789621" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" valueType="stringList">
+									<listOptionValue builtIn="false" value="-rpath=/hd/BBBchroot/usr/lib/arm-linux-gnueabihf"/>
 								</option>
+								<option id="gnu.cpp.link.option.flags.1928695775" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="--sysroot=/hd/BBBchroot" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1276489222" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -261,6 +260,16 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="ARM">
+			<resource resourceType="PROJECT" workspacePath="/MyDrone"/>
+		</configuration>
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/MyDrone"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/MyDrone"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>
