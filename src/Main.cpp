@@ -87,7 +87,7 @@ int main() {
     syslog(LOG_INFO, "mydrone Event Bus created");
 
 
-	MyClock myClock(eventBus, 5);
+	MyClock myClock(eventBus, 5); // 200Hz tick
     syslog(LOG_INFO, "mydrone MyClock created");
 
 	MyIMUAgent imuAgent(eventBus, {MyEvent::EventType::Tick});

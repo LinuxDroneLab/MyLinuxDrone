@@ -8,9 +8,15 @@
 #ifndef AGENTS_MYRCAGENT_H_
 #define AGENTS_MYRCAGENT_H_
 
+#define MYRCAGENT_STATUS_REQUIRE_MODE 1
+#define MYRCAGENT_STATUS_RECEIVE_MODE 2
+#define MYRCAGENT_STATUS_WAIT_MODE    3
+
+
 #include <agents/MyAgent.h>
 #include <boost/thread.hpp>
 #include <commons/ValueInt16.h>
+#include <sys/poll.h>
 
 class MyRCAgent: public MyAgent {
 public:
@@ -27,8 +33,22 @@ private:
     static ValueInt16 CHAN_VALUES[];
     static unsigned char readBuf[];
 
+    struct EcapData
+    {
+        uint8_t cmd[2];
+        uint32_t chanValue[8];
+    };
+
 	bool initialized;
 	void initialize();
+	void pulse();
+	bool sendDataRequest();
+	bool receiveData();
+
+	uint8_t status;
+	uint8_t tickCounter;
+	uint8_t tickDivider;
+    struct pollfd pruDevice;
 	float thrust;
 	float roll;
 	float pitch;

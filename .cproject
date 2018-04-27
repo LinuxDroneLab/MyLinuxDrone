@@ -150,58 +150,60 @@
 				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="Per ARM" id="cdt.managedbuild.config.gnu.exe.debug.1496565039.329100869" name="ARM" parent="cdt.managedbuild.config.gnu.exe.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1496565039.329100869." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.base.2104124827" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.base">
-							<option id="cdt.managedbuild.option.gnu.cross.prefix.2122649825" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-linux-gnueabihf-" valueType="string"/>
-							<option id="cdt.managedbuild.option.gnu.cross.path.2128753371" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" value="/usr/bin" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.2122649825" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="arm-linux-gnueabihf-" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.2128753371" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" useByScannerDiscovery="false" value="/home/andrea/Scaricati/gcc-linaro-5.5.0-2017.10-x86_64_arm-linux-gnueabihf/bin" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1844909558" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
 							<builder buildPath="${workspace_loc:/MyDrone}/ARM" id="cdt.managedbuild.builder.gnu.cross.1253472330" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1352912636" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1559720241" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1559720241" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__cplusplus=201103L"/>
 									<listOptionValue builtIn="false" value="BOOST_LOG_DYN_LINK"/>
 								</option>
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.972081027" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.debugging.level.1740256665" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.preprocessor.preprocess.907527812" name="Preprocess only (-E)" superClass="gnu.c.compiler.option.preprocessor.preprocess" value="false" valueType="boolean"/>
-								<option id="gnu.c.compiler.option.include.paths.2031952408" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.972081027" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1740256665" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.preprocessor.preprocess.907527812" name="Preprocess only (-E)" superClass="gnu.c.compiler.option.preprocessor.preprocess" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.include.paths.2031952408" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/include"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/include/glib-2.0"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/include/gio-unix-2.0"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/lib/arm-linux-gnueabihf/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/hd/eworkspace/pru-rc-lib/include}&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.dialect.std.584902723" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.misc.pic.334766954" name="Position Independent Code (-fPIC)" superClass="gnu.c.compiler.option.misc.pic" value="true" valueType="boolean"/>
-								<option id="gnu.c.compiler.option.include.files.1336629656" name="Include files (-include)" superClass="gnu.c.compiler.option.include.files" valueType="includeFiles">
+								<option id="gnu.c.compiler.option.dialect.std.584902723" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.misc.pic.334766954" name="Position Independent Code (-fPIC)" superClass="gnu.c.compiler.option.misc.pic" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.include.files.1336629656" name="Include files (-include)" superClass="gnu.c.compiler.option.include.files" useByScannerDiscovery="false" valueType="includeFiles">
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/include/pruss_intc_mapping.h"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/include/prussdrv.h"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1432139851" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.470474730" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
-								<option id="gnu.cpp.compiler.option.include.paths.1214282334" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.cpp.compiler.option.include.paths.1214282334" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/include/"/>
+									<listOptionValue builtIn="false" value="/hd/eworkspace/pru-rc-lib/include"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/include/glib-2.0/"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/include/gio-unix-2.0"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/lib/arm-linux-gnueabihf/glib-2.0/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.74051367" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.74051367" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__cplusplus=201103L"/>
 									<listOptionValue builtIn="false" value="BOOST_LOG_DYN_LINK"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.optimization.level.360710819" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.573868288" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.other.pic.1187972273" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.dialect.std.806720781" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.files.581302257" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" valueType="includeFiles">
+								<option id="gnu.cpp.compiler.option.optimization.level.360710819" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.573868288" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.other.pic.1187972273" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.806720781" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++11" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.include.files.581302257" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" useByScannerDiscovery="false" valueType="includeFiles">
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/include/prussdrv.h"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/include/pruss_intc_mapping.h"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.1842224640" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fpermissive" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.1842224640" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -fpermissive" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1273622964" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.505339216" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1657641405" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
-								<option id="gnu.cpp.link.option.libs.574213195" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option id="gnu.cpp.link.option.libs.574213195" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="pthread"/>
 									<listOptionValue builtIn="false" value="pthread_nonshared"/>
 									<listOptionValue builtIn="false" value="gio-2.0"/>
@@ -216,11 +218,17 @@
 									<listOptionValue builtIn="false" value="prussdrv"/>
 									<listOptionValue builtIn="false" value="prussdrvd"/>
 								</option>
-								<option id="gnu.cpp.link.option.paths.443595810" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths"/>
-								<option id="gnu.cpp.link.option.other.1314789621" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" valueType="stringList">
+								<option id="gnu.cpp.link.option.paths.443595810" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/hd/BBBchroot/usr/lib/arm-linux-gnueabihf"/>
+									<listOptionValue builtIn="false" value="/BBBchroot/usr/lib"/>
+									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/lib"/>
+								</option>
+								<option id="gnu.cpp.link.option.other.1314789621" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" useByScannerDiscovery="false" valueType="stringList">
+									<listOptionValue builtIn="false" value="-rpath=/hd/BBBchroot/lib/arm-linux-gnueabihf"/>
+									<listOptionValue builtIn="false" value="-rpath=/BBBchroot/usr/local/lib"/>
 									<listOptionValue builtIn="false" value="-rpath=/hd/BBBchroot/usr/lib/arm-linux-gnueabihf"/>
 								</option>
-								<option id="gnu.cpp.link.option.flags.1928695775" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="--sysroot=/hd/BBBchroot" valueType="string"/>
+								<option id="gnu.cpp.link.option.flags.1928695775" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="--sysroot=/hd/BBBchroot" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1276489222" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -244,21 +252,6 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="MyDrone.cdt.managedbuild.target.gnu.exe.588161486" name="Executable" projectType="cdt.managedbuild.target.gnu.exe"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.427680616;cdt.managedbuild.config.gnu.exe.release.427680616.;cdt.managedbuild.tool.gnu.c.compiler.exe.release.1443443937;cdt.managedbuild.tool.gnu.c.compiler.input.299267672">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.427680616;cdt.managedbuild.config.gnu.exe.release.427680616.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1868392800;cdt.managedbuild.tool.gnu.cpp.compiler.input.525954823">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1496565039;cdt.managedbuild.config.gnu.exe.debug.1496565039.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.636719563;cdt.managedbuild.tool.gnu.c.compiler.input.617828271">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1496565039;cdt.managedbuild.config.gnu.exe.debug.1496565039.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1190049410;cdt.managedbuild.tool.gnu.cpp.compiler.input.1437521982">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="ARM">
@@ -272,4 +265,26 @@
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1496565039.329100869;cdt.managedbuild.config.gnu.exe.debug.1496565039.329100869.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.470474730;cdt.managedbuild.tool.gnu.cpp.compiler.input.1273622964">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.427680616;cdt.managedbuild.config.gnu.exe.release.427680616.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1868392800;cdt.managedbuild.tool.gnu.cpp.compiler.input.525954823">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1496565039;cdt.managedbuild.config.gnu.exe.debug.1496565039.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1190049410;cdt.managedbuild.tool.gnu.cpp.compiler.input.1437521982">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.427680616;cdt.managedbuild.config.gnu.exe.release.427680616.;cdt.managedbuild.tool.gnu.c.compiler.exe.release.1443443937;cdt.managedbuild.tool.gnu.c.compiler.input.299267672">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1496565039.329100869;cdt.managedbuild.config.gnu.exe.debug.1496565039.329100869.;cdt.managedbuild.tool.gnu.cross.c.compiler.1352912636;cdt.managedbuild.tool.gnu.c.compiler.input.1432139851">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1496565039;cdt.managedbuild.config.gnu.exe.debug.1496565039.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.636719563;cdt.managedbuild.tool.gnu.c.compiler.input.617828271">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
 </cproject>
