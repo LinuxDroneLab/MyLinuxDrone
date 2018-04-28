@@ -8,7 +8,6 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/rc/subdir.mk
 -include src/queues/subdir.mk
 -include src/motors/subdir.mk
 -include src/imu/subdir.mk
@@ -55,7 +54,7 @@ all: MyDrone
 MyDrone: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	arm-linux-gnueabihf-g++ -L/hd/BBBchroot/usr/lib/arm-linux-gnueabihf -L/BBBchroot/usr/lib -L/BBBchroot/usr/local/lib --sysroot=/hd/BBBchroot -Xlinker -rpath=/hd/BBBchroot/lib/arm-linux-gnueabihf -Xlinker -rpath=/BBBchroot/usr/local/lib -Xlinker -rpath=/hd/BBBchroot/usr/lib/arm-linux-gnueabihf -o "MyDrone" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-linux-gnueabihf-g++ -L/hd/BBBchroot/usr/lib/arm-linux-gnueabihf --sysroot=/hd/BBBchroot -Xlinker -rpath=/hd/BBBchroot/lib/arm-linux-gnueabihf -Xlinker -rpath=/BBBchroot/usr/local/lib -Xlinker -rpath=/hd/BBBchroot/usr/lib/arm-linux-gnueabihf -o "MyDrone" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

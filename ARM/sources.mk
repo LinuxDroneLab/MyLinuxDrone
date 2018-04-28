@@ -34,5 +34,4 @@ src/i2c \
 src/imu \
 src/motors \
 src/queues \
-src/rc \
 

@@ -21,16 +21,16 @@ MotorDriver::~MotorDriver() {
 
 bool MotorDriver::initialize() {
 	syslog(LOG_INFO, "mydrone: MotorDriver: initializing pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
-	{ // set pinmux as 'pwm'
-		ofstream fout(pinmuxPath + "/state",ios::out);
-		if(fout.is_open()) {
-			fout << "pwm";
-			fout.close();
-		} else {
-			syslog(LOG_ERR, "mydrone: MotorDriver: cannot open pwm stream. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
-			return false;
-		}
-	}
+//	{ // set pinmux as 'pwm'
+//		ofstream fout(pinmuxPath + "/state",ios::out);
+//		if(fout.is_open()) {
+//			fout << "pwm";
+//			fout.close();
+//		} else {
+//			syslog(LOG_ERR, "mydrone: MotorDriver: cannot open pwm stream. pinmux: %s, pwmchip: %s, device: %d", pinmuxPath.c_str(), pwmchipPath.c_str(), uint8_t(deviceNum));
+//			return false;
+//		}
+//	}
 	{ // export device
 		ofstream fout(pwmchipPath + "/export",ios::out);
 		if(fout.is_open()) {
@@ -45,6 +45,9 @@ bool MotorDriver::initialize() {
 
 	{ // set period
 		ofstream fout(pwmchipPath + "/pwm" + std::to_string(deviceNum) + "/period",ios::out);
+		for(int i = 0; (i < 100) && (!fout.is_open()); i++) {
+	        ofstream fout(pwmchipPath + "/pwm" + std::to_string(deviceNum) + "/period",ios::out);
+		}
 		if(fout.is_open()) {
 			fout << std::to_string(20000000);
 			fout.close();
@@ -58,6 +61,9 @@ bool MotorDriver::initialize() {
 		ofstream duty(pwmchipPath + "/pwm" + std::to_string(deviceNum) + "/duty_cycle",ios::out);
 //		boost::shared_ptr<ofstream> duty(boost::make_shared<ofstream>(pwmchipPath + "/pwm" + std::to_string(deviceNum) + "/duty_cycle",ios::out));
 
+        for(int i = 0; (i < 100) && (!duty.is_open()); i++) {
+            ofstream duty(pwmchipPath + "/pwm" + std::to_string(deviceNum) + "/duty_cycle",ios::out);
+        }
 		if(duty.is_open()) {
 			duty << std::to_string(1000000);
 			duty.close();
@@ -70,6 +76,9 @@ bool MotorDriver::initialize() {
 	}
 	{ // enable pin
 		ofstream fout(pwmchipPath + "/pwm" + std::to_string(deviceNum) + "/enable",ios::out);
+        for(int i = 0; (i < 100) && (!fout.is_open()); i++) {
+            ofstream fout(pwmchipPath + "/pwm" + std::to_string(deviceNum) + "/enable",ios::out);
+        }
 		if(fout.is_open()) {
 			fout << std::to_string(1);
 			fout.close();

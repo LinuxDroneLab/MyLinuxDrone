@@ -34,9 +34,9 @@ unsigned char MyRCAgent::readBuf[MYRCAGENT_MAX_BUFFER_SIZE] = {};
 /*
  * TODO: Change static values to dynamic configuration
  */
-RangeInt16 MyRCAgent::PRU_RANGES[] = { RangeInt16(602, 1584), RangeInt16(611,
-        1578), RangeInt16(665, 1535), RangeInt16(612, 1572), RangeInt16(597,
-        1589), RangeInt16(597, 1588) };
+RangeInt16 MyRCAgent::PRU_RANGES[] = { RangeInt16(628, 1586), RangeInt16(604,
+        1583), RangeInt16(665, 1531), RangeInt16(604, 1581), RangeInt16(595,
+        1588), RangeInt16(596, 1587) };
 RangeInt16 MyRCAgent::CHAN_RANGES[] = { RangeInt16(-500, 500), RangeInt16(-500,
         500), RangeInt16(-500, 500), RangeInt16(-500, 500), RangeInt16(-500,
         500), RangeInt16(-500, 500) };
@@ -73,7 +73,6 @@ MyRCAgent::~MyRCAgent() {
 void MyRCAgent::initialize() {
 	if(!initialized) {
 		syslog(LOG_INFO, "mydrone: MyRCAgent: initializing ...");
-	    int result = 0;
 
 	    /* Open the rpmsg_pru character device file */
 	    pruDevice.fd = open(MYRCAGENT_DEVICE_NAME, O_RDWR);
@@ -124,7 +123,6 @@ bool MyRCAgent::receiveData() {
         if((readBuf[0] == PRU_RC_LIB_CMD_ID)
                 && (readBuf[1] == PRU_RC_LIB_CMD_GET_DATA_RSP)) {
             for(int j = 0; j < 8; j++) {
-                printf("%d , ", data[j]/200);
                 switch(j) {
                 case(CHAN_ROLL): {
                     MyRCAgent::PRU_VALUES[CHAN_ROLL].setValue(uint16_t(data[j]/200));
@@ -164,7 +162,6 @@ bool MyRCAgent::receiveData() {
                 }
                 }
             }
-            printf("\n");
             this->setRCSample(
                     MyRCAgent::CHAN_VALUES[CHAN_THRUST].getValueAsPercent(),
                     MyRCAgent::CHAN_VALUES[CHAN_ROLL].getValueAsPercent(),
@@ -173,10 +170,10 @@ bool MyRCAgent::receiveData() {
                     MyRCAgent::CHAN_VALUES[CHAN_AUX1].getValueAsPercent(),
                     MyRCAgent::CHAN_VALUES[CHAN_AUX2].getValueAsPercent());
         }
-        return true;
+        result = true;
     }
 
-    return false;
+    return result;
 }
 
 /*
@@ -193,14 +190,14 @@ bool MyRCAgent::receiveData() {
 void MyRCAgent::pulse() {
     switch(this->status) {
     case (MYRCAGENT_STATUS_REQUIRE_MODE): {
-        syslog(LOG_INFO, "mydrone: MyRCAgent: STATE[REQUIRE_MODE]");
+//        syslog(LOG_INFO, "mydrone: MyRCAgent: STATE[REQUIRE_MODE]");
         if(this->sendDataRequest()) {
             this->status = MYRCAGENT_STATUS_RECEIVE_MODE;
         }
         break;
     }
     case (MYRCAGENT_STATUS_RECEIVE_MODE): {
-        syslog(LOG_INFO, "mydrone: MyRCAgent: STATE[RECEIVE_MODE]");
+//        syslog(LOG_INFO, "mydrone: MyRCAgent: STATE[RECEIVE_MODE]");
         if(this->receiveData()) {
             if(thrust <= -0.98f && pitch >= 0.98f) {
                 boost::shared_ptr<MinThrustMaxPitch> armMotors(boost::make_shared<MinThrustMaxPitch>(uuid));
@@ -214,14 +211,14 @@ void MyRCAgent::pulse() {
             }
             this->status = MYRCAGENT_STATUS_WAIT_MODE;
         } else if(this->tickCounter == 0) {
-            this->status = MYRCAGENT_STATUS_RECEIVE_MODE;
+            this->status = MYRCAGENT_STATUS_REQUIRE_MODE;
         }
         break;
     }
     case (MYRCAGENT_STATUS_WAIT_MODE): {
-        syslog(LOG_INFO, "mydrone: MyRCAgent: STATE[WAIT_MODE]");
+//        syslog(LOG_INFO, "mydrone: MyRCAgent: STATE[WAIT_MODE]");
         if(this->tickCounter == 0) {
-                    this->status = MYRCAGENT_STATUS_RECEIVE_MODE;
+                    this->status = MYRCAGENT_STATUS_REQUIRE_MODE;
         }
         break;
     }
