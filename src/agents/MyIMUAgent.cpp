@@ -14,6 +14,7 @@
 #include <boost/math/quaternion.hpp>
 #include <events/MyIMUSample.h>
 #include <events/MyBaroSample.h>
+#include <syslog.h>
 
 MyIMUAgent::MyIMUAgent(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::EventType> acceptedEventTypes) : MyAgent(bus, acceptedEventTypes), initialized(false), prevMicros(0) {
 }
@@ -36,6 +37,7 @@ void MyIMUAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 			//long diff = now - prevMicros;
 			// prevMicros = now;
 			if(imu.pulse()) {
+                syslog(LOG_INFO, "MPU6050: Received data");
 				const MPU6050::SensorData& md = imu.getData();
 				boost::math::quaternion<float> q(md.q.w,md.q.x,md.q.y,md.q.z);
 				boost::shared_ptr<MyEvent> evOut(boost::make_shared<MyIMUSample>(this->getUuid(), q));

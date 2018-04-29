@@ -103,6 +103,8 @@ bool MotorDriver::setDutyCycleNanos(uint32_t nanos) {
 	} else if(nanos > 2000000) {
 		nanos = 2000000;
 	}
+//    syslog(LOG_INFO, "mydrone: MotorDriver: pwmchip: %s, device: %d, nanos: %d", pwmchipPath.c_str(), uint8_t(deviceNum), nanos);
+
 	ofstream duty(pwmchipPath + "/pwm" + std::to_string(deviceNum) + "/duty_cycle",ios::out);
 
 	if(duty.is_open()) {

@@ -109,17 +109,17 @@ bool MyRCAgent::sendDataRequest() {
     readBuf[0] = PRU_RC_LIB_CMD_ID;
     readBuf[1] = PRU_RC_LIB_CMD_GET_DATA;
     int result = write(pruDevice.fd, readBuf, 2);
-    if (result > 0) {
-        printf("Message GET_DATA sent to PRU\n");
-    }
-    return true;
+//    if (result > 0) {
+//        printf("Message GET_DATA sent to PRU\n");
+//    }
+    return (result > 0);
 }
 bool MyRCAgent::receiveData() {
     bool result = false;
     uint32_t* data = (uint32_t*)(readBuf+2);
     int bytes = read(pruDevice.fd, readBuf, sizeof(struct EcapData));
     if (bytes > 0) {
-        printf("Message received from PRU:%d:%d:%d 1\n",readBuf[0], readBuf[1], bytes);
+//        printf("Message received from PRU:%d:%d:%d 1\n",readBuf[0], readBuf[1], bytes);
         if((readBuf[0] == PRU_RC_LIB_CMD_ID)
                 && (readBuf[1] == PRU_RC_LIB_CMD_GET_DATA_RSP)) {
             for(int j = 0; j < 8; j++) {

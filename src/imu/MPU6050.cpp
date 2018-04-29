@@ -41,6 +41,7 @@
 #include <stdint.h>
 #include <imu/MPU6050.h>
 #include <i2c/I2Cdev.h>
+#include <syslog.h>
 
 /** Default constructor, uses default I2C address.
  * @see MPU6050_DEFAULT_ADDRESS
@@ -75,7 +76,8 @@ MPU6050::SensorData const & MPU6050::getData() const {
 // read cycle
 bool MPU6050::pulse() {
 	if (!dmpReady) { // TODO: inserire tutto il ciclo di vita su pulse (come fatto con BMP085)
-		return false;
+        syslog(LOG_INFO, "MPU6050: does not works!");
+        return false;
 	}
 
 	// get current FIFO count
@@ -84,6 +86,7 @@ bool MPU6050::pulse() {
 	if (fifoCount == 1024) {
 		// reset so we can continue cleanly
 		resetFIFO();
+        syslog(LOG_INFO, "MPU6050: FIFO overflow!");
 		DEBUG_PRINTLN(F("FIFO overflow!\n"));
 		return false;
 		// otherwise, check for DMP data ready interrupt (this should happen frequently)
@@ -3453,6 +3456,7 @@ uint8_t MPU6050::dmpInitialize() {
 	dmpReady = false;
 
 	// reset device
+    syslog(LOG_INFO, "Resetting MPU6050");
 	DEBUG_PRINTLN(F("\n\nResetting MPU6050..."));
 	reset();
 	usleep(30000); // wait after reset
@@ -3501,6 +3505,7 @@ uint8_t MPU6050::dmpInitialize() {
 	usleep(20000);
 
 	// load DMP code into memory banks
+    syslog(LOG_INFO, "MPU6050: Writing DMP code to MPU memory banks");
 	DEBUG_PRINT(F("Writing DMP code to MPU memory banks (")); DEBUG_PRINT(MPU6050_DMP_CODE_SIZE); DEBUG_PRINTLN(F(" bytes)"));
 	if (writeProgMemoryBlock(dmpMemory, MPU6050_DMP_CODE_SIZE)) {
 		printf("Success! DMP code written and verified.\n");
@@ -3559,6 +3564,7 @@ uint8_t MPU6050::dmpInitialize() {
 			writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0],
 					dmpUpdate[1]);
 
+		    syslog(LOG_INFO, "MPU6050: Resetting FIFO...");
 			DEBUG_PRINTLN(F("Resetting FIFO..."));
 			resetFIFO();
 
@@ -3566,7 +3572,7 @@ uint8_t MPU6050::dmpInitialize() {
 			uint8_t fifoCount = getFIFOCount();
 			uint8_t fifoBuffer[128];
 
-			printf("Current FIFO count=%d\n", fifoCount);
+            syslog(LOG_INFO, "MPU6050: FIFO count: %d", fifoCount);
 			DEBUG_PRINTLN(fifoCount);
 			getFIFOBytes(fifoBuffer, fifoCount);
 
@@ -3585,37 +3591,46 @@ uint8_t MPU6050::dmpInitialize() {
 			DEBUG_PRINTLN(F("Resetting FIFO..."));
 			resetFIFO();
 
+            syslog(LOG_INFO, "MPU6050: Enabling FIFO...");
 			DEBUG_PRINTLN(F("Enabling FIFO..."));
 			setFIFOEnabled(true);
 
+            syslog(LOG_INFO, "MPU6050: Enabling DMP...");
 			DEBUG_PRINTLN(F("Enabling DMP..."));
 			setDMPEnabled(true);
 
+            syslog(LOG_INFO, "MPU6050: Resetting DMP...");
 			DEBUG_PRINTLN(F("Resetting DMP..."));
 			resetDMP();
+		    usleep(30000); // wait after reset
 
+            syslog(LOG_INFO, "MPU6050: Writing final memory update 3/7 (function unknown)...");
 			DEBUG_PRINTLN(F("Writing final memory update 3/7 (function unknown)..."));
 			for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++)
 				dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
 			writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0],
 					dmpUpdate[1]);
 
+            syslog(LOG_INFO, "MPU6050: Writing final memory update 4/7 (function unknown)...");
 			DEBUG_PRINTLN(F("Writing final memory update 4/7 (function unknown)..."));
 			for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++)
 				dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
 			writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0],
 					dmpUpdate[1]);
 
+            syslog(LOG_INFO, "MPU6050: Writing final memory update 5/7 (function unknown)...");
 			DEBUG_PRINTLN(F("Writing final memory update 5/7 (function unknown)..."));
 			for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++)
 				dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
 			writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0],
 					dmpUpdate[1]);
 
-			printf("Waiting for FIFO count > 2...\n");
+            syslog(LOG_INFO, "MPU6050: Waiting for FIFO count > 2...");
+
 			while ((fifoCount = getFIFOCount()) < 3)
 				;
 
+            syslog(LOG_INFO, "MPU6050: Current FIFO count=%d", fifoCount);
 			printf("Current FIFO count=%d", fifoCount);
 			DEBUG_PRINTLN(fifoCount); DEBUG_PRINTLN(F("Reading FIFO data..."));
 			getFIFOBytes(fifoBuffer, fifoCount);
@@ -3623,6 +3638,7 @@ uint8_t MPU6050::dmpInitialize() {
 			DEBUG_PRINTLN(F("Reading interrupt status..."));
 			uint8_t mpuIntStatus __attribute__((__unused__)) = getIntStatus();
 
+            syslog(LOG_INFO, "MPU6050: Current interrupt status=%d", mpuIntStatus);
 			DEBUG_PRINT(F("Current interrupt status=")); DEBUG_PRINTLNF(mpuIntStatus, HEX);
 
 			DEBUG_PRINTLN(F("Reading final memory update 6/7 (function unknown)..."));
@@ -3631,26 +3647,33 @@ uint8_t MPU6050::dmpInitialize() {
 			readMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0],
 					dmpUpdate[1]);
 
+            syslog(LOG_INFO, "MPU6050: is FIFO enabled?... %d", getFIFOEnabled());
+            syslog(LOG_INFO, "MPU6050: Waiting for FIFO count > 2...");
 			DEBUG_PRINTLN(F("Waiting for FIFO count > 2..."));
 			while ((fifoCount = getFIFOCount()) < 3)
 				;
 
+            syslog(LOG_INFO, "MPU6050: Current FIFO count=%d", fifoCount);
 			DEBUG_PRINT(F("Current FIFO count=")); DEBUG_PRINTLN(fifoCount);
 
+			syslog(LOG_INFO, "MPU6050: Reading FIFO data...");
 			DEBUG_PRINTLN(F("Reading FIFO data..."));
 			getFIFOBytes(fifoBuffer, fifoCount);
 
 			DEBUG_PRINTLN(F("Reading interrupt status..."));
 			mpuIntStatus = getIntStatus();
 
+            syslog(LOG_INFO, "MPU6050: Current interrupt status=%d", mpuIntStatus);
 			DEBUG_PRINT(F("Current interrupt status=")); DEBUG_PRINTLNF(mpuIntStatus, HEX);
 
+            syslog(LOG_INFO, "MPU6050: Writing final memory update 7/7 (function unknown)...");
 			DEBUG_PRINTLN(F("Writing final memory update 7/7 (function unknown)..."));
 			for (j = 0; j < 4 || j < dmpUpdate[2] + 3; j++, pos++)
 				dmpUpdate[j] = pgm_read_byte(&dmpUpdates[pos]);
 			writeMemoryBlock(dmpUpdate + 3, dmpUpdate[2], dmpUpdate[0],
 					dmpUpdate[1]);
 
+            syslog(LOG_INFO, "MPU6050: DMP is good to go! Finally.");
 			DEBUG_PRINTLN(F("DMP is good to go! Finally."));
 
 			DEBUG_PRINTLN(F("Disabling DMP (you turn it on later)..."));
@@ -3665,11 +3688,14 @@ uint8_t MPU6050::dmpInitialize() {
 			DEBUG_PRINTLN(F("Resetting FIFO and clearing INT status one last time..."));
 			resetFIFO();
 			getIntStatus();
+            syslog(LOG_INFO, "MPU6050: Initialization Success!");
 		} else {
+            syslog(LOG_INFO, "MPU6050: ERROR! DMP configuration verification failed.");
 			DEBUG_PRINTLN(F("ERROR! DMP configuration verification failed."));
 			return 2; // configuration block loading failed
 		}
 	} else {
+        syslog(LOG_INFO, "MPU6050: ERROR! DMP code verification failed.");
 		DEBUG_PRINTLN(F("ERROR! DMP code verification failed."));
 		return 1; // main binary block loading failed
 	}
