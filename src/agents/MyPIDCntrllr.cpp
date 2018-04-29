@@ -188,7 +188,7 @@ void MyPIDCntrllr::sendOutput(PIDOutput &data) {
 		m_signal(evOut);
 	}
 	{
-	    syslog(LOG_INFO, "mydrone. MOTORS: front(%d), rear(%d), left(%d), right(%d)", data.front, data.rear, data.left, data.right);
+//	    syslog(LOG_INFO, "mydrone. MOTORS: front(%d), rear(%d), left(%d), right(%d)", data.front, data.rear, data.left, data.right);
 
 	    // out state motors
 		boost::shared_ptr<MyOutMotors> evOut(boost::make_shared<MyOutMotors>(this->getUuid(), data.front, data.rear, data.left, data.right));
@@ -292,7 +292,7 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event) {
 			this->arm();
 		} else
 		if (event->getType() == MyEvent::EventType::IMUSample && this->armed) {
-            syslog(LOG_INFO, "IMUSample received");
+//            syslog(LOG_INFO, "IMUSample received");
 			boost::shared_ptr<MyIMUSample> imuSample =
 					boost::static_pointer_cast<MyIMUSample>(event);
 
@@ -307,14 +307,14 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event) {
 			MyPIDCntrllr::TARGET_VALUES[THRUST_POS].setPercentValue((*rcSample).getThrustPercent());
 
 		} else if(event->getType() == MyEvent::EventType::BaroSample) {
-            syslog(LOG_INFO, "BaroSample received");
+//            syslog(LOG_INFO, "BaroSample received");
 			boost::shared_ptr<MyBaroSample> baroSample =
 					boost::static_pointer_cast<MyBaroSample>(event);
 			// syslog(LOG_INFO, "BaroSample: press=%d, alt=%5.5f, temp=%5.5f, seeLevelPress=%d", baroSample->getPressure(), baroSample->getAltitude(), baroSample->getTemperature(), baroSample->getSeeLevelPressure());
 		}
         else {
 			// skip events
-            syslog(LOG_INFO, "Skipped event");
+//            syslog(LOG_INFO, "Skipped event");
 		}
 	}
 }
