@@ -1177,9 +1177,9 @@ public:
 	SensorData const & getData() const;
 private:
 	uint8_t devAddr;
-	uint8_t buffer[14];
+	uint8_t buffer[1024];
 	bool dmpReady = false;
-	uint8_t fifoBuffer[64];
+	uint8_t fifoBuffer[1024];
 	SensorData data;
 	void extractDataFromFifo();
 	uint16_t discardSample;

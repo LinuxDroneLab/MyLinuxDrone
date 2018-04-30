@@ -16,12 +16,12 @@ class MyIMUAgent: public MyAgent {
 public:
 	MyIMUAgent(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::EventType> acceptedEventTypes);
 	virtual ~MyIMUAgent();
+    bool initialize();
 protected:
 	virtual void processEvent(boost::shared_ptr<MyEvent> event);
 
 private:
 	bool initialized;
-	void initialize();
 	MPU6050 imu;
 	BMP085 bmp;
 	long prevMicros;

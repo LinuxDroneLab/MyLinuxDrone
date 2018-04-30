@@ -88,6 +88,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcYPRData(boost::math::quaternion<float> q) {
 	result.pitch = QUATERNION_DIRECTION_RPY[PITCH_POS]*asin(2.0f * real * y - 2.0 * z * x) * 57.295779513f;
 	result.roll = QUATERNION_DIRECTION_RPY[ROLL_POS]*atan2(2.0f * (real * x + y * z), 1.0f - 2.0f * (x * x + y * y))
 			* 57.295779513f;
+	syslog(LOG_INFO, "YPR: y(%3.2f), p(%3.2f), r(%3.2f)", result.yaw, result.pitch, result.roll);
 	return result;
 }
 
@@ -188,7 +189,7 @@ void MyPIDCntrllr::sendOutput(PIDOutput &data) {
 		m_signal(evOut);
 	}
 	{
-//	    syslog(LOG_INFO, "mydrone. MOTORS: front(%d), rear(%d), left(%d), right(%d)", data.front, data.rear, data.left, data.right);
+//	    syslog(LOG_INFO, "mydrone. MOTORS: front(%ld), rear(%ld), left(%ld), right(%ld)", data.front, data.rear, data.left, data.right);
 
 	    // out state motors
 		boost::shared_ptr<MyOutMotors> evOut(boost::make_shared<MyOutMotors>(this->getUuid(), data.front, data.rear, data.left, data.right));
@@ -313,6 +314,13 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event) {
 			// syslog(LOG_INFO, "BaroSample: press=%d, alt=%5.5f, temp=%5.5f, seeLevelPress=%d", baroSample->getPressure(), baroSample->getAltitude(), baroSample->getTemperature(), baroSample->getSeeLevelPressure());
 		}
         else {
+            if(event->getType() == MyEvent::EventType::IMUSample) {
+                boost::shared_ptr<MyIMUSample> imuSample =
+                        boost::static_pointer_cast<MyIMUSample>(event);
+
+                boost::math::quaternion<float> q = imuSample->getQuaternion();
+                this->processImuSample(q);
+            }
 			// skip events
 //            syslog(LOG_INFO, "Skipped event");
 		}

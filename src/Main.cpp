@@ -91,6 +91,10 @@ int main() {
     syslog(LOG_INFO, "mydrone MyClock created");
 
 	MyIMUAgent imuAgent(eventBus, {MyEvent::EventType::Tick});
+    syslog(LOG_INFO, "mydrone initializing MyIMUAgent...");
+	if(!imuAgent.initialize()) {
+	    syslog(LOG_INFO, "mydrone MyIMUAgent NOT initialized!!");
+	}
     syslog(LOG_INFO, "mydrone MyIMUAgent created");
 
 	MyPIDCntrllr pidControlledAgent(eventBus, {MyEvent::EventType::MotorsArmed, MyEvent::EventType::MotorsDisarmed, MyEvent::EventType::IMUSample, MyEvent::EventType::RCSample, MyEvent::EventType::BaroSample});

@@ -22,10 +22,11 @@ MyIMUAgent::MyIMUAgent(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::Event
 MyIMUAgent::~MyIMUAgent() {
 
 }
-void MyIMUAgent::initialize() {
+bool MyIMUAgent::initialize() {
 	if(imu.dmpBegin()) {
 		initialized = true;
 	}
+	return initialized;
 }
 void MyIMUAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 	if(!initialized) {

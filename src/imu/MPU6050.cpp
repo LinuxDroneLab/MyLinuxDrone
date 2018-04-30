@@ -145,7 +145,6 @@ bool MPU6050::dmpBegin() {
 			setDMPEnabled(true);
 			getIntStatus();
 			dmpGetFIFOPacketSize();
-            usleep(100000);
 			result = true;
 		}
 	}
@@ -3579,8 +3578,8 @@ uint8_t MPU6050::dmpInitialize() {
 
             syslog(LOG_INFO, "MPU6050: Waiting for FIFO count > 2...");
 
-			while ((fifoCount = getFIFOCount()) < 3)
-				;
+            while ((fifoCount = getFIFOCount()) < 3)
+                ;
 
             syslog(LOG_INFO, "MPU6050: Current FIFO count=%d", fifoCount);
 			getFIFOBytes(fifoBuffer, fifoCount);
@@ -3622,8 +3621,10 @@ uint8_t MPU6050::dmpInitialize() {
 			 return 3; // TODO: proper error code for no memory
 			 }*/
 
+            setFIFOEnabled(false);
 			resetFIFO();
 			getIntStatus();
+            setFIFOEnabled(true);
             syslog(LOG_INFO, "MPU6050: Initialization Success!");
 		} else {
             syslog(LOG_INFO, "MPU6050: ERROR! DMP configuration verification failed.");
