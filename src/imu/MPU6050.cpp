@@ -99,6 +99,9 @@ bool MPU6050::pulse() {
 		extractDataFromFifo();
 		if(discardSample > 0) {
 			discardSample--;
+			if(discardSample == 0) {
+		        resetFIFO();
+			}
 		}
 	} while ((fifoCount = getFIFOCount()) >= 42);
 	return discardSample == 0;
