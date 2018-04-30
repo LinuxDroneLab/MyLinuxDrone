@@ -88,7 +88,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcYPRData(boost::math::quaternion<float> q) {
 	result.pitch = QUATERNION_DIRECTION_RPY[PITCH_POS]*asin(2.0f * real * y - 2.0 * z * x) * 57.295779513f;
 	result.roll = QUATERNION_DIRECTION_RPY[ROLL_POS]*atan2(2.0f * (real * x + y * z), 1.0f - 2.0f * (x * x + y * y))
 			* 57.295779513f;
-	syslog(LOG_INFO, "YPR: y(%3.2f), p(%3.2f), r(%3.2f)", result.yaw, result.pitch, result.roll);
+//	syslog(LOG_INFO, "YPR: y(%3.2f), p(%3.2f), r(%3.2f)", result.yaw, result.pitch, result.roll);
 	return result;
 }
 
