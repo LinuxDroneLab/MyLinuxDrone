@@ -207,6 +207,8 @@ void MyRCAgent::pulse() {
                 m_signal(disarmMotors);
             } else {
                 boost::shared_ptr<MyEvent> evOut(boost::make_shared<MyRCSample>(this->getUuid(), thrust, roll, pitch, yaw, aux1, aux2));
+ //               syslog(LOG_INFO, "RCSample: r=%3.2f, p=%3.2f, y=%3.2f, t=%3.2f", roll, pitch, yaw, thrust);
+
                 m_signal(evOut);
             }
             this->status = MYRCAGENT_STATUS_WAIT_MODE;

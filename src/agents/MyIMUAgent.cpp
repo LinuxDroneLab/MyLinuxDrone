@@ -39,7 +39,7 @@ void MyIMUAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 			// prevMicros = now;
 			if(imu.pulse()) {
 				const MPU6050::SensorData& md = imu.getData();
-				syslog(LOG_INFO, "YPR: y(%3.2f), p(%3.2f), r(%3.2f) - Accel: x(%d), y(%d), z(%d)", md.ypr[0], md.ypr[1], md.ypr[2], md.accel.x, md.accel.y, md.accel.z);
+//				syslog(LOG_INFO, "YPR: y(%3.2f), p(%3.2f), r(%3.2f) - Accel: x(%d), y(%d), z(%d)", md.ypr[0], md.ypr[1], md.ypr[2], md.accel.x, md.accel.y, md.accel.z);
 
 				boost::math::quaternion<float> q(md.q.w,md.q.x,md.q.y,md.q.z);
 				boost::shared_ptr<MyEvent> evOut(boost::make_shared<MyIMUSample>(this->getUuid(), q));

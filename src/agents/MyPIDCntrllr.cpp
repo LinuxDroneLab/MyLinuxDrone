@@ -306,6 +306,7 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event) {
 			MyPIDCntrllr::TARGET_VALUES[PITCH_POS].setPercentValue((*rcSample).getPitchPercent());
 			MyPIDCntrllr::TARGET_VALUES[YAW_POS].setPercentValue((*rcSample).getYawPercent());
 			MyPIDCntrllr::TARGET_VALUES[THRUST_POS].setPercentValue((*rcSample).getThrustPercent());
+//            syslog(LOG_INFO, "RCSample: r=%3.2f, p=%3.2f, y=%3.2f, t=%3.2f", MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[PITCH_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[YAW_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue());
 
 		} else if(event->getType() == MyEvent::EventType::BaroSample) {
 //            syslog(LOG_INFO, "BaroSample received");
