@@ -122,45 +122,10 @@ bool MyRCAgent::receiveData() {
 //        printf("Message received from PRU:%d:%d:%d 1\n",readBuf[0], readBuf[1], bytes);
         if((readBuf[0] == PRU_RC_LIB_CMD_ID)
                 && (readBuf[1] == PRU_RC_LIB_CMD_GET_DATA_RSP)) {
-            for(int j = 0; j < 8; j++) {
-                switch(j) {
-                case(CHAN_ROLL): {
-                    MyRCAgent::PRU_VALUES[CHAN_ROLL].setValue(uint16_t(data[j]/200));
-                    MyRCAgent::CHAN_VALUES[CHAN_ROLL].setValue(
-                            MyRCAgent::PRU_VALUES[CHAN_ROLL]);
-                    break;
-                }
-                case(CHAN_THRUST): {
-                    MyRCAgent::PRU_VALUES[CHAN_THRUST].setValue(uint16_t(data[j]/200));
-                    MyRCAgent::CHAN_VALUES[CHAN_THRUST].setValue(
-                            MyRCAgent::PRU_VALUES[CHAN_THRUST]);
-                    break;
-                }
-                case(CHAN_PITCH): {
-                    MyRCAgent::PRU_VALUES[CHAN_PITCH].setValue(uint16_t(data[j]/200));
-                    MyRCAgent::CHAN_VALUES[CHAN_PITCH].setValue(
-                            MyRCAgent::PRU_VALUES[CHAN_PITCH]);
-                    break;
-                }
-                case(CHAN_YAW): {
-                    MyRCAgent::PRU_VALUES[CHAN_YAW].setValue(uint16_t(data[j]/200));
-                    MyRCAgent::CHAN_VALUES[CHAN_YAW].setValue(
-                            MyRCAgent::PRU_VALUES[CHAN_YAW]);
-                    break;
-                }
-                case(CHAN_AUX1): {
-                    MyRCAgent::PRU_VALUES[CHAN_AUX1].setValue(uint16_t(data[j]/200));
-                    MyRCAgent::CHAN_VALUES[CHAN_AUX1].setValue(
-                            MyRCAgent::PRU_VALUES[CHAN_AUX1]);
-                    break;
-                }
-                case(CHAN_AUX2): {
-                    MyRCAgent::PRU_VALUES[CHAN_AUX2].setValue(uint16_t(data[j]/200));
-                    MyRCAgent::CHAN_VALUES[CHAN_AUX2].setValue(
-                            MyRCAgent::PRU_VALUES[CHAN_AUX2]);
-                    break;
-                }
-                }
+            for(int j = 0; j < 6; j++) {
+                MyRCAgent::PRU_VALUES[j].setValue(uint16_t(data[j]/200));
+                MyRCAgent::CHAN_VALUES[j].setValue(
+                        MyRCAgent::PRU_VALUES[j]);
             }
             this->setRCSample(
                     MyRCAgent::CHAN_VALUES[CHAN_THRUST].getValueAsPercent(),
