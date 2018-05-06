@@ -25,6 +25,10 @@ public:
 
 	void push(param_type item);
 	float getMean();
+    float getRMS();
+    float getMinRMS();
+    float getMaxRMS();
+    float getCenterRMS();
 	float getIntegral();
 	float getDerivate();
 	void clean();
@@ -32,6 +36,8 @@ private:
 	float m_period;
 	container_type m_misureBuff;
 	container_type m_meanBuff;
+    container_type m_squareBuff;
+    container_type m_rmsBuff;
 	container_type m_derivateBuff;
 	ValueFloat m_integral;
 	static RangeFloat DEFAULT_INTEGRAL_RANGE;

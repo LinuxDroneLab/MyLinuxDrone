@@ -14,6 +14,7 @@
 #include <queues/MyPIDBuffer.h>
 #include <commons/RangeFloat.h>
 #include <commons/ValueFloat.h>
+#include <commons/helper_3dmath.h>
 
 class MyPIDCntrllr: public MyAgent {
 public:
@@ -114,6 +115,13 @@ private:
 		}
 	} PIDOutput;
 
+	typedef struct {
+	    int32_t pressure;
+	    float temperature;
+	    float altitude;
+
+	} PIDBaroData;
+
 	bool initialized;
 	void initialize();
 	bool armed;
@@ -125,8 +133,9 @@ private:
 	void arm();
 	void clean();
 
-	void processImuSample(boost::math::quaternion<float> sample);
-	YPRT getYPRTFromRcData(YPRT &prev);
+	void processImuSample(boost::math::quaternion<float> sample, float yaw, float pitch, float roll, VectorFloat gravity, VectorInt16 accel, VectorInt16 linearAccel);
+
+	YPRT getYPRTFromTargetData(YPRT &prev);
 	YPRT calcYPRData(boost::math::quaternion<float> q);
 	YPRT calcCorrection(YPRT &delta);
 	YPRT calcDelta(YPRT &yprt1, YPRT &yprt2);
@@ -156,12 +165,16 @@ private:
 	float deg2MicrosYawFactor;
 	uint16_t count;
 
+	PIDBaroData baroData;
+	MyPIDBuffer altitudeBuff;
+
 	static RangeFloat TARGET_RANGES[];
 	static ValueFloat TARGET_VALUES[];
 	static int8_t QUATERNION_DIRECTION_RPY[];
 	static int8_t RC_DIRECTION_RPY[];
     static float FREQUENCY;
     static RangeFloat INTEGRAL_RANGE;
+    static RangeFloat ALTITUDE_RANGE;
 };
 
 #endif /* AGENTS_MYPIDCNTRLLR_H_ */

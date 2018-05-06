@@ -13,18 +13,22 @@
 
 class MyBaroSample: public MyEvent {
 public:
-	MyBaroSample(boost::uuids::uuid origin, float altitude, int32_t pressure, int32_t seeLevelPressure, float temperature);
+	MyBaroSample(boost::uuids::uuid origin, float altitude, int32_t pressure, int32_t seeLevelPressure, float temperature, uint32_t rawPressure, uint16_t rawTemperature);
 	virtual ~MyBaroSample();
 	virtual MyEvent::EventType getType() const;
 	float getAltitude() const;
 	int32_t getPressure() const;
 	int32_t getSeeLevelPressure() const;
 	float getTemperature() const;
+    uint32_t getRawPressure() const;
+    uint16_t getRawTemperature() const;
 private:
 	const float altitude;
 	const int32_t pressure;
 	const int32_t seeLevelPressure;
 	const float temperature;
+	const uint32_t rawPressure;
+    const uint16_t rawTemperature;
 };
 
 #endif /* EVENTS_MYBAROSAMPLE_H_ */

@@ -101,6 +101,12 @@ class VectorInt16 {
             y = 0;
             z = 0;
         }
+
+        VectorInt16(const VectorInt16& rht) {
+            x = rht.x;
+            y = rht.y;
+            z = rht.z;
+        }
         
         VectorInt16(int16_t nx, int16_t ny, int16_t nz) {
             x = nx;
@@ -169,6 +175,12 @@ class VectorFloat {
             z = 0;
         }
         
+        VectorFloat(const VectorFloat& rht) {
+            x = rht.x;
+            y = rht.y;
+            z = rht.z;
+        }
+
         VectorFloat(float nx, float ny, float nz) {
             x = nx;
             y = ny;

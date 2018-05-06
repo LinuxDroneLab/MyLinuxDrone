@@ -15,7 +15,7 @@ struct MyPID {
     double value;
 } ;
 
-struct MyIMUSample {
+struct MyPIDIMUSample {
     double current_value;
     double target_value;
     double error_;
@@ -26,9 +26,9 @@ struct MyIMUSample {
 struct MyPIDState
 {
     uint32_t timestampMillis;
-    MyIMUSample yawSample;
-    MyIMUSample pitchSample;
-    MyIMUSample rollSample;
+    MyPIDIMUSample yawSample;
+    MyPIDIMUSample pitchSample;
+    MyPIDIMUSample rollSample;
 };
 
 #endif /* DBUS_MYPIDSTATE_H_ */

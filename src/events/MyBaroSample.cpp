@@ -9,9 +9,9 @@
 #include <events/MyBaroSample.h>
 
 MyBaroSample::MyBaroSample(boost::uuids::uuid origin, float altitude,
-		int32_t pressure, int32_t seeLevelPressure, float temperature) :
+		int32_t pressure, int32_t seeLevelPressure, float temperature, uint32_t rawPressure, uint16_t rawTemperature) :
 		MyEvent(origin), altitude(altitude), pressure(pressure), seeLevelPressure(
-				seeLevelPressure), temperature(temperature) {
+				seeLevelPressure), temperature(temperature), rawPressure(rawPressure), rawTemperature(rawTemperature) {
 	this->setPriority(MyPriority::BAROMETER_SAMPLE_PRIORITY);
 }
 
@@ -35,4 +35,10 @@ int32_t MyBaroSample::getPressure() const {
 }
 int32_t MyBaroSample::getSeeLevelPressure() const {
 	return this->seeLevelPressure;
+}
+uint32_t MyBaroSample::getRawPressure() const {
+    return this->rawPressure;
+}
+uint16_t MyBaroSample::getRawTemperature() const {
+    return this->rawTemperature;
 }

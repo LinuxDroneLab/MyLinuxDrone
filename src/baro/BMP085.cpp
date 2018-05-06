@@ -73,7 +73,7 @@ bool BMP085::pulse() {
 		case waitStartup: {
 			// 10 millis
 			if (calcMillisFrom(statusAtTime) >= 10) {
-				begin(BMP085_ULTRAHIGHRES);
+				begin(BMP085_STANDARD);
 				startCycle();
 				changeStatus(sndTempCmd);
 			}
@@ -112,7 +112,7 @@ bool BMP085::pulse() {
 				loadRawPressure();
 				calcTemperature();
 				calcPressure();
-				calcAltitude();
+				calcAltitude(101500.0f);
 				calcSealevelPressure();
 				result = true;
 				changeStatus(waitNextCycle);
@@ -120,7 +120,7 @@ bool BMP085::pulse() {
 			break;
 		}
 		case waitNextCycle: {
-			if (calcMillisFrom(cycleAtTime) >= 1000) { // Freq 1Hz
+			if (calcMillisFrom(cycleAtTime) >= 0) { // Freq ~77Hz
 				startCycle();
 				changeStatus(sndTempCmd);
 			}
@@ -194,7 +194,11 @@ void BMP085::loadRawPressure(void) {
 	raw <<= 8;
 	raw |= read8(BMP085_PRESSUREDATA + 2);
 	raw >>= (8 - oversampling);
-	data.rawPressure = raw;
+	if(data.rawPressure != 0) {
+	    data.rawPressure = 0.75f * data.rawPressure + 0.25f * raw;
+	} else {
+	    data.rawPressure = raw;
+	}
 }
 
 void BMP085::calcPressure() {
@@ -239,8 +243,8 @@ void BMP085::calcTemperature(void) {
 	data.temperature = temp;
 }
 void BMP085::calcAltitude(float sealevelPressure) {
-	data.altitude = 44330
-			* (1.0 - pow((float) data.pressure / sealevelPressure, 0.1903));
+	data.altitude = 44330.0f
+			* (1.0f - pow(((float)data.pressure) / sealevelPressure, 0.1903f));
 }
 void BMP085::calcSealevelPressure() {
 	data.seaLevelPressure = (int32_t) (data.pressure
