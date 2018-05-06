@@ -159,9 +159,9 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcDelta(YPRT &yprt1, YPRT &yprt2)
 MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(YPRT &data)
 {
     /* 3      1
-     \  /
-     \/
-     /\
+         \  /
+          \/
+          /\
 	     /  \
 	   2      4
      */
