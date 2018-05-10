@@ -96,7 +96,6 @@ bool MPU6050::pulse() {
 	do {
 		// read a packet from FIFO
 		getFIFOBytes(fifoBuffer, dmpPacketSize);
-		extractDataFromFifo();
 		if(discardSample > 0) {
 			discardSample--;
 			if(discardSample == 0) {
@@ -104,6 +103,7 @@ bool MPU6050::pulse() {
 			}
 		}
 	} while ((fifoCount = getFIFOCount()) >= 42);
+    extractDataFromFifo();
 	return discardSample == 0;
 }
 void MPU6050::extractDataFromFifo() {

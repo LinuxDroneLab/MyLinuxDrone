@@ -63,8 +63,8 @@ MyRCAgent::MyRCAgent(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::EventTy
 	this->aux1=0;
 	this->aux2=0;
 	this->status = MYRCAGENT_STATUS_REQUIRE_MODE;
-	this->tickCounter = 0;
-	this->tickDivider = 20; // with tick at 200Hz, receive at 10Hz
+	this->tickDTimeSum = 0;
+	this->tickDTimeWaitMicros = 100000; // with tick at 200Hz => dTimeMicros = 5000 => get data for each 100000/5000 = 20 cycles (10Hz)
 }
 
 MyRCAgent::~MyRCAgent() {
@@ -141,6 +141,20 @@ bool MyRCAgent::receiveData() {
     return result;
 }
 
+bool MyRCAgent::updateTickTimestamp() {
+    uint32_t now = boost::posix_time::microsec_clock::local_time().time_of_day().total_microseconds();
+    lastDTimeMicros = uint32_t(now - lastTickMicros);
+    lastTickMicros = now;
+    this->tickDTimeSum += this->lastDTimeMicros;
+    if(this->tickDTimeSum > this->tickDTimeWaitMicros) {
+        this->tickDTimeSum -= this->tickDTimeWaitMicros;
+        return true;
+    }
+    return false;
+}
+
+
+
 /*
  * Count tick events. If (num ticks % divider) == 0, then go to RequireMode State
  * States:
@@ -153,16 +167,15 @@ bool MyRCAgent::receiveData() {
  * - Transition: Idle -> RequireMode if (num ticks % divider) == 0
  */
 void MyRCAgent::pulse() {
+    bool updatedRc = this->updateTickTimestamp();
     switch(this->status) {
     case (MYRCAGENT_STATUS_REQUIRE_MODE): {
-//        syslog(LOG_INFO, "mydrone: MyRCAgent: STATE[REQUIRE_MODE]");
         if(this->sendDataRequest()) {
             this->status = MYRCAGENT_STATUS_RECEIVE_MODE;
         }
         break;
     }
     case (MYRCAGENT_STATUS_RECEIVE_MODE): {
-//        syslog(LOG_INFO, "mydrone: MyRCAgent: STATE[RECEIVE_MODE]");
         if(this->receiveData()) {
             if(thrust <= -0.98f && pitch >= 0.98f) {
                 boost::shared_ptr<MinThrustMaxPitch> armMotors(boost::make_shared<MinThrustMaxPitch>(uuid));
@@ -172,26 +185,21 @@ void MyRCAgent::pulse() {
                 m_signal(disarmMotors);
             } else {
                 boost::shared_ptr<MyEvent> evOut(boost::make_shared<MyRCSample>(this->getUuid(), thrust, roll, pitch, yaw, aux1, aux2));
- //               syslog(LOG_INFO, "RCSample: r=%3.2f, p=%3.2f, y=%3.2f, t=%3.2f", roll, pitch, yaw, thrust);
-
                 m_signal(evOut);
             }
             this->status = MYRCAGENT_STATUS_WAIT_MODE;
-        } else if(this->tickCounter == 0) {
+        } else if(updatedRc) {
             this->status = MYRCAGENT_STATUS_REQUIRE_MODE;
         }
         break;
     }
     case (MYRCAGENT_STATUS_WAIT_MODE): {
-//        syslog(LOG_INFO, "mydrone: MyRCAgent: STATE[WAIT_MODE]");
-        if(this->tickCounter == 0) {
+        if(updatedRc) {
                     this->status = MYRCAGENT_STATUS_REQUIRE_MODE;
         }
         break;
     }
     }
-    this->tickCounter++;
-    this->tickCounter %= this->tickDivider;
 
 }
 void MyRCAgent::processEvent(boost::shared_ptr<MyEvent> event) {

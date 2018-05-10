@@ -66,7 +66,7 @@ void MyEvent::setLivingTimeMillis(uint livingTimeMillis) {
 }
 
 bool MyEvent::isExpired() const {
-	long now = boost::posix_time::microsec_clock::local_time().time_of_day().total_milliseconds();
+	unsigned long now = boost::posix_time::microsec_clock::local_time().time_of_day().total_milliseconds();
 	return (now - this->getTimestampMillis()) > this->livingTimeMillis;
 }
 bool MyEvent::isCommand() const {

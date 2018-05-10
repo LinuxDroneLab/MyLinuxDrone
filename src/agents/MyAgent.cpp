@@ -14,6 +14,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <events/MyAgentChangeState.h>
 #include <events/MyCmd.h>
+#include <syslog.h>
 
 //MyAgent::MyAgent() :
 //		uuid(MyUuid::generateUuid()), currentState(
@@ -32,6 +33,7 @@ MyAgent::MyAgent(boost::shared_ptr<MyEventBus> bus,
 	busConnection = m_signal.connect(
 			boost::bind(&MyEventBus::doEvent, bus, _1)); // bus observe me
 	thisConnection = bus->connect(boost::bind(&MyAgent::doEvent, this, _1)); // I observe the bus
+
 }
 
 MyAgent::~MyAgent() {
@@ -73,8 +75,15 @@ void MyAgent::operator()() {
 		MyAgentState state = this->currentState;
 		switch (state) {
 		case MyAgentState::Active: {
+//            boost::posix_time::ptime prev = boost::posix_time::microsec_clock::local_time();
 			value_type ev = received.pop();
 			this->processEvent(ev);
+//			boost::posix_time::ptime post = boost::posix_time::microsec_clock::local_time();
+//            uint16_t dtimeMillis = post.time_of_day().total_milliseconds() - prev.time_of_day().total_milliseconds();
+//            if(dtimeMillis > 7) {
+//                syslog(LOG_INFO, "Agent %s millis: %d", boost::uuids::to_string(this->getUuid()).c_str(), dtimeMillis);
+//            }
+
 			break;
 		}
 		case MyAgentState::ShuttingDown: {

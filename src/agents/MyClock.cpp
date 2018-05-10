@@ -12,6 +12,7 @@
 #include <agents/MyClock.h>
 #include <events/MyTick.h>
 
+
 MyClock::MyClock(boost::shared_ptr<MyEventBus> bus, uint m_waitMillis) :
 		MyAgent(bus, {}), m_shutdown(false), m_waitMillis(m_waitMillis) {
 }

@@ -91,7 +91,7 @@ float MyPIDBuffer::getMaxRMS() {
 }
 
 float MyPIDBuffer::getCenterRMS() {
-    return (this->getMinRMS() + this->getMaxRMS())/2.0f;
+    return sqrt((this->getMinRMS()*this->getMinRMS() + this->getMaxRMS()*this->getMaxRMS())/2.0f);
 }
 
 float MyPIDBuffer::getIntegral() {

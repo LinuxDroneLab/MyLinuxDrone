@@ -95,16 +95,16 @@ int main() {
 	if(!imuAgent.initialize()) {
 	    syslog(LOG_INFO, "mydrone MyIMUAgent NOT initialized!!");
 	}
-    syslog(LOG_INFO, "mydrone MyIMUAgent created");
+    syslog(LOG_INFO, "mydrone MyIMUAgent created %s", boost::uuids::to_string(imuAgent.getUuid()).c_str());
 
 	MyPIDCntrllr pidControlledAgent(eventBus, {MyEvent::EventType::MotorsArmed, MyEvent::EventType::MotorsDisarmed, MyEvent::EventType::IMUSample, MyEvent::EventType::RCSample, MyEvent::EventType::BaroSample});
-    syslog(LOG_INFO, "mydrone MyPIDCntrllr created");
+    syslog(LOG_INFO, "mydrone MyPIDCntrllr created %s", boost::uuids::to_string(pidControlledAgent.getUuid()).c_str());
 
     MyMotorsAgent motorsAgent(eventBus, {MyEvent::EventType::Tick, MyEvent::EventType::MinThrustMaxPitch, MyEvent::EventType::MinThrustMinPitch, MyEvent::EventType::OutMotors});
-    syslog(LOG_INFO, "mydrone MyMotorsAgent created");
+    syslog(LOG_INFO, "mydrone MyMotorsAgent created %s", boost::uuids::to_string(motorsAgent.getUuid()).c_str());
 
     MyRCAgent rcAgent(eventBus, {MyEvent::EventType::Tick});
-    syslog(LOG_INFO, "mydrone MyRCAgent created");
+    syslog(LOG_INFO, "mydrone MyRCAgent created %s", boost::uuids::to_string(rcAgent.getUuid()).c_str());
 
 //	MyDBusEmitterAgent dbusAgent(eventBus, {MyEvent::EventType::YPRError});
 //    syslog(LOG_INFO, "mydrone MyDBusEmitterAgent created");
@@ -132,7 +132,7 @@ int main() {
 	// boost::shared_ptr<MyArmMotorsCmd> armMotors(boost::make_shared<MyArmMotorsCmd>(uuid, motorsAgent.getUuid()));
 	// eventBus->doEvent(armMotors);
 
-	MyPIDControllerServiceWrap::initialize();
+//	MyPIDControllerServiceWrap::initialize();
 //	cout << "Initialized: org.mydrone.MyPIDControllerService" << endl;
 
 	// wait for exit;

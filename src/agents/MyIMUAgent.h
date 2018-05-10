@@ -21,10 +21,12 @@ protected:
 	virtual void processEvent(boost::shared_ptr<MyEvent> event);
 
 private:
+	void calcTickTimestamp();
 	bool initialized;
 	MPU6050 imu;
 	BMP085 bmp;
-	long prevMicros;
+	uint32_t lastTickMicros;
+	uint16_t lastDTimeMicros;
 };
 
 #endif /* AGENTS_MYIMUAGENT_H_ */

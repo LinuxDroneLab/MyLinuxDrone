@@ -39,7 +39,7 @@ void MyMotorsAgent::initialize() {
 	result &= left.initialize();
 	result &= right.initialize();
 	if(result) {
-		this->setThrottleRange();
+//		this->setThrottleRange();
 	    this->disarmMotors();
 		syslog(LOG_INFO, "mydrone: MotorsAgent: initialization OK");
 	} else {

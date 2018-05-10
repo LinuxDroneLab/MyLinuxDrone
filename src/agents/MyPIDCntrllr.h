@@ -119,6 +119,7 @@ private:
 	    int32_t pressure;
 	    float temperature;
 	    float altitude;
+	    float speedMetersPerSecond;
 
 	} PIDBaroData;
 

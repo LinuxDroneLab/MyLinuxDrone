@@ -34,14 +34,25 @@
  * NOTE: SCL and SDA needs pull-up resistors for each I2C bus.               *
  *  2.2kOhm..10kOhm, typ. 4.7kOhm                                            *
  *****************************************************************************/
+#include <inttypes.h>
 #include <baro/BMP085.h>
 #include <i2c/I2Cdev.h>
 #include <unistd.h>
 #include <cmath>
+#include <syslog.h>
 
 BMP085::BMP085() {
 	// temperature, pressure, altitude
-	data = {0,0,0.0f,0,0,0.0f};
+	data.altitude = 0.0f;
+	data.dtimeMillis = 0;
+	data.estimatedAltitude = 0.0f;
+	data.pressure = 0;
+	data.rawPressure = 0;
+	data.rawTemperature = 0;
+	data.seaLevelPressure = 0;
+	data.speedMetersPerSeconds = 0.0f;
+	data.temperature = 0.0f;
+	data.timestamp = boost::posix_time::microsec_clock::local_time();
 
 	// calibration parameters
 	ac1 = 0;
@@ -57,6 +68,7 @@ BMP085::BMP085() {
 	md = 0;
 	oversampling = 0;
 	status = none;
+	this->discardSamples = 1000;
 }
 BMP085::~BMP085() {
 }
@@ -75,26 +87,18 @@ bool BMP085::pulse() {
 			if (calcMillisFrom(statusAtTime) >= 10) {
 				begin(BMP085_STANDARD);
 				startCycle();
-				changeStatus(sndTempCmd);
+                sendRawTemperatureCmd();
+				changeStatus(waitTemperature);
 			}
-			break;
-		}
-		case sndTempCmd: {
-			sendRawTemperatureCmd();
-			changeStatus(waitTemperature);
 			break;
 		}
 		case waitTemperature: {
 			// 5 millis
 			if (calcMillisFrom(statusAtTime) >= 5) {
 				loadRawTemperature();
-				changeStatus(sndPressCmd);
+                sendRawPressureCmd();
+				changeStatus(waitPressure);
 			}
-			break;
-		}
-		case sndPressCmd: {
-			sendRawPressureCmd();
-			changeStatus(waitPressure);
 			break;
 		}
 		case waitPressure: {
@@ -109,20 +113,22 @@ bool BMP085::pulse() {
 				waitMillis = 26;
 
 			if (calcMillisFrom(statusAtTime) >= waitMillis) {
+			    boost::posix_time::ptime prev = data.timestamp;
+			    data.timestamp = boost::posix_time::microsec_clock::local_time();
+			    data.dtimeMillis = data.timestamp.time_of_day().total_milliseconds() - prev.time_of_day().total_milliseconds();
+
 				loadRawPressure();
 				calcTemperature();
 				calcPressure();
 				calcAltitude(101500.0f);
 				calcSealevelPressure();
-				result = true;
-				changeStatus(waitNextCycle);
-			}
-			break;
-		}
-		case waitNextCycle: {
-			if (calcMillisFrom(cycleAtTime) >= 0) { // Freq ~77Hz
-				startCycle();
-				changeStatus(sndTempCmd);
+				if(this->discardSamples == 0) {
+	                result = true;
+				} else {
+				    this->discardSamples--;
+				}
+                sendRawTemperatureCmd();
+				changeStatus(waitTemperature);
 			}
 			break;
 		}
@@ -194,11 +200,12 @@ void BMP085::loadRawPressure(void) {
 	raw <<= 8;
 	raw |= read8(BMP085_PRESSUREDATA + 2);
 	raw >>= (8 - oversampling);
-	if(data.rawPressure != 0) {
-	    data.rawPressure = 0.75f * data.rawPressure + 0.25f * raw;
-	} else {
-	    data.rawPressure = raw;
-	}
+	data.rawPressure = raw;
+//	if(data.rawPressure != 0) {
+//	    data.rawPressure = 0.75f * data.rawPressure + 0.25f * raw;
+//	} else {
+//	    data.rawPressure = raw;
+//	}
 }
 
 void BMP085::calcPressure() {
@@ -245,6 +252,13 @@ void BMP085::calcTemperature(void) {
 void BMP085::calcAltitude(float sealevelPressure) {
 	data.altitude = 44330.0f
 			* (1.0f - pow(((float)data.pressure) / sealevelPressure, 0.1903f));
+	if(data.estimatedAltitude == 0.0f) {
+	    data.estimatedAltitude = data.altitude;
+	} else {
+        float estimatedAltitude = data.estimatedAltitude * 0.75f + data.altitude * 0.025;
+        data.estimatedAltitude = estimatedAltitude;
+        data.altitude = 10.0f*(data.estimatedAltitude);
+	}
 }
 void BMP085::calcSealevelPressure() {
 	data.seaLevelPressure = (int32_t) (data.pressure

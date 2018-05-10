@@ -32,6 +32,7 @@
 #define BMP085_h
 #include <stdint.h>
 #include <chrono>
+#include "boost/date_time/posix_time/posix_time.hpp"
 
 #define BMP085_I2CADDR 0x77
 
@@ -68,6 +69,10 @@ public:
 		int32_t pressure; // Pa
 		int32_t seaLevelPressure; // Pa
 		float altitude; // meters
+		float estimatedAltitude; //meters
+		boost::posix_time::ptime timestamp;
+		uint16_t dtimeMillis;
+		float speedMetersPerSeconds;
 	} SensorData;
 
 	bool begin(uint8_t mode = BMP085_ULTRAHIGHRES);  // by default go ultrahighres
@@ -75,13 +80,14 @@ public:
 	bool pulse();
 
 private:
-	typedef enum {none, waitStartup, sndTempCmd, waitTemperature, sndPressCmd, waitPressure, waitNextCycle} SensorStatus;
+	typedef enum {none, waitStartup, waitTemperature, waitPressure} SensorStatus;
 
 	bool initialized = false;
 	SensorData data;
 	SensorStatus status = none;
 	std::chrono::time_point<std::chrono::system_clock>  statusAtTime;
 	std::chrono::time_point<std::chrono::system_clock>  cycleAtTime;
+	boost::posix_time::ptime pulseAtTime;
 	uint64_t calcMillisFrom(std::chrono::time_point<std::chrono::system_clock> since);
 
 	void startCycle();
@@ -102,6 +108,7 @@ private:
 	void writemem(uint8_t _addr, uint8_t _val);
 
 	uint8_t oversampling;
+	uint16_t discardSamples;
 
 	int16_t ac1, ac2, ac3, b1, b2, mb, mc, md;
 	uint16_t ac4, ac5, ac6;

@@ -47,15 +47,15 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
                                                           ALTITUDE_RANGE)
 {
     keRoll = 3.20f; //0.45f;
-    keIRoll = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
+    keIRoll = 0.026f; //0.000523f; //0.028f; //0.000523f;
     keDRoll = 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
 
     kePitch = 3.20f; //0.45f;
-    keIPitch = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
+    keIPitch = 0.026f; //0.000523f; //0.028f; //0.000523f;
     keDPitch = 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
 
-    keYaw = 0.0f; //0.05f;
-    keIYaw = 0.0f;
+    keYaw = 2.0f; //0.05f;
+    keIYaw = 0.016f;
     keDYaw = 0.0f;
 
     count = 0;
@@ -63,9 +63,9 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
     // TODO: usare parametro diverso per yaw. La rotazione richiede molti più giri
     // modificare di conseguenza la funzione calcOutput
     deg2MicrosFactor = 100.0f; //350.0f;
-    deg2MicrosYawFactor = 1.0f; //60.0f;
+    deg2MicrosYawFactor = 20.0f; //60.0f;
 
-    baroData.altitude =
+    baroData.altitude = 0.0f;
     baroData.pressure = 0;
     baroData.temperature = 0.0f;
 }
@@ -341,6 +341,9 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
     if (sample.thrust > 1450.0f)
     {
         calcErr(deltaRequested, deltaReal);
+//    } else {
+//        // TODO: Da togliere. Mi serve per i test
+//        calcErr(deltaRequested, deltaReal);
     }
 
     targetData = this->getYPRTFromTargetData(targetData);
@@ -401,7 +404,6 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
         else if (event->getType() == MyEvent::EventType::IMUSample
                 && this->armed)
         {
-//            syslog(LOG_INFO, "IMUSample received");
             boost::shared_ptr<MyIMUSample> imuSample =
                     boost::static_pointer_cast<MyIMUSample>(event);
 
@@ -424,36 +426,59 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
                     (*rcSample).getYawPercent());
             MyPIDCntrllr::TARGET_VALUES[THRUST_POS].setPercentValue(
                     (*rcSample).getThrustPercent());
-//            syslog(LOG_INFO, "RCSample: r=%3.2f, p=%3.2f, y=%3.2f, t=%3.2f", MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[PITCH_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[YAW_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue());
+//            syslog(LOG_INFO, "RCSample: ts=%ld, r=%3.2f, p=%3.2f, y=%3.2f, t=%3.2f", rcSample->getTimestampMillis(), MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[PITCH_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[YAW_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue());
 
         }
         else if (event->getType() == MyEvent::EventType::BaroSample)
         {
-//            syslog(LOG_INFO, "BaroSample received");
             boost::shared_ptr<MyBaroSample> baroSample =
                     boost::static_pointer_cast<MyBaroSample>(event);
-//			syslog(LOG_INFO, "BaroSample: press=%d, alt=%5.5f, temp=%5.5f, seeLevelPress=%d, rawPressure=%ul, rawTGemperature=%u", baroSample->getPressure(), baroSample->getAltitude(), baroSample->getTemperature(), baroSample->getSeeLevelPressure(), baroSample->getRawPressure(), baroSample->getRawTemperature());
-            this->altitudeBuff.push(baroSample->getAltitude());
+            // TODO: da spostare in metodo ad hoc per BaroPID ...
+            // inoltre non va bene .. da rivedere dopo studio segnale pressure BMP085
+            float prevAlt = this->altitudeBuff.getCenterRMS();
+            float prevAltCorr = prevAlt*0.75;
+            float current = baroSample->getAltitude()*0.04f;
+            float diff = prevAlt - (prevAltCorr + current);
+            this->altitudeBuff.push(prevAltCorr + current);
+//            if(diff > 0.05f || diff < -0.05f) {
+//                this->altitudeBuff.push(prevAltCorr + current);
+//            } else {
+//                this->altitudeBuff.push(prevAlt);
+//            }
             baroData.altitude = this->altitudeBuff.getCenterRMS();
             baroData.pressure = baroSample->getPressure();
             baroData.temperature = baroSample->getTemperature();
+            baroData.speedMetersPerSecond = (baroData.altitude - prevAlt)*1000.0f/baroSample->getDTimeMillis();
 //            syslog(LOG_INFO,
-//                   "BaroSample: press=%d, alt=%5.5f, temp=%5.5f, seeLevelPress=%d, rawPressure=%u, rawTemperature=%u, altitude=%5.5f",
-//                   baroSample->getPressure(), baroSample->getAltitude(),
+//                   "BaroSample: ts=%ld, press=%d, temp=%5.5f, rawPressure=%u, integral=%5.5f, altitude=%5.5f, speed=%5.5f, dtime=%u",
+//                   baroSample->getTimestampMillis(),
+//                   baroSample->getPressure(),
 //                   baroSample->getTemperature(),
-//                   baroSample->getSeeLevelPressure(),
 //                   baroSample->getRawPressure(),
-//                   baroSample->getRawTemperature(), baroData.altitude);
+//                   this->altitudeBuff.getIntegral(),
+//                   baroData.altitude,
+//                   baroData.speedMetersPerSecond,
+//                   baroSample->getDTimeMillis());
         }
         else if (event->getType() == MyEvent::EventType::IMUSample)
         {
 //            boost::shared_ptr<MyIMUSample> imuSample =
 //                    boost::static_pointer_cast<MyIMUSample>(event);
+//
+//            boost::math::quaternion<float> q = imuSample->getQuaternion();
+//            this->processImuSample(q, imuSample->getYaw(),
+//                                   imuSample->getPitch(), imuSample->getRoll(),
+//                                   imuSample->getGravity(),
+//                                   imuSample->getAccel(),
+//                                   imuSample->getLinearAccel());
 //            syslog(LOG_INFO,
-//                   "ImuSample: roll=%5.5f, pitch=%5.5f, yaw=%5.5f",
+//                   "ImuSample: ts=%ld, roll=%5.5f, pitch=%5.5f, yaw=%5.5f, accelz=%d, linAccelz=%d",
+//                   imuSample->getTimestampMillis(),
 //                   imuSample->getRoll(),
 //                   imuSample->getPitch(),
-//                   imuSample->getYaw());
+//                   imuSample->getYaw(),
+//                   imuSample->getAccel().z,
+//                   imuSample->getLinearAccel().z);
         }
         else
         {

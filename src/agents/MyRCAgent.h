@@ -41,13 +41,12 @@ private:
 
 	bool initialized;
 	void initialize();
+    bool updateTickTimestamp();
 	void pulse();
 	bool sendDataRequest();
 	bool receiveData();
 
 	uint8_t status;
-	uint8_t tickCounter;
-	uint8_t tickDivider;
     struct pollfd pruDevice;
 	float thrust;
 	float roll;
@@ -55,6 +54,12 @@ private:
 	float yaw;
 	float aux1;
 	float aux2;
+
+	uint32_t lastTickMicros;
+    uint16_t lastDTimeMicros;
+    uint32_t tickDTimeSum;
+    uint32_t tickDTimeWaitMicros;
+
 };
 
 #endif /* AGENTS_MYRCAGENT_H_ */
