@@ -1,0 +1,133 @@
+/dts-v1/;
+
+/ {
+	compatible = "ti,beaglebone", "ti,beaglebone-black", "ti,beaglebone-green";
+	part-number = "AM335X-PRU-RPROC-4-9-TI";
+	version = "00A0";
+
+	fragment@0 {
+		target-path = [2f 00];
+
+		__overlay__ {
+
+			ocp {
+				#address-cells = <0x1>;
+				#size-cells = <0x1>;
+
+				pruss_soc_bus@4a326000 {
+					compatible = "ti,am3356-pruss-soc-bus";
+					reg = <0x4a326000 0x2000>;
+					ti,hwmods = "pruss";
+					#address-cells = <0x1>;
+					#size-cells = <0x1>;
+					ranges;
+					status = "okay";
+					linux,phandle = <0x2>;
+					phandle = <0x2>;
+
+					pruss@4a300000 {
+						compatible = "ti,am3356-pruss";
+						reg = <0x4a300000 0x2000 0x4a302000 0x2000 0x4a310000 0x3000 0x4a326000 0x2000 0x4a32e000 0x31c 0x4a332000 0x58>;
+						reg-names = "dram0", "dram1", "shrdram2", "cfg", "iep", "mii_rt";
+						#address-cells = <0x1>;
+						#size-cells = <0x1>;
+						ranges;
+						status = "okay";
+						linux,phandle = <0x3>;
+						phandle = <0x3>;
+
+						intc@4a320000 {
+							compatible = "ti,am3356-pruss-intc";
+							reg = <0x4a320000 0x2000>;
+							reg-names = "intc";
+							interrupts = <0x14 0x15 0x16 0x17 0x18 0x19 0x1a 0x1b>;
+							interrupt-names = "host2", "host3", "host4", "host5", "host6", "host7", "host8", "host9";
+							interrupt-controller;
+							#interrupt-cells = <0x1>;
+							linux,phandle = <0x1>;
+							phandle = <0x1>;
+						};
+
+						pru@4a334000 {
+							compatible = "ti,am3356-pru";
+							reg = <0x4a334000 0x2000 0x4a322000 0x400 0x4a322400 0x100>;
+							reg-names = "iram", "control", "debug";
+							label = "pru0";
+							interrupt-parent = <0x1>;
+							interrupts = <0x10 0x11>;
+							interrupt-names = "vring", "kick";
+							status = "okay";
+							linux,phandle = <0x4>;
+							phandle = <0x4>;
+						};
+
+						pru@4a338000 {
+							compatible = "ti,am3356-pru";
+							reg = <0x4a338000 0x2000 0x4a324000 0x400 0x4a324400 0x100>;
+							reg-names = "iram", "control", "debug";
+							label = "pru1";
+							interrupt-parent = <0x1>;
+							interrupts = <0x12 0x13>;
+							interrupt-names = "vring", "kick";
+							status = "okay";
+							linux,phandle = <0x5>;
+							phandle = <0x5>;
+						};
+
+						mdio@4a332400 {
+							compatible = "ti,davinci_mdio";
+							reg = <0x4a332400 0x90>;
+							clocks = <0xffffffff>;
+							clock-names = "fck";
+							bus_freq = <0xf4240>;
+							#address-cells = <0x1>;
+							#size-cells = <0x0>;
+							status = "disabled";
+							linux,phandle = <0x6>;
+							phandle = <0x6>;
+						};
+					};
+				};
+			};
+		};
+	};
+
+	__symbols__ {
+		pruss_soc_bus = "/fragment@0/__overlay__/ocp/pruss_soc_bus@4a326000";
+		pruss = "/fragment@0/__overlay__/ocp/pruss_soc_bus@4a326000/pruss@4a300000";
+		pruss_intc = "/fragment@0/__overlay__/ocp/pruss_soc_bus@4a326000/pruss@4a300000/intc@4a320000";
+		pru0 = "/fragment@0/__overlay__/ocp/pruss_soc_bus@4a326000/pruss@4a300000/pru@4a334000";
+		pru1 = "/fragment@0/__overlay__/ocp/pruss_soc_bus@4a326000/pruss@4a300000/pru@4a338000";
+		pruss_mdio = "/fragment@0/__overlay__/ocp/pruss_soc_bus@4a326000/pruss@4a300000/mdio@4a332400";
+	};
+
+	__fixups__ {
+		dpll_core_m4_ck = "/fragment@0/__overlay__/ocp/pruss_soc_bus@4a326000/pruss@4a300000/mdio@4a332400:clocks:0";
+	};
+
+	__local_fixups__ {
+
+		fragment@0 {
+
+			__overlay__ {
+
+				ocp {
+
+					pruss_soc_bus@4a326000 {
+
+						pruss@4a300000 {
+
+							pru@4a334000 {
+								interrupt-parent = <0x0>;
+							};
+
+							pru@4a338000 {
+								interrupt-parent = <0x0>;
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};

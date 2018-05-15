@@ -1,0 +1,91 @@
+/* Device Tree Overlay for enabling the pins that are used in Chapter 13
+* This overlay is based on the EBB-PRU-Example overlay
+* Written by Derek Molloy for the book "Exploring BeagleBone: Tools and 
+* Techniques for Building with Embedded Linux" by John Wiley & Sons, 2014
+* ISBN 9781118935125. Please see the file README.md in the repository root 
+* directory for copyright and GNU GPLv3 license information.
+*/
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "ti,beaglebone", "ti,beaglebone-black";
+
+    /* identification */
+    part-number = "PRU-ECAP";
+    version = "00A0";
+
+    /* state the resources this cape uses */
+    exclusive-use =
+        
+        "P9.27",
+        "P9.42",
+        "pru0",
+        "pruss";
+        
+    fragment@0 {
+        target = <&am33xx_pinmux>;
+        __overlay__ {
+        
+            gpio_pins: pinmux_gpio_pins {         // The GPIO pins
+                pinctrl-single,pins = <
+                    0x070 0x07  // P9_11 MODE7 | OUTPUT | GPIO pull-down
+                    0x074 0x27  // P9_13 MODE7 | INPUT | GPIO pull-down
+                >;
+            };
+            
+            pru_pru_pins: pinmux_pru_pru_pins {   // The PRU pin modes
+                pinctrl-single,pins = <
+                    // BONE_P9_42A (PIN_INPUT_PULLDOWN | MUX_MODE0)
+                    0x164 0x23  // P9_42A ECAP0_IN, MODE3 | INPUT | PRU
+                >;
+            };
+        };
+    };
+        
+    fragment@1 {        // Enable pru pins
+        target = <&ocp>;
+        __overlay__{
+            gpio_helper {
+                compatible = "gpio-of-helper";
+                status = "okay";
+                pinctrl-names = "default";
+                pinctrl-0 = <&gpio_pins>;
+            };
+            
+//            pru_gpio_helper {
+//                compatible = "gpio-of-helper";
+//                status = "okay";
+//                pinctrl-names = "default";
+//                pinctrl-0 = <&pru_pru_pins>;
+//            };
+        };
+    };
+    
+    /************************/
+    /* PRUSS                */
+    /************************/
+
+    fragment@10 {
+        target = <&pruss>;
+        __overlay__ {
+            status = "okay";
+        };
+    };
+    fragment@12 {
+        target = <&epwmss0>;
+        __overlay__ {
+            status = "okay";
+        };
+    };
+    fragment@14 {
+        target = <&ecap0>;
+        __overlay__ {
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&pru_pru_pins>;
+
+        };
+    };
+
+};

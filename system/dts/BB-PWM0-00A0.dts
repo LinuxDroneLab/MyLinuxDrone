@@ -1,0 +1,77 @@
+/dts-v1/;
+
+/ {
+	compatible = "ti,beaglebone", "ti,beaglebone-black", "ti,beaglebone-green";
+	part-number = "BB-PWM0";
+	version = "00A0";
+
+	fragment@0 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+
+			Panel_Pins {
+				pinctrl-single,pins = <0x150 0x3 0x154 0x3>;
+				linux,phandle = <0x1>;
+				phandle = <0x1>;
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+
+			helper {
+				compatible = "bone-pinmux-helper";
+				pinctrl-names = "default";
+				pinctrl-0 = <0x1>;
+				status = "okay";
+				linux,phandle = <0x2>;
+				phandle = <0x2>;
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@3 {
+		target = <0xffffffff>;
+
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	__symbols__ {
+		pinctrl_spec = "/fragment@0/__overlay__/Panel_Pins";
+		test_helper = "/fragment@1/__overlay__/helper";
+	};
+
+	__fixups__ {
+		am33xx_pinmux = "/fragment@0:target:0";
+		ocp = "/fragment@1:target:0";
+		epwmss0 = "/fragment@2:target:0";
+		ehrpwm0 = "/fragment@3:target:0";
+	};
+
+	__local_fixups__ {
+
+		fragment@1 {
+
+			__overlay__ {
+
+				helper {
+					pinctrl-0 = <0x0>;
+				};
+			};
+		};
+	};
+};

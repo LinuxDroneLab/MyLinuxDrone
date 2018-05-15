@@ -1,0 +1,12 @@
+[Unit]
+ConditionPathExists=/sys/class/remoteproc/remoteproc2/firmware
+Requires=multi-user.target
+After=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/bin/pru-rc-start.sh
+
+[Install]
+WantedBy=default.target
