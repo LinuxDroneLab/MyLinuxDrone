@@ -30,4 +30,4 @@ Debug
 *.dtb
 *.dtbo
 appunti.txt
-.original
+*.original
