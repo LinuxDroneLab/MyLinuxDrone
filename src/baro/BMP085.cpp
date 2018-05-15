@@ -68,7 +68,7 @@ BMP085::BMP085() {
 	md = 0;
 	oversampling = 0;
 	status = none;
-	this->discardSamples = 1000;
+	this->discardSamples = 3000;
 }
 BMP085::~BMP085() {
 }

@@ -49,7 +49,6 @@ int main() {
     openlog(DAEMON_NAME, LOG_CONS | LOG_NDELAY | LOG_PERROR | LOG_PID, LOG_USER);
 
     syslog(LOG_INFO, "Entering Daemon");
-
     pid_t pid, sid;
 
    //Fork the Parent Process

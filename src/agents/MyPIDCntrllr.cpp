@@ -34,7 +34,7 @@ ValueFloat MyPIDCntrllr::TARGET_VALUES[] = {
 int8_t MyPIDCntrllr::QUATERNION_DIRECTION_RPY[] = { 1, -1, 1 };
 int8_t MyPIDCntrllr::RC_DIRECTION_RPY[] = { 1, -1, 1 };
 float MyPIDCntrllr::FREQUENCY = 100.0f;
-RangeFloat MyPIDCntrllr::INTEGRAL_RANGE = RangeFloat(-20.3f, 20.3f);
+RangeFloat MyPIDCntrllr::INTEGRAL_RANGE = RangeFloat(-25.3f, 25.3f);
 RangeFloat MyPIDCntrllr::ALTITUDE_RANGE = RangeFloat(-20000.0f, 20000.0f);
 using namespace std;
 
@@ -46,23 +46,24 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
                 1.0f, 4, 10, 10, INTEGRAL_RANGE), altitudeBuff(1.0f, 20, 2, 2,
                                                           ALTITUDE_RANGE)
 {
-    keRoll = 3.20f; //0.45f;
-    keIRoll = 0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDRoll = 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
+    targetChanged = false;
+    imuSampleCounter = 0;
+    this->clean();
+    keRoll = 0.0f; //1.90f; //3.2f; //0.45f;
+    keIRoll = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
+    keDRoll = 0.0f; //1.5f; // 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
 
-    kePitch = 3.20f; //0.45f;
-    keIPitch = 0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDPitch = 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
+    kePitch = 0.0f; //1.90f; //3.2f; //0.45f;
+    keIPitch = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
+    keDPitch = 0.0f; //1.5f; // 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
 
-    keYaw = 2.0f; //0.05f;
-    keIYaw = 0.016f;
-    keDYaw = 0.0f;
-
-    count = 0;
+    keYaw = 0.0f; //1.5f; // 8.0f; //0.05f;
+    keIYaw = 0.0f; //0.116f;
+    keDYaw = 0.0f; //1.3f; // 6.3f;
 
     // TODO: usare parametro diverso per yaw. La rotazione richiede molti più giri
     // modificare di conseguenza la funzione calcOutput
-    deg2MicrosFactor = 100.0f; //350.0f;
+    deg2MicrosFactor = 75.0f; //350.0f;
     deg2MicrosYawFactor = 20.0f; //60.0f;
 
     baroData.altitude = 0.0f;
@@ -105,19 +106,20 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcYPRData(boost::math::quaternion<float> q)
 void MyPIDCntrllr::calcErr(YPRT &yprtReq, YPRT &yprtReal)
 {
     // considero errore limitato a 10 deg. more less for yaw and 60deg for pitch and roll
-    yawErr.push(
-            std::min<float>(
-                    10.0f,
-                    std::max<float>(-10.0f, yprtReal.yaw - yprtReq.yaw)));
+    float yawErrTmp = std::min<float>(
+            2.0f,
+            std::max<float>(-2.0f, yprtReal.yaw - yprtReq.yaw));
+    yawErr.push(yawErrTmp);
     pitchErr.push(
             std::min<float>(
-                    60.0f,
-                    std::max<float>(-60.0f, yprtReal.pitch - yprtReq.pitch)));
+                    2.0f,
+                    std::max<float>(-2.0f, yprtReal.pitch - yprtReq.pitch)));
     rollErr.push(
             std::min<float>(
-                    60.0f,
-                    std::max<float>(-60.0f, yprtReal.roll - yprtReq.roll)));
-//	syslog(LOG_INFO, "EYPRT: y(%3.5f, %3.5f), p(%3.5f, %3.5f), r(%3.5f, %3.5f), t(%5.5f)", yprtReal.yaw, yprtReq.yaw, yprtReal.pitch, yprtReq.pitch, yprtReal.roll, yprtReq.roll, yprtReal.thrust);
+                    2.0f,
+                    std::max<float>(-2.0f, yprtReal.roll - yprtReq.roll)));
+//	syslog(LOG_INFO, "EYPRT: y(%3.5f, %3.5f, %3.5f), p(%3.5f, %3.5f, %3.5f), r(%3.5f, %3.5f, %3.5f), t(%5.5f)", yprtReal.yaw, yprtReq.yaw, yawErr.getMean(), yprtReal.pitch, yprtReq.pitch, pitchErr.getMean(), yprtReal.roll, yprtReq.roll, rollErr.getMean(), yprtReal.thrust);
+//    syslog(LOG_INFO, "EYPRT: p(%3.5f, %3.5f, %3.5f, %3.5f), r(%3.5f, %3.5f, %3.5f, %3.5f), t(%5.5f)", yprtReal.pitch, pitchErr.getMean(), pitchErr.getIntegral(), pitchErr.getDerivate(), yprtReal.roll, rollErr.getMean(), rollErr.getIntegral(), rollErr.getDerivate(), yprtReal.thrust);
 
 }
 
@@ -125,7 +127,6 @@ void MyPIDCntrllr::calcErr(YPRT &yprtReq, YPRT &yprtReal)
 // the thrust is absolute value
 MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt)
 {
-    count++;
     YPRT result = { 0.0f, 0.0f, 0.0f, 0.0f };
     float yawCorr = yawErr.getMean() * keYaw + yawErr.getIntegral() * keIYaw
             + yawErr.getDerivate() * keDYaw;
@@ -138,6 +139,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt)
     result.pitch = yprt.pitch - pitchCorr;
     result.roll = yprt.roll - rollCorr;
     result.thrust = yprt.thrust;
+    syslog(LOG_INFO, "p=(%5.5f, %5.5f), r=(%5.5f, %5.5f), t=(%5.5f)", yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
 //	syslog(LOG_INFO, "CYPRT: y(%3.5f, %3.5f), p(%3.5f, %3.5f), r(%3.5f, %3.5f), t(%5.5f)", yprt.yaw, yawCorr, yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
 //	syslog(LOG_INFO, "CYPRT: y(%3.5f), p(%3.5f), r(%3.5f), t(%5.5f)", yawCorr, pitchCorr, rollCorr, yprt.thrust);
 //TRG(1)=0; VAL(1)=45; E(1)=10; EI(1)=44935; ED(1)=0;
@@ -145,6 +147,8 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt)
     {
 //		syslog(LOG_INFO, "P(%u)=%3.5f; PR(%u)=%3.5f; F(%u)=%3.5f; E(%u)=%3.5f; EI(%u)=%3.5f; ED(%u)=%3.5f; T(%u)=%3.5f;", count, this->targetData.pitch, count, realData.pitch, count, yprt.pitch, count, pitchErr.getMean()*kePitch, count, pitchErr.getIntegral()*keIPitch, count, pitchErr.getDerivate()*keDPitch, count, yprt.thrust);
 //	   syslog(LOG_INFO, "R(%u)=%3.5f; P(%u)=%3.5f; Y(%u)=%3.5f; RR(%u)=%3.5f; RP(%u)=%3.5f; RY(%u)=%3.5f; T(%u)=%3.5f", count, this->realData.roll, count, realData.pitch, count, realData.yaw, count, this->targetData.roll, count, targetData.pitch, count, targetData.yaw,count, yprt.thrust);
+    } else {
+
     }
 
     return result;
@@ -156,6 +160,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcDelta(YPRT &yprt1, YPRT &yprt2)
     return result;
 }
 
+// TODO: spostare su MyMotorsAgent
 MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(YPRT &data)
 {
     /* 3      1
@@ -254,9 +259,9 @@ void MyPIDCntrllr::sendOutput(PIDOutput &data)
     { // out error event
         boost::shared_ptr<MyYPRError> evOut(
                 boost::make_shared<MyYPRError>(
-                        this->getUuid(), realData.yaw, realData.pitch,
-                        realData.roll, targetData.yaw, targetData.pitch,
-                        targetData.roll, keRoll * rollErr.getMean(),
+                        this->getUuid(), prevSample.yaw, prevSample.pitch,
+                        prevSample.roll, requestedData.yaw, requestedData.pitch,
+                        requestedData.roll, keRoll * rollErr.getMean(),
                         keIRoll * rollErr.getIntegral(),
                         keDRoll * rollErr.getDerivate(),
                         kePitch * pitchErr.getMean(),
@@ -315,48 +320,52 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
                                     VectorFloat gravity, VectorInt16 accel,
                                     VectorInt16 linearAccel)
 {
-
-//	YPRT sample = calcYPRData(sampleQ);
     YPRT sample = { };
     sample.yaw = yaw;
     sample.pitch = pitch;
     sample.roll = roll;
-    sample.thrust = targetData.thrust; // not evaluated from IMU. I force to requested.
-    if (targetData.isZero())
+    sample.thrust = requestedData.thrust; // not evaluated from IMU. I force to requested.
+
+    // inizializza stato iniziale in seguito ad un disarm
+    if (prevSample.isZero() && prevExpected.isZero())
     {
-        targetData = sample;
-        realData = sample;
+        prevSample = sample;
+        prevExpected = {0.0f,0.0f,0.0f,0.0f};
     }
 
+    //syslog(LOG_INFO, "Y(%5.5f, %5.5f),P(%5.5f, %5.5f),R(%5.5f, %5.5f)", mysample.yaw, sample.yaw, mysample.pitch, sample.pitch, mysample.roll, sample.roll);
     /* CALCOLO ERRORE
      * l'errore è dato dalla differenza tra la variazione avvenuta e quella richiesta nel ciclo precedente
      * deltaReal - deltaRequested = (sample - realData) - (targetData - realData) = sample - targetData
      */
-    YPRT deltaRequested = (targetData - sample);
-    deltaRequested.divideYPR(22.0f);
-    YPRT deltaReal = sample - realData;
+    imuSampleCounter++;
+    if(imuSampleCounter >= 10 || targetChanged) {
+        imuSampleCounter = 0;
+        targetChanged = false;
+    }
+    YPRT nextExpected = (requestedData - sample);
+    nextExpected.divideYPR(10.0f-imuSampleCounter); // Distanza da percorrere nel tempo rimanente (prima del prossimo target)
+    YPRT deltaReal = sample - prevSample; // Distanza percorsa nel ciclo precedente
 
     // Calcolo errore solo se sono in volo
     // TODO: trovare un modo migliore ...
-    if (sample.thrust > 1450.0f)
+    if (sample.thrust > 1430.0f)
     {
-        calcErr(deltaRequested, deltaReal);
+        calcErr(prevExpected, deltaReal);
 //    } else {
 //        // TODO: Da togliere. Mi serve per i test
-//        calcErr(deltaRequested, deltaReal);
+//        calcErr(prevExpected, deltaReal);
     }
 
-    targetData = this->getYPRTFromTargetData(targetData);
-    realData = sample;
+    prevSample = sample;
+    prevExpected = nextExpected;
 
     /* CALCOLO INPUT
      * calculate input data for transformation function
      * La correzione è data dal target richiesto (espresso in gradi) in un ciclo di frequenza e compensata con l'errore (gained)
      */
-    YPRT input2Correct = (targetData - sample);
-    input2Correct.divideYPR(22.0f);
-    input2Correct.thrust = sample.thrust;
-    YPRT input = calcCorrection(input2Correct);
+    nextExpected.thrust = sample.thrust;
+    YPRT input = calcCorrection(nextExpected);
 
     // calculate transformation function
     PIDOutput output = calcOutput(input);
@@ -369,8 +378,11 @@ void MyPIDCntrllr::clean()
     yawErr.clean();
     pitchErr.clean();
     rollErr.clean();
-    targetData.clean();
-    realData.clean();
+    requestedData.clean();
+    prevSample.clean();
+    prevExpected.clean();
+    targetChanged = false;
+    imuSampleCounter = 0;
     this->armed = false;
 }
 void MyPIDCntrllr::disarm()
@@ -381,7 +393,6 @@ void MyPIDCntrllr::arm()
 {
     this->clean();
     this->armed = true;
-    this->count = 0;
 }
 void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
 {
@@ -426,6 +437,10 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
                     (*rcSample).getYawPercent());
             MyPIDCntrllr::TARGET_VALUES[THRUST_POS].setPercentValue(
                     (*rcSample).getThrustPercent());
+            targetChanged = true;
+            requestedData = this->getYPRTFromTargetData(requestedData);
+            requestedData.limitYPR(MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f, MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f); // Distanza da percorrere in un decimo di secondo
+
 //            syslog(LOG_INFO, "RCSample: ts=%ld, r=%3.2f, p=%3.2f, y=%3.2f, t=%3.2f", rcSample->getTimestampMillis(), MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[PITCH_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[YAW_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue());
 
         }
@@ -435,27 +450,28 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
                     boost::static_pointer_cast<MyBaroSample>(event);
             // TODO: da spostare in metodo ad hoc per BaroPID ...
             // inoltre non va bene .. da rivedere dopo studio segnale pressure BMP085
-            float prevAlt = this->altitudeBuff.getCenterRMS();
-            float prevAltCorr = prevAlt*0.75;
-            float current = baroSample->getAltitude()*0.04f;
-            float diff = prevAlt - (prevAltCorr + current);
-            this->altitudeBuff.push(prevAltCorr + current);
+            float prevAlt = this->altitudeBuff.getMean();
+//            float prevAltCorr = prevAlt*0.75;
+//            float current = baroSample->getAltitude()*0.04f;
+//            float diff = prevAlt - (prevAltCorr + current);
+//            this->altitudeBuff.push(prevAltCorr + current);
+            this->altitudeBuff.push(baroSample->getAltitude());
 //            if(diff > 0.05f || diff < -0.05f) {
 //                this->altitudeBuff.push(prevAltCorr + current);
 //            } else {
 //                this->altitudeBuff.push(prevAlt);
 //            }
-            baroData.altitude = this->altitudeBuff.getCenterRMS();
+
+            baroData.altitude = this->altitudeBuff.getMean();
             baroData.pressure = baroSample->getPressure();
             baroData.temperature = baroSample->getTemperature();
             baroData.speedMetersPerSecond = (baroData.altitude - prevAlt)*1000.0f/baroSample->getDTimeMillis();
 //            syslog(LOG_INFO,
-//                   "BaroSample: ts=%ld, press=%d, temp=%5.5f, rawPressure=%u, integral=%5.5f, altitude=%5.5f, speed=%5.5f, dtime=%u",
+//                   "BaroSample: ts=%ld, press=%d, temp=%5.5f, rawPressure=%u, altitude=%5.5f, speed=%5.5f, dtime=%u",
 //                   baroSample->getTimestampMillis(),
 //                   baroSample->getPressure(),
 //                   baroSample->getTemperature(),
 //                   baroSample->getRawPressure(),
-//                   this->altitudeBuff.getIntegral(),
 //                   baroData.altitude,
 //                   baroData.speedMetersPerSecond,
 //                   baroSample->getDTimeMillis());

@@ -16,6 +16,11 @@
 #include <commons/ValueFloat.h>
 #include <commons/helper_3dmath.h>
 
+#define MYPIDCNTRLLR_MAX_DEG_PER_SEC       200.0f
+#define MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW   30.0f
+#define MYPIDCNTRLLR_IMU_FREQUENCY         100.0f
+
+
 class MyPIDCntrllr: public MyAgent {
 public:
 	MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::EventType> acceptedEventTypes);
@@ -126,9 +131,12 @@ private:
 	bool initialized;
 	void initialize();
 	bool armed;
+	bool targetChanged;
+	uint8_t imuSampleCounter;
 
-	YPRT targetData = {}; // from RC
-	YPRT realData = {}; // from IMU Sample
+	YPRT requestedData = {}; // from RC
+	YPRT prevSample = {}; // from IMU Sample
+    YPRT prevExpected = {}; // from IMU Sample
 
 	void disarm();
 	void arm();
@@ -164,7 +172,6 @@ private:
 
 	float deg2MicrosFactor;
 	float deg2MicrosYawFactor;
-	uint16_t count;
 
 	PIDBaroData baroData;
 	MyPIDBuffer altitudeBuff;
