@@ -63,7 +63,7 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
 
     // TODO: usare parametro diverso per yaw. La rotazione richiede molti più giri
     // modificare di conseguenza la funzione calcOutput
-    deg2MicrosFactor = 15.0f; //350.0f;
+    deg2MicrosFactor = 100.0f; //350.0f;
     deg2MicrosYawFactor = 0.0f; //60.0f;
 
     baroData.altitude = 0.0f;
@@ -139,7 +139,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt)
     result.pitch = yprt.pitch - pitchCorr;
     result.roll = yprt.roll - rollCorr;
     result.thrust = yprt.thrust;
-    syslog(LOG_INFO, "p=(%5.5f, %5.5f), r=(%5.5f, %5.5f), t=(%5.5f)", yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
+//    syslog(LOG_INFO, "p=(%5.5f, %5.5f), r=(%5.5f, %5.5f), t=(%5.5f)", yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
 
     return result;
 }
@@ -335,7 +335,8 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
     }
     YPRT nextExpected = (requestedData - sample);
     nextExpected.limitYPR(MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f, MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f); // Distanza da percorrere in un centesimo di secondo
-    nextExpected.divideYPR(10.0f - imuSampleCounter); // Distanza da percorrere nel tempo rimanente (prima del prossimo target)
+    nextExpected.divideYPR(10.0f); // Distanza da percorrere nel tempo rimanente (prima del prossimo target)
+
     YPRT deltaReal = sample - prevSample; // Distanza percorsa nel ciclo precedente
 
     // Calcolo errore solo se sono in volo
