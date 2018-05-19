@@ -63,8 +63,8 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
 
     // TODO: usare parametro diverso per yaw. La rotazione richiede molti più giri
     // modificare di conseguenza la funzione calcOutput
-    deg2MicrosFactor = 75.0f; //350.0f;
-    deg2MicrosYawFactor = 20.0f; //60.0f;
+    deg2MicrosFactor = 15.0f; //350.0f;
+    deg2MicrosYawFactor = 0.0f; //60.0f;
 
     baroData.altitude = 0.0f;
     baroData.pressure = 0;
@@ -140,16 +140,6 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt)
     result.roll = yprt.roll - rollCorr;
     result.thrust = yprt.thrust;
     syslog(LOG_INFO, "p=(%5.5f, %5.5f), r=(%5.5f, %5.5f), t=(%5.5f)", yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
-//	syslog(LOG_INFO, "CYPRT: y(%3.5f, %3.5f), p(%3.5f, %3.5f), r(%3.5f, %3.5f), t(%5.5f)", yprt.yaw, yawCorr, yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
-//	syslog(LOG_INFO, "CYPRT: y(%3.5f), p(%3.5f), r(%3.5f), t(%5.5f)", yawCorr, pitchCorr, rollCorr, yprt.thrust);
-//TRG(1)=0; VAL(1)=45; E(1)=10; EI(1)=44935; ED(1)=0;
-    if (result.thrust > 1200.0f)
-    {
-//		syslog(LOG_INFO, "P(%u)=%3.5f; PR(%u)=%3.5f; F(%u)=%3.5f; E(%u)=%3.5f; EI(%u)=%3.5f; ED(%u)=%3.5f; T(%u)=%3.5f;", count, this->targetData.pitch, count, realData.pitch, count, yprt.pitch, count, pitchErr.getMean()*kePitch, count, pitchErr.getIntegral()*keIPitch, count, pitchErr.getDerivate()*keDPitch, count, yprt.thrust);
-//	   syslog(LOG_INFO, "R(%u)=%3.5f; P(%u)=%3.5f; Y(%u)=%3.5f; RR(%u)=%3.5f; RP(%u)=%3.5f; RY(%u)=%3.5f; T(%u)=%3.5f", count, this->realData.roll, count, realData.pitch, count, realData.yaw, count, this->targetData.roll, count, targetData.pitch, count, targetData.yaw,count, yprt.thrust);
-    } else {
-
-    }
 
     return result;
 }
@@ -283,7 +273,7 @@ void MyPIDCntrllr::sendOutput(PIDOutput &data)
     }
 }
 
-MyPIDCntrllr::YPRT MyPIDCntrllr::getYPRTFromTargetData(YPRT &prev)
+MyPIDCntrllr::YPRT MyPIDCntrllr::getYPRTFromTargetData()
 {
     YPRT result = { };
     result.yaw = float(
@@ -344,18 +334,19 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
         targetChanged = false;
     }
     YPRT nextExpected = (requestedData - sample);
-    nextExpected.divideYPR(10.0f-imuSampleCounter); // Distanza da percorrere nel tempo rimanente (prima del prossimo target)
+    nextExpected.limitYPR(MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f, MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f); // Distanza da percorrere in un centesimo di secondo
+    nextExpected.divideYPR(10.0f - imuSampleCounter); // Distanza da percorrere nel tempo rimanente (prima del prossimo target)
     YPRT deltaReal = sample - prevSample; // Distanza percorsa nel ciclo precedente
 
     // Calcolo errore solo se sono in volo
     // TODO: trovare un modo migliore ...
-    if (sample.thrust > 1430.0f)
-    {
+//    if (sample.thrust > 1430.0f)
+//    {
         calcErr(prevExpected, deltaReal);
 //    } else {
 //        // TODO: Da togliere. Mi serve per i test
 //        calcErr(prevExpected, deltaReal);
-    }
+//    }
 
     prevSample = sample;
     prevExpected = nextExpected;
@@ -438,8 +429,7 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
             MyPIDCntrllr::TARGET_VALUES[THRUST_POS].setPercentValue(
                     (*rcSample).getThrustPercent());
             targetChanged = true;
-            requestedData = this->getYPRTFromTargetData(requestedData);
-            requestedData.limitYPR(MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f, MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f); // Distanza da percorrere in un decimo di secondo
+            requestedData = this->getYPRTFromTargetData();
 
 //            syslog(LOG_INFO, "RCSample: ts=%ld, r=%3.2f, p=%3.2f, y=%3.2f, t=%3.2f", rcSample->getTimestampMillis(), MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[PITCH_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[YAW_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue());
 

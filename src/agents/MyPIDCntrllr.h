@@ -144,7 +144,7 @@ private:
 
 	void processImuSample(boost::math::quaternion<float> sample, float yaw, float pitch, float roll, VectorFloat gravity, VectorInt16 accel, VectorInt16 linearAccel);
 
-	YPRT getYPRTFromTargetData(YPRT &prev);
+	YPRT getYPRTFromTargetData();
 	YPRT calcYPRData(boost::math::quaternion<float> q);
 	YPRT calcCorrection(YPRT &delta);
 	YPRT calcDelta(YPRT &yprt1, YPRT &yprt2);
