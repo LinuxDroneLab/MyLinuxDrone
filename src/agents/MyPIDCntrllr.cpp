@@ -49,21 +49,21 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
     targetChanged = false;
     imuSampleCounter = 0;
     this->clean();
-    keRoll = 0.0f; //1.90f; //3.2f; //0.45f;
+    keRoll = 1.3f; //1.90f; //3.2f; //0.45f;
     keIRoll = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDRoll = 0.0f; //3.0f; // 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
+    keDRoll = 2.7f; //3.0f; // 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
 
-    kePitch = 0.0f; //1.90f; //3.2f; //0.45f;
+    kePitch = 1.3f; //1.90f; //3.2f; //0.45f;
     keIPitch = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDPitch = 0.0f; //3.0f; // 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
+    keDPitch = 2.7f; //3.0f; // 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
 
-    keYaw = 0.0f; //1.5f; // 8.0f; //0.05f;
+    keYaw = 0.5f; //1.5f; // 8.0f; //0.05f;
     keIYaw = 0.0f; //0.116f;
     keDYaw = 0.0f; //1.3f; // 6.3f;
 
     // TODO: usare parametro diverso per yaw. La rotazione richiede molti più giri
     // modificare di conseguenza la funzione calcOutput
-    deg2MicrosFactor = 400.0f; //350.0f;
+    deg2MicrosFactor = 200.0f; //350.0f;
     deg2MicrosYawFactor = 0.0f; //60.0f;
 
     baroData.altitude = 0.0f;
@@ -136,11 +136,19 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcCorrection(YPRT &yprt)
             + pitchErr.getDerivate() * keDPitch;
     float rollCorr = rollErr.getMean() * keRoll
             + rollErr.getIntegral() * keIRoll + rollErr.getDerivate() * keDRoll;
-    result.yaw = yprt.yaw - yawCorr;
-    result.pitch = yprt.pitch - pitchCorr;
-    result.roll = yprt.roll - rollCorr;
+
+// FIXME: non mi pare funzioni
+//    result.yaw = yprt.yaw - yawCorr;
+//    result.pitch = yprt.pitch - pitchCorr;
+//    result.roll = yprt.roll - rollCorr;
+//    result.thrust = yprt.thrust;
+
+    result.yaw = -yawCorr;
+    result.pitch = -pitchCorr;
+    result.roll = -rollCorr;
     result.thrust = yprt.thrust;
-//    syslog(LOG_INFO, "p=(%5.5f, %5.5f), r=(%5.5f, %5.5f), t=(%5.5f)", yprt.pitch, pitchCorr, yprt.roll, rollCorr, yprt.thrust);
+
+    // syslog(LOG_INFO, "y=(%5.5f), pI=(%5.5f), rI=(%5.5f), t=(%5.5f)", yawCorr, pitchErr.getIntegral(), rollErr.getIntegral(), yprt.thrust);
 
     return result;
 }
@@ -291,6 +299,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::getYPRTFromTargetData()
                             * MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue()));
     result.thrust = float(
             std::round(MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue()));
+
     if ((result.yaw >= -1.1f) && (result.yaw <= 1.1f))
     {
         result.yaw = 0.0f;
@@ -344,13 +353,13 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
 
     // Calcolo errore solo se sono in volo
     // TODO: trovare un modo migliore ...
-    if (sample.thrust > 1200.0f)
-    {
+//    if (sample.thrust > 1400.0f)
+//    {
         calcErr(prevExpected, deltaReal);
 //    } else {
 //        // TODO: Da togliere. Mi serve per i test
 //        calcErr(prevExpected, deltaReal);
-    }
+//    }
 
     prevSample = sample;
     prevExpected = nextExpected;
