@@ -137,12 +137,13 @@ private:
 	YPRT requestedData = {}; // from RC
 	YPRT prevSample = {}; // from IMU Sample
     YPRT prevExpected = {}; // from IMU Sample
+    long int imuSampleTimeStampMillis;
 
 	void disarm();
 	void arm();
 	void clean();
 
-	void processImuSample(boost::math::quaternion<float> sample, float yaw, float pitch, float roll, VectorFloat gravity, VectorInt16 accel, VectorInt16 linearAccel);
+	void processImuSample(boost::math::quaternion<float> sample, float yaw, float pitch, float roll, VectorFloat gravity, VectorInt16 accel, VectorInt16 linearAccel, long int elapsedMillis);
 
 	YPRT getYPRTFromTargetData();
 	YPRT calcYPRData(boost::math::quaternion<float> q);

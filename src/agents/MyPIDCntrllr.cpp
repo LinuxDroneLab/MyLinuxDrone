@@ -51,11 +51,11 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
     this->clean();
     keRoll = 0.0f; //1.90f; //3.2f; //0.45f;
     keIRoll = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDRoll = 0.0f; //1.5f; // 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
+    keDRoll = 0.0f; //3.0f; // 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
 
     kePitch = 0.0f; //1.90f; //3.2f; //0.45f;
     keIPitch = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDPitch = 0.0f; //1.5f; // 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
+    keDPitch = 0.0f; //3.0f; // 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
 
     keYaw = 0.0f; //1.5f; // 8.0f; //0.05f;
     keIYaw = 0.0f; //0.116f;
@@ -63,12 +63,13 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
 
     // TODO: usare parametro diverso per yaw. La rotazione richiede molti più giri
     // modificare di conseguenza la funzione calcOutput
-    deg2MicrosFactor = 100.0f; //350.0f;
+    deg2MicrosFactor = 400.0f; //350.0f;
     deg2MicrosYawFactor = 0.0f; //60.0f;
 
     baroData.altitude = 0.0f;
     baroData.pressure = 0;
     baroData.temperature = 0.0f;
+    imuSampleTimeStampMillis = 0;
 }
 
 MyPIDCntrllr::~MyPIDCntrllr()
@@ -308,7 +309,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::getYPRTFromTargetData()
 void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
                                     float yaw, float pitch, float roll,
                                     VectorFloat gravity, VectorInt16 accel,
-                                    VectorInt16 linearAccel)
+                                    VectorInt16 linearAccel, long int elapsedMillis)
 {
     YPRT sample = { };
     sample.yaw = yaw;
@@ -334,20 +335,22 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
         targetChanged = false;
     }
     YPRT nextExpected = (requestedData - sample);
-    nextExpected.limitYPR(MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f, MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f); // Distanza da percorrere in un centesimo di secondo
-    nextExpected.divideYPR(10.0f); // Distanza da percorrere nel tempo rimanente (prima del prossimo target)
+    nextExpected.limitYPR(MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f, MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f); // Distanza max da percorrere in un decimo di secondo
+    nextExpected.divideYPR(10.0f); // Distanza da percorrere in un centesimo di secondo
 
     YPRT deltaReal = sample - prevSample; // Distanza percorsa nel ciclo precedente
+    // normalize delta on 10 millis (100Hz)
+    deltaReal.divideYPR(float(elapsedMillis)/10.0f);
 
     // Calcolo errore solo se sono in volo
     // TODO: trovare un modo migliore ...
-//    if (sample.thrust > 1430.0f)
-//    {
+    if (sample.thrust > 1200.0f)
+    {
         calcErr(prevExpected, deltaReal);
 //    } else {
 //        // TODO: Da togliere. Mi serve per i test
 //        calcErr(prevExpected, deltaReal);
-//    }
+    }
 
     prevSample = sample;
     prevExpected = nextExpected;
@@ -359,11 +362,20 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
     nextExpected.thrust = sample.thrust;
     YPRT input = calcCorrection(nextExpected);
 
+
     // calculate transformation function
-    PIDOutput output = calcOutput(input);
+    PIDOutput output = {};
+    if(requestedData.thrust >= 1010.0f) {
+        output = calcOutput(input);
+    } else {
+        output.clean();
+    }
+
+//    syslog(LOG_INFO, "Y(%5.5f),P(%5.5f),R(%5.5f), FR(%ld),FL(%ld),RR(%ld),RL(%ld), T(%5.5f)", nextExpected.yaw, nextExpected.pitch, nextExpected.roll, output.front - std::lrint(input.thrust), output.left - std::lrint(input.thrust), output.right  - std::lrint(input.thrust),output.rear  - std::lrint(input.thrust), input.thrust);
+//    syslog(LOG_INFO, "P(%5.5f),PD(%5.5f),PI(%5.5f), FR(%ld),FL(%ld),RR(%ld),RL(%ld), T(%5.5f)", pitchErr.getMean() * deg2MicrosFactor, pitchErr.getDerivate() * keDPitch * deg2MicrosFactor, pitchErr.getIntegral() * keIPitch * deg2MicrosFactor, output.front - std::lrint(input.thrust), output.left - std::lrint(input.thrust), output.right  - std::lrint(input.thrust),output.rear  - std::lrint(input.thrust), input.thrust);
 
     // send to motors
-    this->sendOutput(output);
+        this->sendOutput(output);
 }
 void MyPIDCntrllr::clean()
 {
@@ -409,13 +421,18 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
         {
             boost::shared_ptr<MyIMUSample> imuSample =
                     boost::static_pointer_cast<MyIMUSample>(event);
-
+            long int elapsedMillis = 10;
+            if(imuSampleTimeStampMillis != 0) {
+                elapsedMillis = imuSample->getTimestampMillis() - imuSampleTimeStampMillis;
+            }
+            imuSampleTimeStampMillis = imuSample->getTimestampMillis();
             boost::math::quaternion<float> q = imuSample->getQuaternion();
             this->processImuSample(q, imuSample->getYaw(),
                                    imuSample->getPitch(), imuSample->getRoll(),
                                    imuSample->getGravity(),
                                    imuSample->getAccel(),
-                                   imuSample->getLinearAccel());
+                                   imuSample->getLinearAccel(),
+                                   elapsedMillis);
         }
         else if (event->getType() == MyEvent::EventType::RCSample)
         {
@@ -431,6 +448,7 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
                     (*rcSample).getThrustPercent());
             targetChanged = true;
             requestedData = this->getYPRTFromTargetData();
+//            syslog(LOG_INFO, "RC: Y(%5.5f),P(%5.5f),R(%5.5f),T(%5.5f)", requestedData.yaw, requestedData.pitch, requestedData.roll, requestedData.thrust);
 
 //            syslog(LOG_INFO, "RCSample: ts=%ld, r=%3.2f, p=%3.2f, y=%3.2f, t=%3.2f", rcSample->getTimestampMillis(), MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[PITCH_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[YAW_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue());
 
