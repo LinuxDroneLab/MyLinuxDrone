@@ -929,67 +929,65 @@
 						phandle = <0x89>;
 					};
 
+					pinmux_P8_13_default_pin {
+						pinctrl-single,pins = <0x24 0x4>;
+						linux,phandle = <0xf5>;
+						phandle = <0xf5>;
+					};
 
+					pinmux_P8_13_gpio_pin {
+						pinctrl-single,pins = <0x24 0x2f>;
+						linux,phandle = <0xf6>;
+						phandle = <0xf6>;
+					};
 
-			pinmux_P8_13_default_pin {
-				pinctrl-single,pins = <0x24 0x04>;
-				linux,phandle = <0xf5>;
-				phandle = <0xf5>;
-			};
+					pinmux_P8_13_gpio_pu_pin {
+						pinctrl-single,pins = <0x24 0x37>;
+						linux,phandle = <0xf7>;
+						phandle = <0xf7>;
+					};
 
-			pinmux_P8_13_gpio_pin {
-				pinctrl-single,pins = <0x24 0x2f>;
-				linux,phandle = <0xf6>;
-				phandle = <0xf6>;
-			};
+					pinmux_P8_13_gpio_pd_pin {
+						pinctrl-single,pins = <0x24 0x27>;
+						linux,phandle = <0xf8>;
+						phandle = <0xf8>;
+					};
 
-			pinmux_P8_13_gpio_pu_pin {
-				pinctrl-single,pins = <0x24 0x37>;
-				linux,phandle = <0xf7>;
-				phandle = <0xf7>;
-			};
+					pinmux_P8_13_pwm_pin {
+						pinctrl-single,pins = <0x24 0x4>;
+						linux,phandle = <0xf9>;
+						phandle = <0xf9>;
+					};
 
-			pinmux_P8_13_gpio_pd_pin {
-				pinctrl-single,pins = <0x24 0x27>;
-				linux,phandle = <0xf8>;
-				phandle = <0xf8>;
-			};
+					pinmux_P8_19_default_pin {
+						pinctrl-single,pins = <0x20 0x4>;
+						linux,phandle = <0xf0>;
+						phandle = <0xf0>;
+					};
 
-			pinmux_P8_13_pwm_pin {
-				pinctrl-single,pins = <0x24 0x04>;
-				linux,phandle = <0xf9>;
-				phandle = <0xf9>;
-			};
+					pinmux_P8_19_gpio_pin {
+						pinctrl-single,pins = <0x20 0x2f>;
+						linux,phandle = <0xf1>;
+						phandle = <0xf1>;
+					};
 
-			pinmux_P8_19_default_pin {
-				pinctrl-single,pins = <0x20 0x04>;
-				linux,phandle = <0xf0>;
-				phandle = <0xf0>;
-			};
+					pinmux_P8_19_gpio_pu_pin {
+						pinctrl-single,pins = <0x20 0x37>;
+						linux,phandle = <0xf2>;
+						phandle = <0xf2>;
+					};
 
-			pinmux_P8_19_gpio_pin {
-				pinctrl-single,pins = <0x20 0x2f>;
-				linux,phandle = <0xf1>;
-				phandle = <0xf1>;
-			};
+					pinmux_P8_19_gpio_pd_pin {
+						pinctrl-single,pins = <0x20 0x27>;
+						linux,phandle = <0xf3>;
+						phandle = <0xf3>;
+					};
 
-			pinmux_P8_19_gpio_pu_pin {
-				pinctrl-single,pins = <0x20 0x37>;
-				linux,phandle = <0xf2>;
-				phandle = <0xf2>;
-			};
-
-			pinmux_P8_19_gpio_pd_pin {
-				pinctrl-single,pins = <0x20 0x27>;
-				linux,phandle = <0xf3>;
-				phandle = <0xf3>;
-			};
-
-			pinmux_P8_19_pwm_pin {
-				pinctrl-single,pins = <0x20 0x04>;
-				linux,phandle = <0xf4>;
-				phandle = <0xf4>;
-			};
+					pinmux_P8_19_pwm_pin {
+						pinctrl-single,pins = <0x20 0x4>;
+						linux,phandle = <0xf4>;
+						phandle = <0xf4>;
+					};
 
 					pinmux_P9_19_default_pin {
 						pinctrl-single,pins = <0x17c 0x33>;
@@ -1230,6 +1228,7 @@
 							compatible = "ti,gate-clock";
 							clocks = <0x29>;
 							ti,bit-shift = <0x0>;
+							ti,set-bit-to-disable;
 							reg = <0x664>;
 							linux,phandle = <0x3d>;
 							phandle = <0x3d>;
@@ -1240,6 +1239,7 @@
 							compatible = "ti,gate-clock";
 							clocks = <0x29>;
 							ti,bit-shift = <0x1>;
+							ti,set-bit-to-disable;
 							reg = <0x664>;
 							linux,phandle = <0x3e>;
 							phandle = <0x3e>;
@@ -1250,6 +1250,7 @@
 							compatible = "ti,gate-clock";
 							clocks = <0x29>;
 							ti,bit-shift = <0x2>;
+							ti,set-bit-to-disable;
 							reg = <0x664>;
 							linux,phandle = <0x3f>;
 							phandle = <0x3f>;
@@ -2474,30 +2475,27 @@
 			phandle = <0xe3>;
 		};
 
+		P8_13_pinmux {
+			compatible = "bone-pinmux-helper";
+			status = "okay";
+			pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "pwm";
+			pinctrl-0 = <0xf5>;
+			pinctrl-1 = <0xf6>;
+			pinctrl-2 = <0xf7>;
+			pinctrl-3 = <0xf8>;
+			pinctrl-4 = <0xf9>;
+		};
 
-
-			P8_13_pinmux {
-				compatible = "bone-pinmux-helper";
-				status = "okay";
-				pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "pwm";
-				pinctrl-0 = <0xf5>;
-				pinctrl-1 = <0xf6>;
-				pinctrl-2 = <0xf7>;
-				pinctrl-3 = <0xf8>;
-				pinctrl-4 = <0xf9>;
-			};
-
-			P8_19_pinmux {
-				compatible = "bone-pinmux-helper";
-				status = "okay";
-				pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "pwm";
-				pinctrl-0 = <0xf0>;
-				pinctrl-1 = <0xf1>;
-				pinctrl-2 = <0xf2>;
-				pinctrl-3 = <0xf3>;
-				pinctrl-4 = <0xf4>;
-			};
-
+		P8_19_pinmux {
+			compatible = "bone-pinmux-helper";
+			status = "okay";
+			pinctrl-names = "default", "gpio", "gpio_pu", "gpio_pd", "pwm";
+			pinctrl-0 = <0xf0>;
+			pinctrl-1 = <0xf1>;
+			pinctrl-2 = <0xf2>;
+			pinctrl-3 = <0xf3>;
+			pinctrl-4 = <0xf4>;
+		};
 
 		P9_19_pinmux {
 			compatible = "bone-pinmux-helper";

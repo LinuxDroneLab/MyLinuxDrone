@@ -131,8 +131,6 @@ private:
 	bool initialized;
 	void initialize();
 	bool armed;
-	bool targetChanged;
-	uint8_t imuSampleCounter;
 
 	YPRT requestedData = {}; // from RC
 	YPRT prevSample = {}; // from IMU Sample

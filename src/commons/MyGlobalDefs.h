@@ -12,5 +12,7 @@
 #define PITCH_POS 1
 #define YAW_POS 2
 #define THRUST_POS 3
+#define AUX1_POS 4
+#define AUX2_POS 5
 
 #endif /* COMMONS_MYGLOBALDEFS_H_ */
