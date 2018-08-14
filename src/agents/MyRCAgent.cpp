@@ -63,6 +63,8 @@ MyRCAgent::MyRCAgent(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::EventTy
 	this->aux1=0;
 	this->aux2=0;
 	this->status = MYRCAGENT_STATUS_REQUIRE_MODE;
+	this->lastDTimeMicros = 0;
+    this->lastTickMicros = boost::posix_time::microsec_clock::local_time().time_of_day().total_microseconds();
 	this->tickDTimeSum = 0;
 	this->tickDTimeWaitMicros = 100000; // with tick at 200Hz => dTimeMicros = 5000 => get data for each 100000/5000 = 20 cycles (10Hz)
 }
