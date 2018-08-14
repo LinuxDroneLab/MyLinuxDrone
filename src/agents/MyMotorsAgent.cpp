@@ -24,6 +24,7 @@ unsigned char MyMotorsAgent::readBuf[MYMOTORSAGENT_MAX_BUFFER_SIZE] = {0};
 #define MYMOTORSAGENT_DEVICE_NAME             "/dev/rpmsg_pru30"
 #define MYMOTORSAGENT_MIN_DUTY 3125
 #define MYMOTORSAGENT_MAX_DUTY 6250
+#define MYMOTORSAGENT_PERIOD 62499
 
 MyMotorsAgent::MyMotorsAgent(boost::shared_ptr<MyEventBus> bus,
 		vector<MyEvent::EventType> acceptedEventTypes) :
@@ -169,16 +170,18 @@ bool MyMotorsAgent::sendStop() {
 bool MyMotorsAgent::sendDuty(uint16_t du1A, uint16_t du1B, uint16_t du2A, uint16_t du2B) {
     this->cleanBuffer();
     readBuf[0] = PRU_PWMSS_LIB_CMD_ID;
-    readBuf[1] = PRU_PWMSS_LIB_CMD_SET_DUTY;
+    readBuf[1] = PRU_PWMSS_LIB_CMD_SET_DATA;
     readBuf[2] = 0; // pwmss 0
-    readBuf[7] = 2; // pwmss 2
+    readBuf[9] = 2; // pwmss 2
     uint16_t* data1 = (uint16_t*)(readBuf+3);
+    data1[0]=MYMOTORSAGENT_PERIOD;
     data1[1]=du1A;
     data1[2]=du1B;
-    uint16_t* data2 = (uint16_t*)(readBuf+8);
+    uint16_t* data2 = (uint16_t*)(readBuf+10);
+    data2[0]=MYMOTORSAGENT_PERIOD;
     data2[1]=du2A;
     data2[2]=du2B;
-    return (write(pruDevice.fd, readBuf, 12) > 0 ) && this->receiveData();
+    return (write(pruDevice.fd, readBuf, 16) > 0 ) && this->receiveData();
 }
 
 bool MyMotorsAgent::receiveData() {
