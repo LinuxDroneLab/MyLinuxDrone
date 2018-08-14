@@ -111,17 +111,17 @@ void MyPIDCntrllr::calcErr(YPRT &yprtReq, YPRT &yprtReal)
 {
     // considero errore limitato a 10 deg. more less for yaw and 60deg for pitch and roll
     float yawErrTmp = std::min<float>(
-            2.0f,
-            std::max<float>(-2.0f, yprtReal.yaw - yprtReq.yaw));
+            10.0f,
+            std::max<float>(-10.0f, yprtReal.yaw - yprtReq.yaw));
     yawErr.push(yawErrTmp);
     pitchErr.push(
             std::min<float>(
-                    2.0f,
-                    std::max<float>(-2.0f, yprtReal.pitch - yprtReq.pitch)));
+                    10.0f,
+                    std::max<float>(-10.0f, yprtReal.pitch - yprtReq.pitch)));
     rollErr.push(
             std::min<float>(
-                    2.0f,
-                    std::max<float>(-2.0f, yprtReal.roll - yprtReq.roll)));
+                    10.0f,
+                    std::max<float>(-10.0f, yprtReal.roll - yprtReq.roll)));
 //	syslog(LOG_INFO, "EYPRT: y(%3.5f), p(%3.5f,%3.5f), r(%3.5f,%3.5f)", yawErr.getMean(), pitchErr.getMean(), pitchErr.getIntegral(), rollErr.getMean(), rollErr.getIntegral());
 //    syslog(LOG_INFO, "EYPRT: p(%3.5f, %3.5f, %3.5f, %3.5f), r(%3.5f, %3.5f, %3.5f, %3.5f), t(%5.5f)", yprtReal.pitch, pitchErr.getMean(), pitchErr.getIntegral(), pitchErr.getDerivate(), yprtReal.roll, rollErr.getMean(), rollErr.getIntegral(), rollErr.getDerivate(), yprtReal.thrust);
 
@@ -249,10 +249,10 @@ MyPIDCntrllr::PIDOutput MyPIDCntrllr::calcOutput(YPRT &data)
                                     * 1000.0f)));
 
     MyPIDCntrllr::PIDOutput result = { };
-    result.front = f1;
-    result.rear = f2;
-    result.left = f3;
-    result.right = f4;
+    result.front = uint16_t(f1/320); // in range [3125,6250]
+    result.rear = uint16_t(f2/320);
+    result.left = uint16_t(f3/320);
+    result.right = uint16_t(f4/320);
 //	syslog(LOG_INFO, "MOT: f(%ld), r(%ld), l(%ld), r(%ld), y(%5.5f), p(%5.5f), r(%5.5f), t(%5.5f), tt(%5.5f)", f1, f2, f3, f4, data.yaw, data.pitch, data.roll, data.thrust, targetData.thrust);
     return result;
 }
@@ -337,8 +337,8 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
     }
 
     YPRT nextExpected = (requestedData - sample);
-    nextExpected.limitYPR(MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f, MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f); // Distanza max da percorrere in un decimo di secondo
-    nextExpected.divideYPR(10.0f); // Distanza da percorrere in un centesimo di secondo
+//    nextExpected.limitYPR(MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f, MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f); // Distanza max da percorrere in un decimo di secondo
+    nextExpected.divideYPR(100.0f); // Distanza da percorrere in un centesimo di secondo
 
     YPRT deltaReal = sample - prevSample; // Distanza percorsa nel ciclo precedente
     // normalize delta on 10 millis (100Hz)

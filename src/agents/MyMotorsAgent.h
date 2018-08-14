@@ -12,7 +12,7 @@
 #include <boost/make_shared.hpp>
 #include <events/MyOutMotors.h>
 #include <agents/MyAgent.h>
-#include <motors/MotorDriver.h>
+#include <sys/poll.h>
 
 class MyMotorsAgent: public MyAgent {
 public:
@@ -22,6 +22,7 @@ protected:
 	virtual void processEvent(boost::shared_ptr<MyEvent> event);
 
 private:
+    static unsigned char readBuf[];
 	bool initialized;
 	void initialize();
 	bool armed;
@@ -29,11 +30,13 @@ private:
 	void setThrottleRange();
 	void disarmMotors();
 	void armMotors();
-
-	MotorDriver front;
-	MotorDriver rear;
-	MotorDriver left;
-	MotorDriver right;
+    bool sendData();
+    bool sendStart();
+    bool sendStop();
+    bool receiveData();
+    bool sendDuty(uint16_t du1A, uint16_t du1B, uint16_t du2A, uint16_t du2B);
+    void cleanBuffer();
+    struct pollfd pruDevice;
 };
 
 #endif /* AGENTS_MYMOTORSAGENT_H_ */

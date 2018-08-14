@@ -13,18 +13,18 @@
 
 class MyOutMotors: public MyEvent {
 public:
-	MyOutMotors(boost::uuids::uuid origin, int32_t front, int32_t rear, int32_t left, int32_t right);
+	MyOutMotors(boost::uuids::uuid origin, uint16_t front, uint16_t rear, uint16_t left, uint16_t right);
 	virtual ~MyOutMotors();
 	virtual MyEvent::EventType getType() const;
-	int32_t getFront() const;
-	int32_t getRear() const;
-	int32_t getLeft() const;
-	int32_t getRight() const;
+	uint16_t getFront() const;
+	uint16_t getRear() const;
+	uint16_t getLeft() const;
+	uint16_t getRight() const;
 private:
-	const int32_t front;
-	const int32_t rear;
-	const int32_t left;
-	const int32_t right;
+	const uint16_t front;
+	const uint16_t rear;
+	const uint16_t left;
+	const uint16_t right;
 };
 
 #endif /* EVENTS_MYOUTMOTORS_H_ */

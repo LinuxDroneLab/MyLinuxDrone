@@ -84,12 +84,6 @@ void MyRCAgent::initialize() {
 	            initialized = false;
 	            return;
 	    }
-
-		/*
-		 * TODO:
-		 * open device /dev/rpmsg_31 in R/W mode. Set fd to private attribute
-		 * close device when change state from active to not active
-		 */
         initialized = true;
 	}
 }

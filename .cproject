@@ -167,7 +167,6 @@
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/include/glib-2.0"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/include/gio-unix-2.0"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/lib/arm-linux-gnueabihf/glib-2.0/include"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/hd/eworkspace/pru-rc-lib/include}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.584902723" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.misc.pic.334766954" name="Position Independent Code (-fPIC)" superClass="gnu.c.compiler.option.misc.pic" useByScannerDiscovery="false" value="true" valueType="boolean"/>
@@ -180,11 +179,12 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.470474730" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
 								<option id="gnu.cpp.compiler.option.include.paths.1214282334" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="/hd/BBBchroot/usr/include/"/>
-									<listOptionValue builtIn="false" value="/hd/eworkspace/pru-rc-lib/include"/>
 									<listOptionValue builtIn="false" value="/hd/BBBchroot/usr/include/glib-2.0/"/>
 									<listOptionValue builtIn="false" value="/hd/BBBchroot/usr/include/gio-unix-2.0"/>
 									<listOptionValue builtIn="false" value="/hd/BBBchroot/usr/lib/arm-linux-gnueabihf/glib-2.0/include"/>
 									<listOptionValue builtIn="false" value="/hd/BBBchroot/usr/include/arm-linux-gnueabihf"/>
+									<listOptionValue builtIn="false" value="/hd/eworkspace/pru-rc-lib/include"/>
+									<listOptionValue builtIn="false" value="/hd/eworkspace/pru-pwmss-lib/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.74051367" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
@@ -198,6 +198,7 @@
 								<option id="gnu.cpp.compiler.option.include.files.581302257" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" useByScannerDiscovery="false" valueType="includeFiles">
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/include/prussdrv.h"/>
 									<listOptionValue builtIn="false" value="/BBBchroot/usr/local/include/pruss_intc_mapping.h"/>
+									<listOptionValue builtIn="false" value="/hd/eworkspace/pru-pwmss-lib/include/pru_pwmss_driver.h"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.1842224640" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -fpermissive" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1273622964" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>

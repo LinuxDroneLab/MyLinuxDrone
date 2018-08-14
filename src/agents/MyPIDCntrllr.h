@@ -108,15 +108,15 @@ private:
 	};
 
 	typedef struct {
-		long front;
-		long rear;
-		long left;
-		long right;
+		uint16_t front;
+		uint16_t rear;
+		uint16_t left;
+		uint16_t right;
 		void clean() {
-			front = 1000000L;
-			rear = 1000000L;
-			left = 1000000L;
-			right = 1000000L;
+			front = 3125;
+			rear = 3125;
+			left = 3125;
+			right = 3125;
 		}
 	} PIDOutput;
 
