@@ -109,7 +109,7 @@ MyPIDCntrllr::YPRT MyPIDCntrllr::calcYPRData(boost::math::quaternion<float> q)
 
 void MyPIDCntrllr::calcErr(YPRT &yprtReq, YPRT &yprtReal)
 {
-    // considero errore limitato a 10 deg. more less for yaw and 60deg for pitch and roll
+    // considero errore limitato a 10 deg.
     float yawErrTmp = std::min<float>(
             10.0f,
             std::max<float>(-10.0f, yprtReal.yaw - yprtReq.yaw));
@@ -337,8 +337,26 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
     }
 
     YPRT nextExpected = (requestedData - sample);
-//    nextExpected.limitYPR(MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f, MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f); // Distanza max da percorrere in un decimo di secondo
-    nextExpected.divideYPR(100.0f); // Distanza da percorrere in un centesimo di secondo
+
+    float maxPitchRollDeg = MYPIDCNTRLLR_MAX_DEG_PER_SEC/10.0f;
+    float maxYawDeg = MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW/10.0f;
+    nextExpected.limitYPR(maxPitchRollDeg, maxYawDeg); // Distanza max da percorrere in un decimo di secondo
+
+    /**********************************************************************
+     * Non sembra andar bene ...
+     * riduce troppo quando l'errore è grande
+     * aumenta troppo quando è piccolo
+     */
+    // Calcolo la velocità di rotazione che dovrò avere al prossimo ciclo
+//    float b = ((maxYawDeg + abs(nextExpected.yaw))/maxYawDeg);
+//    nextExpected.yaw = nextExpected.yaw / (b * abs(nextExpected.yaw) + 1);
+//    b = ((maxPitchRollDeg + abs(nextExpected.pitch))/maxPitchRollDeg);
+//    nextExpected.pitch = nextExpected.pitch / (b * abs(nextExpected.pitch) + 1);
+//    b = ((maxPitchRollDeg + abs(nextExpected.roll))/maxPitchRollDeg);
+//    nextExpected.roll = nextExpected.roll / (b * abs(nextExpected.roll) + 1);
+
+    // Calcolo la velocità di rotazione che dovrò avere al prossimo ciclo
+    nextExpected.divideYPR(17.0f);
 
     YPRT deltaReal = sample - prevSample; // Distanza percorsa nel ciclo precedente
     // normalize delta on 10 millis (100Hz)
@@ -346,13 +364,13 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
 
     // Calcolo errore solo se sono in volo
     // TODO: trovare un modo migliore ...
-    if (sample.thrust > 1350.0f)
-    {
+//    if (sample.thrust > 1350.0f)
+//    {
         calcErr(prevExpected, deltaReal);
 //    } else {
 //        // TODO: Da togliere. Mi serve per i test
 //        calcErr(prevExpected, deltaReal);
-    }
+//    }
 
     prevSample = sample;
     prevExpected = nextExpected;

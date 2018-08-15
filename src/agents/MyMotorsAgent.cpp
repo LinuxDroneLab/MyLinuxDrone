@@ -96,6 +96,7 @@ void MyMotorsAgent::processEvent(boost::shared_ptr<MyEvent> event) {
 
 void MyMotorsAgent::writeMotors(boost::shared_ptr<MyOutMotors> event) {
     this->sendDuty(event->getRear(), event->getFront(), event->getLeft(), event->getRight());
+//    syslog(LOG_INFO, "F:[%d,%d] B:[%d,%d]", event->getFront(), event->getRight(), event->getLeft(), event->getRear());
 
 	// cout << "Armed: MF: " << event->getFront() << ", MR: " << event->getRear() << ", ML: " << event->getLeft() << ", MR: " << event->getRight() << endl;
 //	front.setDutyCycleNanos(event->getFront());
