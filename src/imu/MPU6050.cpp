@@ -129,7 +129,7 @@ bool MPU6050::initialize() {
 
     setDLPFMode(MPU6050_DLPF_BW_98);
 	setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
-	setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
+	setFullScaleGyroRange(MPU6050_GYRO_FS_500);
     setFullScaleAccelRange(MPU6050_ACCEL_FS_4);
     setTempSensorEnabled(true);
 	setRate(3); // 1KHz/(1+rate) = 250Hz;

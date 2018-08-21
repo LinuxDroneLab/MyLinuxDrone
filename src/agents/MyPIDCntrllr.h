@@ -72,7 +72,7 @@ private:
     DegPerSecond inputData;
     DegPerSecond outputData;
 
-    MotorsInput outputMotors;
+    MotorsInput motorsInput;
 
 	int16_t rollErr;
     int16_t rollDErr;
