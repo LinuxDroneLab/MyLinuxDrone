@@ -70,20 +70,22 @@ bool MyPIDCntrllr::pulse()
  * then calc pid and output
  */
 void MyPIDCntrllr::control() {
-//    float newKeRoll = float((rcAgent.getRCSample().aux1 + 500))/200.0f;
-//    float newKeDRoll = float((rcAgent.getRCSample().aux2 + 500))/50.0f;
-//    if(abs(keRoll - newKeRoll) > 0.01 || abs(keDRoll - newKeDRoll) > 0.01) {
-//        keRoll = newKeRoll;
-//        kePitch = newKeRoll;
-//        keDRoll = newKeDRoll;
-//        keDPitch = newKeDRoll;
-//        syslog(LOG_INFO, "E(%5.5f) - D(%5.5f)", keRoll, keDRoll);
-//    }
+    if(!this->motorsAgent.isArmed()) {
+        float newKeRoll = float((rcAgent.getRCSample().aux1 + 500))/100.0f;
+        float newKeDRoll = float((rcAgent.getRCSample().aux2 + 500))/50.0f;
+        if(abs(keRoll - newKeRoll) > 0.01 || abs(keDRoll - newKeDRoll) > 0.01) {
+            keRoll = newKeRoll;
+            kePitch = newKeRoll;
+            keDRoll = newKeDRoll;
+            keDPitch = newKeDRoll;
+            syslog(LOG_INFO, "E(%5.5f) - D(%5.5f)", keRoll, keDRoll);
+        }
+    }
 
     if(rcAgent.isMinThrustMaxPitch()) {
-        this->motorsAgent.armMotors();
+        this->arm();
     } else if(rcAgent.isMinThrustMinPitch()) {
-        this->motorsAgent.disarmMotors();
+        this->disarm();
     } else {
         this->updateTargetDataFromRCSample();
     }
