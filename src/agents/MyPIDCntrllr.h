@@ -38,6 +38,13 @@ private:
         int16_t yaw;
     } DegPerSecond;
 
+    typedef struct {
+        int16_t front;
+        int16_t rear;
+        int16_t left;
+        int16_t right;
+    } MotorsInput;
+
 	typedef struct {
 	    int32_t pressure;
 	    float temperature;
@@ -65,6 +72,8 @@ private:
     DegPerSecond inputData;
     DegPerSecond outputData;
 
+    MotorsInput outputMotors;
+
 	int16_t rollErr;
     int16_t rollDErr;
     int16_t rollIErr;
@@ -83,6 +92,8 @@ private:
 	void control();
     void updateTargetDataFromRCSample();
     void calcPID();
+    void calcMotorsInput();
+    void send2Motors();
 
     static RangeFloat INTEGRAL_RANGE;
     static RangeFloat ALTITUDE_RANGE;

@@ -68,7 +68,6 @@ bool MyPIDCntrllr::pulse()
  * then calc pid and output
  */
 void MyPIDCntrllr::control() {
-    this->calcPID();
     if(rcAgent.isMinThrustMaxPitch()) {
         this->motorsAgent.armMotors();
     } else if(rcAgent.isMinThrustMinPitch()) {
@@ -77,12 +76,19 @@ void MyPIDCntrllr::control() {
         this->updateTargetDataFromRCSample();
     }
 
+    this->calcPID();
     this->calcMotorsInput();
     this->send2Motors();
 
     this->firstCycle = false;
 
 //    syslog(LOG_INFO, "mydrone: G(%5.5f,%5.5f,%5.5f)", this->imuAgent.getData().gyroDegxSec.x, this->imuAgent.getData().gyroDegxSec.y, this->imuAgent.getData().gyroDegxSec.z);
+}
+void MyPIDCntrllr::calcMotorsInput() {
+
+}
+void MyPIDCntrllr::send2Motors() {
+
 }
 void MyPIDCntrllr::calcPID() {
     MyIMUAgent::Motion6Data& imuData = this->imuAgent.getData();
@@ -99,7 +105,7 @@ void MyPIDCntrllr::calcPID() {
 
     this->inputData.roll = std::min<int16_t>(PID_CNTRLLR_MAX_ROLL, std::max<int16_t>(this->inputData.roll, -PID_CNTRLLR_MAX_ROLL));
     this->inputData.pitch = std::min<int16_t>(PID_CNTRLLR_MAX_ROLL, std::max<int16_t>(this->inputData.pitch, -PID_CNTRLLR_MAX_ROLL));
-    this->inputData.yaw = std::min<int16_t>(PID_CNTRLLR_MAX_YAW, std::max<int16_t>(this->inputData.roll, -PID_CNTRLLR_MAX_YAW));
+    this->inputData.yaw = std::min<int16_t>(PID_CNTRLLR_MAX_YAW, std::max<int16_t>(this->inputData.yaw, -PID_CNTRLLR_MAX_YAW));
 
     // Calc error (real - requested at prev cycle)
     int16_t newRollErr = this->inputData.roll - this->targetData.roll;
