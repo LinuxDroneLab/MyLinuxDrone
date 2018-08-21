@@ -20,12 +20,15 @@
 #include <iostream>
 #include <syslog.h>
 
+#define pi 3.1415926
+#define pi2 1.5707963
+
 RangeFloat MyPIDCntrllr::TARGET_RANGES[] = { RangeFloat(-62.0f, 62.0f), // roll
                                              RangeFloat(-62.0f, 62.0f), // pitch
                                              RangeFloat(-125.0f, 125.0f), // yaw
                                              RangeFloat(1000.0f, 2000.0f), // thrust
-                                             RangeFloat(0.0f, 10.0f), // aux1
-                                             RangeFloat(0.0f, 10.0f)  // aux2
+                                             RangeFloat(0.0f, 100.0f), // aux1
+                                             RangeFloat(0.0f, 100.0f)  // aux2
         };
 ValueFloat MyPIDCntrllr::TARGET_VALUES[] = {
         ValueFloat(0.0f, MyPIDCntrllr::TARGET_RANGES[ROLL_POS]),
@@ -38,7 +41,7 @@ ValueFloat MyPIDCntrllr::TARGET_VALUES[] = {
 int8_t MyPIDCntrllr::QUATERNION_DIRECTION_RPY[] = { 1, -1, 1 };
 int8_t MyPIDCntrllr::RC_DIRECTION_RPY[] = { 1, -1, 1 };
 float MyPIDCntrllr::FREQUENCY = 100.0f;
-RangeFloat MyPIDCntrllr::INTEGRAL_RANGE = RangeFloat(-25.3f, 25.3f);
+RangeFloat MyPIDCntrllr::INTEGRAL_RANGE = RangeFloat(-10.0f, 10.0f);
 RangeFloat MyPIDCntrllr::ALTITUDE_RANGE = RangeFloat(-20000.0f, 20000.0f);
 using namespace std;
 
@@ -51,23 +54,31 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
                                                           ALTITUDE_RANGE)
 {
     this->clean();
+    /*
+     * Una configurazione che sembra andare:
+     * keRoll/kePitch = 1.11f;
+     * keDRoll/keDPitch = 9.8f;
+     * keIRoll/keIPitch = 0.04080f;
+     * keYaw = 2.41f; <-- con questo qualcosa non va. Senza di esso il decollo OK, ma gira su sé stesso.
+     * Modificare controllo Yaw in modo che identifichi la velocità di rotazione e non i gradi target
+     */
 
-    keRoll = 1.48f; //1.90f; //3.2f; //0.45f;
-    keIRoll = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDRoll = 5.56f; //3.0f; // 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
+    keRoll = 1.44f; //1.11f; //1.48f //1.90f; //3.2f; //0.45f;
+    keIRoll = 0.0f; //0.04080f; //0.026f; //0.000523f; //0.028f; //0.000523f;
+    keDRoll = 4.10f; // 9.8f; // 5.56f ok senza yaw; //3.0f; // 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
 
-    kePitch = 1.48f; //1.90f; //3.2f; //0.45f;
-    keIPitch = 0.0f; //0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDPitch = 5.56f; //3.0f; // 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
+    kePitch = 1.44; // 1.11f; //1.48f //1.90f; //3.2f; //0.45f;
+    keIPitch = 0.0f; //0.0480f; //0.026f; //0.000523f; //0.028f; //0.000523f;
+    keDPitch = 4.10f; // 9.8f;//5.56f ok senza yaw; //3.0f; // 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
 
-    keYaw = 0.5f; //1.5f; // 8.0f; //0.05f;
+    keYaw = 2.41f; //1.5f; // 8.0f; //0.05f;
     keIYaw = 0.0f; //0.116f;
     keDYaw = 0.0f; //1.3f; // 6.3f;
 
     // TODO: usare parametro diverso per yaw. La rotazione richiede molti più giri
     // modificare di conseguenza la funzione calcOutput
     deg2MicrosFactor = 200.0f; //350.0f;
-    deg2MicrosYawFactor = 0.0f; //60.0f;
+    deg2MicrosYawFactor = 200.0f; //60.0f;
 
     baroData.altitude = 0.0f;
     baroData.pressure = 0;
@@ -372,6 +383,9 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
 //        calcErr(prevExpected, deltaReal);
 //    }
 
+    float alfa = ((requestedData.thrust - 1000.0f)/1000.0f)*(pi2);
+
+    nextExpected.thrust = 1000.0f + (requestedData.thrust - 1000.0f) * sin(alfa);
     prevSample = sample;
     prevExpected = nextExpected;
 
@@ -379,7 +393,6 @@ void MyPIDCntrllr::processImuSample(boost::math::quaternion<float> sampleQ,
      * calculate input data for transformation function
      * La correzione è data dal target richiesto (espresso in gradi) in un ciclo di frequenza e compensata con l'errore (gained)
      */
-    nextExpected.thrust = requestedData.thrust;
     YPRT input = calcCorrection(nextExpected);
 
 
@@ -469,14 +482,27 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
             MyPIDCntrllr::TARGET_VALUES[AUX2_POS].setPercentValue(
                     (*rcSample).getAux2Percent());
             requestedData = this->getYPRTFromTargetData();
-//            int v1 = int(MyPIDCntrllr::TARGET_VALUES[AUX2_POS].getValue()*100.0f);
-//            int v2 = int(keRoll*100.0f);
-//            int vv1 = int(MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue()*100.0f);
-//            int vv2 = int(keDRoll*100.0f);
-//            if(vv1 != vv2) {
-//                keDRoll = MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue();
+//            float v1 = MyPIDCntrllr::TARGET_VALUES[AUX2_POS].getValue();
+//            float vv1 = MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue()/10.0f;
+
+//            if(abs(vv1 - keYaw) > 0.1f) {
+//                keYaw = vv1;
+//                syslog(LOG_INFO, "K: E(%5.5f)",keYaw);
+//            }
+
+//            float vv1 = MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue()/1000.0f;
+//            if(abs(vv1 - keIRoll) > 0.001f) {
+//                keIRoll = vv1;
+//                keIPitch = vv1;
+//                syslog(LOG_INFO, "K: E(%5.5f)",keIRoll);
+//            }
+
+//            if(abs(v1 - keDRoll) > 0.1f || abs(vv1 - keRoll) > 0.1f) {
+//                keDRoll = v1;
 //                keDPitch = keDRoll;
-//                syslog(LOG_INFO, "K: E(%5.5f),D(%5.5f) - AUX: A1(%5.5f),A2(%5.5f)",keRoll, keDRoll, MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[AUX2_POS].getValue());
+//                keRoll = vv1;
+//                kePitch = keRoll;
+//                syslog(LOG_INFO, "K: E(%5.5f),D(%5.5f)",keRoll, keDRoll);
 //            }
 //            syslog(LOG_INFO, "RC: Y(%5.5f),P(%5.5f),R(%5.5f),T(%5.5f),A1(%5.5f),A2(%5.5f)", requestedData.yaw, requestedData.pitch, requestedData.roll, requestedData.thrust, MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[AUX2_POS].getValue());
 

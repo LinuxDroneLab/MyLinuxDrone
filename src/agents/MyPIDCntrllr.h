@@ -17,7 +17,7 @@
 #include <commons/helper_3dmath.h>
 
 #define MYPIDCNTRLLR_MAX_DEG_PER_SEC       200.0f
-#define MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW   30.0f
+#define MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW   200.0f
 #define MYPIDCNTRLLR_IMU_FREQUENCY         100.0f
 
 

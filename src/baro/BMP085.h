@@ -90,6 +90,7 @@ private:
 	boost::posix_time::ptime pulseAtTime;
 	uint64_t calcMillisFrom(std::chrono::time_point<std::chrono::system_clock> since);
 
+
 	void startCycle();
 	void changeStatus(SensorStatus s);
 	void sendRawTemperatureCmd(void);
