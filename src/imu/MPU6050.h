@@ -38,7 +38,6 @@
 #define _MPU6050_H_
 
 #include <stdint.h>
-#include <i2c/I2Cdev.h>
 #include <commons/helper_3dmath.h>
 
 #define pgm_read_byte(p) (*(uint8_t *)(p))
@@ -682,7 +681,7 @@ public:
 	MPU6050();
 	MPU6050(uint8_t address);
 
-	void initialize();
+	bool initialize();
 	bool testConnection();
 	bool dmpBegin(); // initialize, testConnection, dmpInitialize
 	bool pulse();

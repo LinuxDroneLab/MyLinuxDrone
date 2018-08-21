@@ -4,33 +4,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/agents/MyAgent.cpp \
-../src/agents/MyClock.cpp \
-../src/agents/MyDBusEmitterAgent.cpp \
 ../src/agents/MyIMUAgent.cpp \
 ../src/agents/MyMotorsAgent.cpp \
 ../src/agents/MyPIDCntrllr.cpp \
-../src/agents/MyPIDControllerAgent.cpp \
 ../src/agents/MyRCAgent.cpp 
 
 OBJS += \
-./src/agents/MyAgent.o \
-./src/agents/MyClock.o \
-./src/agents/MyDBusEmitterAgent.o \
 ./src/agents/MyIMUAgent.o \
 ./src/agents/MyMotorsAgent.o \
 ./src/agents/MyPIDCntrllr.o \
-./src/agents/MyPIDControllerAgent.o \
 ./src/agents/MyRCAgent.o 
 
 CPP_DEPS += \
-./src/agents/MyAgent.d \
-./src/agents/MyClock.d \
-./src/agents/MyDBusEmitterAgent.d \
 ./src/agents/MyIMUAgent.d \
 ./src/agents/MyMotorsAgent.d \
 ./src/agents/MyPIDCntrllr.d \
-./src/agents/MyPIDControllerAgent.d \
 ./src/agents/MyRCAgent.d 
 
 

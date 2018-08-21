@@ -13,18 +13,28 @@
 #define MYRCAGENT_STATUS_WAIT_MODE    3
 
 
-#include <agents/MyAgent.h>
 #include <boost/thread.hpp>
 #include <commons/ValueInt16.h>
 #include <sys/poll.h>
 
-class MyRCAgent: public MyAgent {
+class MyRCAgent {
 public:
-	MyRCAgent(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::EventType> acceptedEventTypes);
+    typedef struct {
+        int16_t thrust;
+        int16_t roll;
+        int16_t pitch;
+        int16_t yaw;
+        int16_t aux1;
+        int16_t aux2;
+    } RCSample;
+	MyRCAgent();
 	virtual ~MyRCAgent();
-	void setRCSample(float thrust, float roll, float pitch, float yaw, float aux1, float aux2);
+    RCSample& getRCSample();
+    bool loadData();
+    bool initialize();
+    bool isMinThrustMaxPitch();
+    bool isMinThrustMinPitch();
 protected:
-	virtual void processEvent(boost::shared_ptr<MyEvent> event);
 
 private:
     static RangeInt16 PRU_RANGES[];
@@ -40,25 +50,22 @@ private:
     };
 
 	bool initialized;
-	void initialize();
     bool updateTickTimestamp();
-	void pulse();
 	bool sendDataRequest();
 	bool receiveData();
+    void setRCSample();
 
 	uint8_t status;
     struct pollfd pruDevice;
-	float thrust;
-	float roll;
-	float pitch;
-	float yaw;
-	float aux1;
-	float aux2;
+    RCSample rcSample;
 
 	uint32_t lastTickMicros;
     uint16_t lastDTimeMicros;
     uint32_t tickDTimeSum;
     uint32_t tickDTimeWaitMicros;
+
+    bool minThrustMaxPitch;
+    bool minThrustMinPitch;
 
 };
 

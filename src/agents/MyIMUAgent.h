@@ -9,24 +9,31 @@
 #define AGENTS_MYIMUAGENT_H_
 
 #include <imu/MPU6050.h>
-#include <baro/BMP085.h>
-#include <agents/MyAgent.h>
 
-class MyIMUAgent: public MyAgent {
+class MyIMUAgent {
 public:
-	MyIMUAgent(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::EventType> acceptedEventTypes);
+    typedef struct {
+        VectorInt16 accel;
+        VectorInt16 accelCal;
+        VectorInt16 gyro;
+        VectorInt16 gyroCal;
+        VectorInt16 gyroDegxSec;
+        uint8_t frequency;
+        float gyroLSB;
+        uint16_t accelLSB;
+    } Motion6Data;
+
+	MyIMUAgent();
 	virtual ~MyIMUAgent();
     bool initialize();
+    bool loadData();
+    Motion6Data& getData();
 protected:
-	virtual void processEvent(boost::shared_ptr<MyEvent> event);
 
 private:
-	void calcTickTimestamp();
 	bool initialized;
 	MPU6050 imu;
-	BMP085 bmp;
-	uint32_t lastTickMicros;
-	uint16_t lastDTimeMicros;
+	Motion6Data data;
 };
 
 #endif /* AGENTS_MYIMUAGENT_H_ */

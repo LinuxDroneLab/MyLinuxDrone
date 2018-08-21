@@ -10,26 +10,24 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <events/MyOutMotors.h>
-#include <agents/MyAgent.h>
 #include <sys/poll.h>
 
-class MyMotorsAgent: public MyAgent {
+class MyMotorsAgent {
 public:
-	MyMotorsAgent(boost::shared_ptr<MyEventBus> bus,  vector<MyEvent::EventType> acceptedEventTypes);
+	MyMotorsAgent();
 	virtual ~MyMotorsAgent();
+    bool initialize();
+    void disarmMotors();
+    void armMotors();
+    bool isArmed();
+    void writeMotors(uint16_t rear, uint16_t front, uint16_t left, uint16_t right) ;
 protected:
-	virtual void processEvent(boost::shared_ptr<MyEvent> event);
 
 private:
     static unsigned char readBuf[];
 	bool initialized;
-	void initialize();
 	bool armed;
-	void writeMotors(boost::shared_ptr<MyOutMotors> event) ;
 	void setThrottleRange();
-	void disarmMotors();
-	void armMotors();
     bool sendData();
     bool sendStart();
     bool sendStop();

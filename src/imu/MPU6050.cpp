@@ -122,13 +122,22 @@ void MPU6050::extractDataFromFifo() {
  * the clock source to use the X Gyro for reference, which is slightly better than
  * the default internal clock source.
  */
-void MPU6050::initialize() {
-	setClockSource(MPU6050_CLOCK_PLL_XGYRO);
-	setFullScaleGyroRange(MPU6050_GYRO_FS_250);
-	setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
-	setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
-    setDMPEnabled(false);
+bool MPU6050::initialize() {
+    // slave sensor not enabled
+    setI2CMasterModeEnabled(false);
+    setI2CBypassEnabled(true);
 
+    setDLPFMode(MPU6050_DLPF_BW_98);
+	setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
+	setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
+    setFullScaleAccelRange(MPU6050_ACCEL_FS_4);
+    setTempSensorEnabled(true);
+	setRate(3); // 1KHz/(1+rate) = 250Hz;
+
+	setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
+	setWakeCycleEnabled(false);
+    setDMPEnabled(false);
+    return true;
 }
 
 /** Verify the I2C connection.

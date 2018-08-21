@@ -8,14 +8,9 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src/queues/subdir.mk
--include src/motors/subdir.mk
 -include src/imu/subdir.mk
 -include src/i2c/subdir.mk
--include src/events/subdir.mk
--include src/dbus/subdir.mk
 -include src/commons/subdir.mk
--include src/bus/subdir.mk
 -include src/baro/subdir.mk
 -include src/agents/subdir.mk
 -include src/subdir.mk

@@ -26,12 +26,7 @@ SUBDIRS := \
 src \
 src/agents \
 src/baro \
-src/bus \
 src/commons \
-src/dbus \
-src/events \
 src/i2c \
 src/imu \
-src/motors \
-src/queues \
 
