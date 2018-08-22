@@ -70,17 +70,17 @@ bool MyPIDCntrllr::pulse()
  * then calc pid and output
  */
 void MyPIDCntrllr::control() {
-    if(!this->motorsAgent.isArmed()) {
-        float newKeRoll = float((rcAgent.getRCSample().aux1 + 500))/100.0f;
-        float newKeDRoll = float((rcAgent.getRCSample().aux2 + 500))/50.0f;
-        if(abs(keRoll - newKeRoll) > 0.01 || abs(keDRoll - newKeDRoll) > 0.01) {
-            keRoll = newKeRoll;
-            kePitch = newKeRoll;
-            keDRoll = newKeDRoll;
-            keDPitch = newKeDRoll;
-            syslog(LOG_INFO, "E(%5.5f) - D(%5.5f)", keRoll, keDRoll);
-        }
-    }
+//    if(!this->motorsAgent.isArmed()) {
+//        float newKeRoll = float((rcAgent.getRCSample().aux1 + 500))/100.0f;
+//        float newKeDRoll = float((rcAgent.getRCSample().aux2 + 500))/50.0f;
+//        if(abs(keRoll - newKeRoll) > 0.01 || abs(keDRoll - newKeDRoll) > 0.01) {
+//            keRoll = newKeRoll;
+//            kePitch = newKeRoll;
+//            keDRoll = newKeDRoll;
+//            keDPitch = newKeDRoll;
+//            syslog(LOG_INFO, "E(%5.5f) - D(%5.5f)", keRoll, keDRoll);
+//        }
+//    }
 
     if(rcAgent.isMinThrustMaxPitch()) {
         this->arm();
@@ -97,6 +97,7 @@ void MyPIDCntrllr::control() {
     this->firstCycle = false;
 
 //    syslog(LOG_INFO, "mydrone: G(%5.5f,%5.5f,%5.5f)", this->imuAgent.getData().gyroDegxSec.x, this->imuAgent.getData().gyroDegxSec.y, this->imuAgent.getData().gyroDegxSec.z);
+    syslog(LOG_INFO, "mydrone: G(%d,%d,%d), Err(%d,%d,%d), M(%d,%d,%d,%d), T(%d,%d,%d), TH(%d)", this->imuAgent.getData().gyroDegxSec.x, this->imuAgent.getData().gyroDegxSec.y, this->imuAgent.getData().gyroDegxSec.z, this->rollErr, this->pitchErr, this->yawErr, this->motorsInput.front, this->motorsInput.rear, this->motorsInput.left, this->motorsInput.right, this->targetData.roll, this->targetData.pitch, this->targetData.yaw, this->inputData.thrust);
 }
 
 void MyPIDCntrllr::calcMotorsInput() {
@@ -232,6 +233,8 @@ void MyPIDCntrllr::clean()
     this->targetData.pitch = 0;
     this->targetData.yaw = 0;
     this->targetData.thrust = 1000;
+    this->firstCycle = true;
+
 }
 void MyPIDCntrllr::disarm()
 {
