@@ -86,6 +86,12 @@ private:
     int16_t yawDErr;
     int16_t yawIErr;
 
+    float rollDeg;
+    float pitchDeg;
+
+    float rollDegAcc;
+    float pitchDegAcc;
+
 	void disarm();
 	void arm();
 	void clean();
@@ -94,6 +100,8 @@ private:
     void calcPID();
     void calcMotorsInput();
     void send2Motors();
+    void calcRollPitchAccel();
+    void calcRollPitch();
 
     static RangeFloat INTEGRAL_RANGE;
     static RangeFloat ALTITUDE_RANGE;

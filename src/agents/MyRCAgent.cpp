@@ -19,7 +19,6 @@
 #define CHAN_AUX1 4
 #define CHAN_AUX2 5
 
-#define MYRCAGENT_MAX_BUFFER_SIZE         512
 unsigned char MyRCAgent::readBuf[MYRCAGENT_MAX_BUFFER_SIZE] = { };
 #define MYRCAGENT_DEVICE_NAME             "/dev/rpmsg_pru31"
 
@@ -38,6 +37,8 @@ RangeInt16 MyRCAgent::CHAN_RANGES[] = { RangeInt16(-500, 500), RangeInt16(-500,
                                                                           500),
                                         RangeInt16(-500, 500), RangeInt16(-500,
                                                                           500) };
+int16_t MyRCAgent::CHAN_CENTER_VALUES[6] = { -8,0,8,0,0,0 };
+
 ValueInt16 MyRCAgent::PRU_VALUES[] = {
         ValueInt16(0, MyRCAgent::PRU_RANGES[CHAN_ROLL]), ValueInt16(
                 0, MyRCAgent::PRU_RANGES[CHAN_THRUST]),
@@ -101,11 +102,11 @@ MyRCAgent::RCSample& MyRCAgent::getRCSample()
 void MyRCAgent::setRCSample()
 {
     this->rcSample.thrust = MyRCAgent::CHAN_VALUES[CHAN_THRUST].getValue();
-    this->rcSample.roll = MyRCAgent::CHAN_VALUES[CHAN_ROLL].getValue();
-    this->rcSample.pitch = MyRCAgent::CHAN_VALUES[CHAN_PITCH].getValue();
-    this->rcSample.yaw = MyRCAgent::CHAN_VALUES[CHAN_YAW].getValue();
-    this->rcSample.aux1 = MyRCAgent::CHAN_VALUES[CHAN_AUX1].getValue();
-    this->rcSample.aux2 = MyRCAgent::CHAN_VALUES[CHAN_AUX2].getValue();
+    this->rcSample.roll = MyRCAgent::CHAN_VALUES[CHAN_ROLL].getValue() - MyRCAgent::CHAN_CENTER_VALUES[CHAN_ROLL];
+    this->rcSample.pitch = MyRCAgent::CHAN_VALUES[CHAN_PITCH].getValue() - MyRCAgent::CHAN_CENTER_VALUES[CHAN_PITCH];
+    this->rcSample.yaw = MyRCAgent::CHAN_VALUES[CHAN_YAW].getValue() - MyRCAgent::CHAN_CENTER_VALUES[CHAN_YAW];
+    this->rcSample.aux1 = MyRCAgent::CHAN_VALUES[CHAN_AUX1].getValue() - MyRCAgent::CHAN_CENTER_VALUES[CHAN_AUX1];
+    this->rcSample.aux2 = MyRCAgent::CHAN_VALUES[CHAN_AUX2].getValue() - MyRCAgent::CHAN_CENTER_VALUES[CHAN_AUX2];
 }
 
 bool MyRCAgent::sendDataRequest()

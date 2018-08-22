@@ -36,13 +36,23 @@ bool MyIMUAgent::initialize()
 }
 bool MyIMUAgent::loadData()
 {
+    int16_t localData[6];
     bool result = false;
     if (initialize())
     {
         if (imu.getIntDataReadyStatus())
         {
-            imu.getMotion6(&data.accel.x, &data.accel.y, &data.accel.z,
-                           &data.gyro.x, &data.gyro.y, &data.gyro.z);
+
+            imu.getMotion6(localData, localData+1, localData+2,
+                           localData+3, localData+4, localData+5);
+
+            data.accel.x = localData[0];
+            data.accel.y = localData[1];
+            data.accel.z = localData[2];
+            data.gyro.x = localData[3];
+            data.gyro.y = localData[4];
+            data.gyro.z = localData[5];
+
             data.gyroDegxSec.x = (data.gyro.x - data.gyroCal.x) / data.gyroLSB;
             data.gyroDegxSec.y = (data.gyro.y - data.gyroCal.y) / data.gyroLSB;
             data.gyroDegxSec.z = (data.gyro.z - data.gyroCal.z) / data.gyroLSB;

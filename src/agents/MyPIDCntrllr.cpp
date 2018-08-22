@@ -35,6 +35,11 @@ MyPIDCntrllr::MyPIDCntrllr(): initialized(false), firstCycle(true)
     keYaw   = 0.0;
     keDYaw  = 0.0f;
     keIYaw  = 0.0f;
+
+    rollDeg = 0.0f;
+    pitchDeg = 0.0f;
+    rollDegAcc = 0.0f;
+    pitchDegAcc = 0.0f;
 }
 
 MyPIDCntrllr::~MyPIDCntrllr()
@@ -90,14 +95,15 @@ void MyPIDCntrllr::control() {
         this->updateTargetDataFromRCSample();
     }
 
+    this->calcRollPitchAccel();
+    this->calcRollPitch();
     this->calcPID();
     this->calcMotorsInput();
     this->send2Motors();
 
     this->firstCycle = false;
 
-//    syslog(LOG_INFO, "mydrone: G(%5.5f,%5.5f,%5.5f)", this->imuAgent.getData().gyroDegxSec.x, this->imuAgent.getData().gyroDegxSec.y, this->imuAgent.getData().gyroDegxSec.z);
-    syslog(LOG_INFO, "mydrone: G(%d,%d,%d), Err(%d,%d,%d), M(%d,%d,%d,%d), T(%d,%d,%d), TH(%d)", this->imuAgent.getData().gyroDegxSec.x, this->imuAgent.getData().gyroDegxSec.y, this->imuAgent.getData().gyroDegxSec.z, this->rollErr, this->pitchErr, this->yawErr, this->motorsInput.front, this->motorsInput.rear, this->motorsInput.left, this->motorsInput.right, this->targetData.roll, this->targetData.pitch, this->targetData.yaw, this->inputData.thrust);
+    // syslog(LOG_INFO, "mydrone: G(%d,%d,%d), Err(%d,%d,%d), M(%d,%d,%d,%d), T(%d,%d,%d), TH(%d)", this->imuAgent.getData().gyroDegxSec.x, this->imuAgent.getData().gyroDegxSec.y, this->imuAgent.getData().gyroDegxSec.z, this->rollErr, this->pitchErr, this->yawErr, this->motorsInput.front, this->motorsInput.rear, this->motorsInput.left, this->motorsInput.right, this->targetData.roll, this->targetData.pitch, this->targetData.yaw, this->inputData.thrust);
 }
 
 void MyPIDCntrllr::calcMotorsInput() {
@@ -153,6 +159,36 @@ void MyPIDCntrllr::send2Motors() {
     this->motorsAgent.writeMotors(this->motorsInput.rear, this->motorsInput.front, this->motorsInput.left, this->motorsInput.right);
 }
 
+void MyPIDCntrllr::calcRollPitchAccel() {
+    MyIMUAgent::Motion6Data& imuData = this->imuAgent.getData();
+    float accX = float(imuData.accel.x)/imuData.accelLSB;
+    float accY = float(imuData.accel.y)/imuData.accelLSB;
+    float accZ = float(imuData.accel.z)/imuData.accelLSB;
+    float accModule = sqrt(accX*accX + accY*accY + accZ*accZ);
+    if(abs(accX) < accModule) {
+        this->rollDegAcc = std::asin((float)accX/accModule)* 57.296;
+    }
+    if(abs(accY) < accModule) {
+        this->pitchDegAcc = std::asin((float)accY/accModule)* 57.296;
+    }
+}
+/*
+ * from http://www.brokking.net
+ */
+void MyPIDCntrllr::calcRollPitch() {
+    MyIMUAgent::Motion6Data& imuData = this->imuAgent.getData();
+    //Gyro angle calculations
+    //0.0000611 = 1 / (250Hz / 65.5)
+    this->pitchDeg += imuData.gyroDegxSec.y * 0.0000611;
+    this->rollDeg += imuData.gyroDegxSec.x * 0.0000611;
+
+    this->pitchDeg -= this->rollDeg * sin(imuData.gyroDegxSec.z * 0.000001066); // 0.0000611 * (pi)/360
+    this->rollDeg += this->pitchDeg * sin(imuData.gyroDegxSec.z * 0.000001066);
+
+    this->pitchDeg = this->pitchDeg * 0.9996 + this->pitchDegAcc * 0.0004;
+    this->rollDeg = this->rollDeg * 0.9996 + this->rollDegAcc * 0.0004;
+
+}
 void MyPIDCntrllr::calcPID() {
     MyIMUAgent::Motion6Data& imuData = this->imuAgent.getData();
     VectorInt16& gyroData = imuData.gyroDegxSec;
@@ -160,15 +196,30 @@ void MyPIDCntrllr::calcPID() {
         this->inputData.roll = gyroData.x;
         this->inputData.pitch = gyroData.y;
         this->inputData.yaw = gyroData.z;
+        this->rollDeg = this->rollDegAcc;
+        this->pitchDeg = this->pitchDegAcc;
     } else {
         this->inputData.roll = (this->inputData.roll * 0.7f) + (gyroData.x * 0.3f);
         this->inputData.pitch = (this->inputData.pitch * 0.7f) + (gyroData.y * 0.3f);
         this->inputData.yaw = (this->inputData.yaw * 0.7f) + (gyroData.z * 0.3f);
     }
+
+    float pitchLevelAdjust = 0.0f;
+    float rollLevelAdjust = 0.0f;
+
+    if(this->targetData.roll == 0 && this->targetData.pitch == 0) {
+        pitchLevelAdjust = this->pitchDeg * 5;
+        rollLevelAdjust = this->rollDeg * 5;
+        this->targetData.roll -= rollLevelAdjust;
+        this->targetData.pitch -= pitchLevelAdjust;
+    }
+
     this->inputData.thrust = this->targetData.thrust;
     this->inputData.roll = std::min<int16_t>(PID_CNTRLLR_MAX_ROLL, std::max<int16_t>(this->inputData.roll, -PID_CNTRLLR_MAX_ROLL));
     this->inputData.pitch = std::min<int16_t>(PID_CNTRLLR_MAX_ROLL, std::max<int16_t>(this->inputData.pitch, -PID_CNTRLLR_MAX_ROLL));
     this->inputData.yaw = std::min<int16_t>(PID_CNTRLLR_MAX_YAW, std::max<int16_t>(this->inputData.yaw, -PID_CNTRLLR_MAX_YAW));
+
+    // syslog(LOG_INFO, "RP(%5.5f, %5.5f), RPYAcc(%5.5f, %5.5f), Adj(%5.5f, %5.5f)", this->rollDeg, this->pitchDeg, this->rollDegAcc, this->pitchDegAcc, rollLevelAdjust, pitchLevelAdjust);
 
     // syslog(LOG_INFO, "inputData: RPY(%d,%d,%d)", this->inputData.roll, this->inputData.pitch, this->inputData.yaw);
 
@@ -209,9 +260,20 @@ void MyPIDCntrllr::calcPID() {
 
 void MyPIDCntrllr::updateTargetDataFromRCSample() {
     MyRCAgent::RCSample& sample = this->rcAgent.getRCSample();
-    this->targetData.roll = sample.roll >> 1; // 250 deg/sec max
-    this->targetData.pitch = sample.pitch >> 1; // 250 deg/sec max
-    this->targetData.yaw = sample.yaw >> 3; // 62 deg/sec max
+    this->targetData.roll = sample.roll/2; // 250 deg/sec max
+    this->targetData.pitch = sample.pitch/2; // 250 deg/sec max
+    this->targetData.yaw = sample.yaw/8; // 62 deg/sec max
+
+    // dead band
+    if(this->targetData.roll < 20 && this->targetData.roll > -20) {
+        this->targetData.roll = 0;
+    }
+    if(this->targetData.pitch < 20 && this->targetData.pitch > -20) {
+        this->targetData.pitch = 0;
+    }
+    if(this->targetData.yaw < 20 && this->targetData.yaw > -20) {
+        this->targetData.yaw = 0;
+    }
     this->targetData.thrust = std::min<int16_t>(PID_CNTRLLR_MAX_THRUST, std::max<int16_t>(1500 + sample.thrust, PID_CNTRLLR_MIN_THRUST)); // range [1000,2000]
 }
 

@@ -11,6 +11,7 @@
 #define MYRCAGENT_STATUS_REQUIRE_MODE 1
 #define MYRCAGENT_STATUS_RECEIVE_MODE 2
 #define MYRCAGENT_STATUS_WAIT_MODE    3
+#define MYRCAGENT_MAX_BUFFER_SIZE     512
 
 
 #include <boost/thread.hpp>
@@ -37,11 +38,12 @@ public:
 protected:
 
 private:
-    static RangeInt16 PRU_RANGES[];
-    static RangeInt16 CHAN_RANGES[];
-    static ValueInt16 PRU_VALUES[];
-    static ValueInt16 CHAN_VALUES[];
-    static unsigned char readBuf[];
+    static RangeInt16 PRU_RANGES[6];
+    static RangeInt16 CHAN_RANGES[6];
+    static ValueInt16 PRU_VALUES[6];
+    static ValueInt16 CHAN_VALUES[6];
+    static int16_t CHAN_CENTER_VALUES[6];
+    static unsigned char readBuf[MYRCAGENT_MAX_BUFFER_SIZE];
 
     struct EcapData
     {
