@@ -166,10 +166,10 @@ void MyPIDCntrllr::calcRollPitchAccel() {
     float accZ = float(imuData.accel.z)/imuData.accelLSB;
     float accModule = sqrt(accX*accX + accY*accY + accZ*accZ);
     if(abs(accX) < accModule) {
-        this->rollDegAcc = std::asin((float)accX/accModule)* 57.296;
+        this->rollDegAcc = std::asin((float)accY/accModule)* 57.296;
     }
     if(abs(accY) < accModule) {
-        this->pitchDegAcc = std::asin((float)accY/accModule)* 57.296;
+        this->pitchDegAcc = std::asin((float)accX/accModule)* 57.296;
     }
 }
 /*
@@ -179,11 +179,14 @@ void MyPIDCntrllr::calcRollPitch() {
     MyIMUAgent::Motion6Data& imuData = this->imuAgent.getData();
     //Gyro angle calculations
     //0.0000611 = 1 / (250Hz / 65.5)
-    this->pitchDeg += imuData.gyroDegxSec.y * 0.0000611;
-    this->rollDeg += imuData.gyroDegxSec.x * 0.0000611;
+    // Attenzione: imuData.gyroDegxSec.y è già diviso per 65.5
+    // Attenzione: pitchDeg ha segno inverso rispetto al gyro
+    this->pitchDeg -= imuData.gyroDegxSec.y * 0.004f;
+    this->rollDeg += imuData.gyroDegxSec.x * 0.004f;
 
-    this->pitchDeg -= this->rollDeg * sin(imuData.gyroDegxSec.z * 0.000001066); // 0.0000611 * (pi)/360
-    this->rollDeg += this->pitchDeg * sin(imuData.gyroDegxSec.z * 0.000001066);
+
+    this->pitchDeg -= this->rollDeg * sin(imuData.gyroDegxSec.z * 0.000069813); // 0.0000611 * (2pi)/360
+    this->rollDeg += this->pitchDeg * sin(imuData.gyroDegxSec.z * 0.000069813);
 
     this->pitchDeg = this->pitchDeg * 0.9996 + this->pitchDegAcc * 0.0004;
     this->rollDeg = this->rollDeg * 0.9996 + this->rollDegAcc * 0.0004;
