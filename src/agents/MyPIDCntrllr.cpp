@@ -63,15 +63,15 @@ MyPIDCntrllr::MyPIDCntrllr(boost::shared_ptr<MyEventBus> bus,
      * Modificare controllo Yaw in modo che identifichi la velocità di rotazione e non i gradi target
      */
 
-    keRoll = 1.44f; //1.11f; //1.48f //1.90f; //3.2f; //0.45f;
+    keRoll = 1.40f; //1.11f; //1.48f //1.90f; //3.2f; //0.45f;
     keIRoll = 0.0f; //0.04080f; //0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDRoll = 4.10f; // 9.8f; // 5.56f ok senza yaw; //3.0f; // 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
+    keDRoll = 11.30f; // 9.8f; // 5.56f ok senza yaw; //3.0f; // 3.8f; //5.5f; //15.5f; // 4.0f; //0.012f; //2.0f;
 
-    kePitch = 1.44; // 1.11f; //1.48f //1.90f; //3.2f; //0.45f;
+    kePitch = 1.40; // 1.11f; //1.48f //1.90f; //3.2f; //0.45f;
     keIPitch = 0.0f; //0.0480f; //0.026f; //0.000523f; //0.028f; //0.000523f;
-    keDPitch = 4.10f; // 9.8f;//5.56f ok senza yaw; //3.0f; // 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
+    keDPitch = 11.30f; // 9.8f;//5.56f ok senza yaw; //3.0f; // 3.8f; //5.5f; //15.5f; //4.0f; //0.012f; //2.0f;
 
-    keYaw = 2.41f; //1.5f; // 8.0f; //0.05f;
+    keYaw = 1.91f; //1.5f; // 8.0f; //0.05f;
     keIYaw = 0.0f; //0.116f;
     keDYaw = 0.0f; //1.3f; // 6.3f;
 
@@ -482,9 +482,10 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
             MyPIDCntrllr::TARGET_VALUES[AUX2_POS].setPercentValue(
                     (*rcSample).getAux2Percent());
             requestedData = this->getYPRTFromTargetData();
+            syslog(LOG_INFO, "ReqData(485) RPY(%5.5f,%5.5f,%5.5f)", requestedData.roll, requestedData.pitch, requestedData.yaw);
 //            float v1 = MyPIDCntrllr::TARGET_VALUES[AUX2_POS].getValue();
-//            float vv1 = MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue()/10.0f;
 
+//            float vv1 = MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue()/10.0f;
 //            if(abs(vv1 - keYaw) > 0.1f) {
 //                keYaw = vv1;
 //                syslog(LOG_INFO, "K: E(%5.5f)",keYaw);
@@ -497,6 +498,8 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
 //                syslog(LOG_INFO, "K: E(%5.5f)",keIRoll);
 //            }
 
+//            float v1 = MyPIDCntrllr::TARGET_VALUES[AUX2_POS].getValue();
+//            float vv1 = MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue()/10.0f;
 //            if(abs(v1 - keDRoll) > 0.1f || abs(vv1 - keRoll) > 0.1f) {
 //                keDRoll = v1;
 //                keDPitch = keDRoll;
@@ -504,9 +507,6 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
 //                kePitch = keRoll;
 //                syslog(LOG_INFO, "K: E(%5.5f),D(%5.5f)",keRoll, keDRoll);
 //            }
-//            syslog(LOG_INFO, "RC: Y(%5.5f),P(%5.5f),R(%5.5f),T(%5.5f),A1(%5.5f),A2(%5.5f)", requestedData.yaw, requestedData.pitch, requestedData.roll, requestedData.thrust, MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[AUX2_POS].getValue());
-
-//            syslog(LOG_INFO, "RCSample: ts=%ld, r=%3.2f, p=%3.2f, y=%3.2f, t=%3.2f", rcSample->getTimestampMillis(), MyPIDCntrllr::TARGET_VALUES[ROLL_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[PITCH_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[YAW_POS].getValue(), MyPIDCntrllr::TARGET_VALUES[THRUST_POS].getValue());
 
         }
         else if (event->getType() == MyEvent::EventType::BaroSample)
