@@ -482,7 +482,7 @@ void MyPIDCntrllr::processEvent(boost::shared_ptr<MyEvent> event)
             MyPIDCntrllr::TARGET_VALUES[AUX2_POS].setPercentValue(
                     (*rcSample).getAux2Percent());
             requestedData = this->getYPRTFromTargetData();
-            syslog(LOG_INFO, "ReqData(485) RPY(%5.5f,%5.5f,%5.5f)", requestedData.roll, requestedData.pitch, requestedData.yaw);
+//            syslog(LOG_INFO, "ReqData(485) RPY(%5.5f,%5.5f,%5.5f)", requestedData.roll, requestedData.pitch, requestedData.yaw);
 //            float v1 = MyPIDCntrllr::TARGET_VALUES[AUX2_POS].getValue();
 
 //            float vv1 = MyPIDCntrllr::TARGET_VALUES[AUX1_POS].getValue()/10.0f;
