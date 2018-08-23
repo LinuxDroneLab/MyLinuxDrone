@@ -40,6 +40,7 @@ MyPIDCntrllr::MyPIDCntrllr(): initialized(false), firstCycle(true)
     pitchDeg = 0.0f;
     rollDegAcc = 0.0f;
     pitchDegAcc = 0.0f;
+
 }
 
 MyPIDCntrllr::~MyPIDCntrllr()
@@ -161,14 +162,14 @@ void MyPIDCntrllr::send2Motors() {
 
 void MyPIDCntrllr::calcRollPitchAccel() {
     MyIMUAgent::Motion6Data& imuData = this->imuAgent.getData();
-    float accX = float(imuData.accel.x)/imuData.accelLSB;
-    float accY = float(imuData.accel.y)/imuData.accelLSB;
-    float accZ = float(imuData.accel.z)/imuData.accelLSB;
+    float accX = float(imuData.accel.x)/float(imuData.accelLSB);
+    float accY = float(imuData.accel.y)/float(imuData.accelLSB);
+    float accZ = float(imuData.accel.z)/float(imuData.accelLSB);
     float accModule = sqrt(accX*accX + accY*accY + accZ*accZ);
-    if(abs(accX) < accModule) {
+    if(abs(accY) < accModule) {
         this->rollDegAcc = std::asin((float)accY/accModule)* 57.296;
     }
-    if(abs(accY) < accModule) {
+    if(abs(accX) < accModule) {
         this->pitchDegAcc = std::asin((float)accX/accModule)* 57.296;
     }
 }
@@ -190,6 +191,8 @@ void MyPIDCntrllr::calcRollPitch() {
 
     this->pitchDeg = this->pitchDeg * 0.9996 + this->pitchDegAcc * 0.0004;
     this->rollDeg = this->rollDeg * 0.9996 + this->rollDegAcc * 0.0004;
+
+//    syslog(LOG_INFO, "RPAcc(%3.2f, %3.2f), RP(%3.2f, %3.2f), Acc(%d,%d)", this->rollDegAcc, this->pitchDegAcc, this->rollDeg, this->pitchDeg, imuData.accel.x, imuData.accel.y);
 
 }
 void MyPIDCntrllr::calcPID() {

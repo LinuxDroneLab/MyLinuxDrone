@@ -13,13 +13,30 @@ MyIMUAgent::MyIMUAgent() :
 {
     data.frequency = 250;
     data.gyroLSB = 65.5;
-    data.accelLSB = 1024;
+    data.accelLSB = 8192;
 
-//16.4  S(-181197,-98537,-27111), M(-45,-25,-7), Min(-339,-175,-51), Max(0,0,0),
-//65.5  S(-694062,-365156,-107261), M(-170,-90,-27), Min(-214,-112,-39), Max(0,0,0),
-    data.gyroCal.x = -170;
-    data.gyroCal.y = -90;
-    data.gyroCal.z = -27;
+    /*
+     * AxisFactors(1.04191, 1.0508, 1.01568)
+     * Accel AxisFactors(1.04191, 1.0508, 1.01568)
+     * Accel K=(0.00232558, 0.00206612. 0.00163934)
+     * Gyro Offsets(-171, -93, -26)
+     *
+     */
+    data.gyroCal.x = -171;
+    data.gyroCal.y = -93;
+    data.gyroCal.z = -26;
+
+    data.accelKX = 0.00232558f;
+    data.accelKY = 0.00206612f;
+    data.accelKZ = 0.00163934f;
+
+    data.accelAxisFactorX = 1.04191f;
+    data.accelAxisFactorY = 1.0508f;
+    data.accelAxisFactorZ = 1.01568f;
+
+    data.accel.x = 0;
+    data.accel.y = 0;
+    data.accel.z = 0;
 }
 
 MyIMUAgent::~MyIMUAgent()
@@ -46,9 +63,9 @@ bool MyIMUAgent::loadData()
             imu.getMotion6(localData, localData+1, localData+2,
                            localData+3, localData+4, localData+5);
 
-            data.accel.x = localData[0];
-            data.accel.y = localData[1];
-            data.accel.z = localData[2];
+            data.accel.x = float(data.accel.x) * (1.0f - data.accelKX) + float(localData[0]) * data.accelAxisFactorX * data.accelKX;
+            data.accel.y = float(data.accel.y) * (1.0f - data.accelKY) + float(localData[1]) * data.accelAxisFactorY * data.accelKY;
+            data.accel.z = float(data.accel.z) * (1.0f - data.accelKZ) + float(localData[2]) * data.accelAxisFactorZ * data.accelKZ;
             data.gyro.x = localData[3];
             data.gyro.y = localData[4];
             data.gyro.z = localData[5];

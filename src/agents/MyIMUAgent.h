@@ -18,6 +18,12 @@ public:
         VectorInt16 gyro;
         VectorInt16 gyroCal;
         VectorInt16 gyroDegxSec;
+        float accelKX;
+        float accelKY;
+        float accelKZ;
+        float accelAxisFactorX;
+        float accelAxisFactorY;
+        float accelAxisFactorZ;
         uint8_t frequency;
         float gyroLSB;
         uint16_t accelLSB;
