@@ -12,6 +12,8 @@
 #include <boost/make_shared.hpp>
 #include <sys/poll.h>
 
+#define MYMOTORSAGENT_MAX_BUFFER_SIZE         64
+
 class MyMotorsAgent {
 public:
 	MyMotorsAgent();
@@ -24,7 +26,7 @@ public:
 protected:
 
 private:
-    static unsigned char readBuf[];
+    static unsigned char readBuf[MYMOTORSAGENT_MAX_BUFFER_SIZE];
 	bool initialized;
 	bool armed;
 	void setThrottleRange();

@@ -20,18 +20,24 @@
 #define CHAN_AUX2 5
 
 unsigned char MyRCAgent::readBuf[MYRCAGENT_MAX_BUFFER_SIZE] = { };
+
+// PRU1
 #define MYRCAGENT_DEVICE_NAME             "/dev/rpmsg_pru31"
 
+// 2 bytes per cmd_id e tipo record
+// 32 bytes per ogni canale. Sono 8 canali. 8 * 32 bytes = 270 bytes
+// totale 272 bytes
+#define MYRCAGENT_ECAP_DATA_SIZE 272
 /*
  * TODO: Change static values to dynamic configuration
  */
-RangeInt16 MyRCAgent::PRU_RANGES[] = { RangeInt16(628, 1586), RangeInt16(604,
+RangeInt16 MyRCAgent::PRU_RANGES[6] = { RangeInt16(628, 1586), RangeInt16(604,
                                                                          1583),
                                        RangeInt16(665, 1531), RangeInt16(604,
                                                                          1581),
                                        RangeInt16(595, 1588), RangeInt16(596,
                                                                          1587) };
-RangeInt16 MyRCAgent::CHAN_RANGES[] = { RangeInt16(-500, 500), RangeInt16(-500,
+RangeInt16 MyRCAgent::CHAN_RANGES[6] = { RangeInt16(-500, 500), RangeInt16(-500,
                                                                           500),
                                         RangeInt16(-500, 500), RangeInt16(-500,
                                                                           500),
@@ -39,14 +45,14 @@ RangeInt16 MyRCAgent::CHAN_RANGES[] = { RangeInt16(-500, 500), RangeInt16(-500,
                                                                           500) };
 int16_t MyRCAgent::CHAN_CENTER_VALUES[6] = { -8,0,8,0,0,0 };
 
-ValueInt16 MyRCAgent::PRU_VALUES[] = {
+ValueInt16 MyRCAgent::PRU_VALUES[6] = {
         ValueInt16(0, MyRCAgent::PRU_RANGES[CHAN_ROLL]), ValueInt16(
                 0, MyRCAgent::PRU_RANGES[CHAN_THRUST]),
         ValueInt16(0, MyRCAgent::PRU_RANGES[CHAN_PITCH]), ValueInt16(
                 0, MyRCAgent::PRU_RANGES[CHAN_YAW]),
         ValueInt16(0, MyRCAgent::PRU_RANGES[CHAN_AUX1]), ValueInt16(
                 0, MyRCAgent::PRU_RANGES[CHAN_AUX2]) };
-ValueInt16 MyRCAgent::CHAN_VALUES[] = {
+ValueInt16 MyRCAgent::CHAN_VALUES[6] = {
         ValueInt16(0, MyRCAgent::CHAN_RANGES[CHAN_ROLL]), ValueInt16(
                 0, MyRCAgent::CHAN_RANGES[CHAN_THRUST]),
         ValueInt16(0, MyRCAgent::CHAN_RANGES[CHAN_PITCH]), ValueInt16(
@@ -64,7 +70,7 @@ MyRCAgent::MyRCAgent() :
     this->lastTickMicros =
             boost::posix_time::microsec_clock::local_time().time_of_day().total_microseconds();
     this->tickDTimeSum = 0;
-    this->tickDTimeWaitMicros = 100000; // with tick at 200Hz => dTimeMicros = 5000 => get data for each 100000/5000 = 20 cycles (10Hz)
+    this->tickDTimeWaitMicros = 100000; // 10Hz
 }
 
 MyRCAgent::~MyRCAgent()
@@ -127,7 +133,7 @@ bool MyRCAgent::receiveData()
 {
     bool result = false;
     uint32_t* data = (uint32_t*) (readBuf + 2);
-    int bytes = read(pruDevice.fd, readBuf, sizeof(struct EcapData));
+    int bytes = read(pruDevice.fd, readBuf, MYRCAGENT_ECAP_DATA_SIZE);
     if (bytes > 0)
     {
 //        printf("Message received from PRU:%d:%d:%d 1\n",readBuf[0], readBuf[1], bytes);
@@ -198,6 +204,8 @@ bool MyRCAgent::loadData()
         if (this->sendDataRequest())
         {
             this->status = MYRCAGENT_STATUS_RECEIVE_MODE;
+        } else {
+            syslog(LOG_INFO, "MyRCAgent:Cannot send data request!");
         }
         break;
     }
@@ -223,6 +231,7 @@ bool MyRCAgent::loadData()
         }
         else if (updatedRc)
         {
+            syslog(LOG_INFO, "MyRCAgent: RC data not received!");
             this->status = MYRCAGENT_STATUS_REQUIRE_MODE;
         }
         break;

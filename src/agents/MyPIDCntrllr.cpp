@@ -8,6 +8,8 @@
 #include <agents/MyPIDCntrllr.h>
 #include <iostream>
 #include <syslog.h>
+#include <chrono>
+#include <thread>
 
 #define pi 3.1415926
 #define pi2 1.5707963
@@ -22,24 +24,29 @@ using namespace std;
 
 MyPIDCntrllr::MyPIDCntrllr(): initialized(false), firstCycle(true)
 {
+    // da provare:
+    // Aug 25 14:40:57 beaglebone mydrone[876]: E(3.22000) - D(7.98000)
+
     this->clean();
 
-    keRoll   = 2.44f;
-    keDRoll  = 0.0f;
+    keRoll   = 3.22f;
+    keDRoll  = 7.98f;
     keIRoll  = 0.00f;
 
-    kePitch   = 2.44f;
-    keDPitch  = 0.0f;
+    kePitch   = 3.22f;
+    keDPitch  = 7.98f;
     keIPitch  = 0.0f;
 
-    keYaw   = 0.0;
-    keDYaw  = 0.0f;
-    keIYaw  = 0.0f;
+    keYaw   = 43.3;
+    keDYaw  = 12.4f;
+    keIYaw  = 1.0f;
 
     rollDeg = 0.0f;
     pitchDeg = 0.0f;
     rollDegAcc = 0.0f;
     pitchDegAcc = 0.0f;
+
+    timestampMicrosPrevCycle = 0;
 
 }
 
@@ -63,29 +70,71 @@ bool MyPIDCntrllr::initialize()
 }
 bool MyPIDCntrllr::pulse()
 {
-    initialize();
-    bool imuChanged = this->imuAgent.loadData();
-    bool rcChanged = this->rcAgent.loadData();
-    if(imuChanged) { // I work at imu frequency
-        this->control();
+    uint32_t now = boost::posix_time::microsec_clock::local_time().time_of_day().total_microseconds();
+    if(timestampMicrosPrevCycle > 0) {
+        durationMicrosCycle = uint32_t(now - timestampMicrosPrevCycle);
+    } else {
+        timestampMicrosPrevCycle = now;
     }
-    return imuChanged | rcChanged;
+
+    initialize();
+    if(durationMicrosCycle >= 4000 && durationMicrosCycle < 40000 ) {
+        bool imuChanged = this->imuAgent.loadData();
+        if(imuChanged) {
+            timestampMicrosPrevCycle = now;
+        }
+        bool rcChanged = this->rcAgent.loadData();
+        this->control();
+        if(durationMicrosCycle > 10500) {
+            syslog(LOG_INFO, "mydrone: COUNTER=%d", durationMicrosCycle);
+        }
+        return imuChanged | rcChanged;
+    } else if(durationMicrosCycle >= 40000) {
+        bool isArmed = motorsAgent.isArmed();
+        syslog(LOG_INFO, "mydrone: ALARM!! Imu does not responds!! I'm trying to reset it ...");
+        this->disarm();
+        this->imuAgent.reset();
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));;
+        this->imuAgent.initialize();
+        if(isArmed) {
+            this->arm();
+        }
+        timestampMicrosPrevCycle = now;
+    }
+    return false;
 }
+void MyPIDCntrllr::setKRollPitch() {
+    // check ke,keD roll/pitch with AUX1 and AUX2
+    float newKeRoll = float((rcAgent.getRCSample().aux1 + 500))/100.0f;
+    float newKeDRoll = float((rcAgent.getRCSample().aux2 + 500))/50.0f;
+    if(abs(keRoll - newKeRoll) > 0.01 || abs(keDRoll - newKeDRoll) > 0.01) {
+        keRoll = newKeRoll;
+        kePitch = newKeRoll;
+        keDRoll = newKeDRoll;
+        keDPitch = newKeDRoll;
+        syslog(LOG_INFO, "ERoll/Pitch(%5.5f) - DRoll/Pitch(%5.5f)", keRoll, keDRoll);
+    }
+}
+void MyPIDCntrllr::setKYaw() {
+    // check ke,keD yaw with AUX1 and AUX2
+    float newKeYaw = float((rcAgent.getRCSample().aux1 + 500))/10.0f;
+    float newKeDYaw = float((rcAgent.getRCSample().aux2 + 500))/10.0f;
+    if(abs(keYaw - newKeYaw) > 0.01 || abs(keDYaw - newKeDYaw) > 0.01) {
+        keYaw = newKeYaw;
+        keDYaw = newKeDYaw;
+        syslog(LOG_INFO, "EYaw(%5.5f) - DYaw(%5.5f)", keYaw, keDYaw);
+    }
+}
+
 /*
  * Get input from imu and rc,
  * then calc pid and output
  */
 void MyPIDCntrllr::control() {
+
 //    if(!this->motorsAgent.isArmed()) {
-//        float newKeRoll = float((rcAgent.getRCSample().aux1 + 500))/100.0f;
-//        float newKeDRoll = float((rcAgent.getRCSample().aux2 + 500))/50.0f;
-//        if(abs(keRoll - newKeRoll) > 0.01 || abs(keDRoll - newKeDRoll) > 0.01) {
-//            keRoll = newKeRoll;
-//            kePitch = newKeRoll;
-//            keDRoll = newKeDRoll;
-//            keDPitch = newKeDRoll;
-//            syslog(LOG_INFO, "E(%5.5f) - D(%5.5f)", keRoll, keDRoll);
-//        }
+////        this->setKRollPitch();
+////        this->setKYaw();
 //    }
 
     if(rcAgent.isMinThrustMaxPitch()) {
@@ -210,6 +259,7 @@ void MyPIDCntrllr::calcPID() {
         this->inputData.yaw = (this->inputData.yaw * 0.7f) + (gyroData.z * 0.3f);
     }
 
+//    syslog(LOG_INFO, "mydrone(262) inputData Yaw: %d",inputData.yaw);
     float pitchLevelAdjust = 0.0f;
     float rollLevelAdjust = 0.0f;
 
@@ -217,7 +267,7 @@ void MyPIDCntrllr::calcPID() {
         pitchLevelAdjust = this->pitchDeg * 5;
         rollLevelAdjust = this->rollDeg * 5;
         this->targetData.roll -= rollLevelAdjust;
-        this->targetData.pitch -= pitchLevelAdjust;
+        this->targetData.pitch += pitchLevelAdjust;
     }
 
     this->inputData.thrust = this->targetData.thrust;
@@ -277,7 +327,7 @@ void MyPIDCntrllr::updateTargetDataFromRCSample() {
     if(this->targetData.pitch < 20 && this->targetData.pitch > -20) {
         this->targetData.pitch = 0;
     }
-    if(this->targetData.yaw < 20 && this->targetData.yaw > -20) {
+    if(this->targetData.yaw < 6 && this->targetData.yaw > -6) {
         this->targetData.yaw = 0;
     }
     this->targetData.thrust = std::min<int16_t>(PID_CNTRLLR_MAX_THRUST, std::max<int16_t>(1500 + sample.thrust, PID_CNTRLLR_MIN_THRUST)); // range [1000,2000]

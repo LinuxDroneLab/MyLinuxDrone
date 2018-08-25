@@ -45,12 +45,6 @@ private:
     static int16_t CHAN_CENTER_VALUES[6];
     static unsigned char readBuf[MYRCAGENT_MAX_BUFFER_SIZE];
 
-    struct EcapData
-    {
-        uint8_t cmd[2];
-        uint32_t chanValue[8];
-    };
-
 	bool initialized;
     bool updateTickTimestamp();
 	bool sendDataRequest();

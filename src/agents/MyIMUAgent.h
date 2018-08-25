@@ -32,6 +32,7 @@ public:
 	MyIMUAgent();
 	virtual ~MyIMUAgent();
     bool initialize();
+    bool reset();
     bool loadData();
     Motion6Data& getData();
 protected:

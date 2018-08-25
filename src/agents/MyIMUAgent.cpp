@@ -51,6 +51,12 @@ bool MyIMUAgent::initialize()
     }
     return initialized;
 }
+bool MyIMUAgent::reset()
+{
+    this->initialized = false;
+    this->imu.reset();
+    return true;
+}
 bool MyIMUAgent::loadData()
 {
     int16_t localData[6];

@@ -86,6 +86,9 @@ private:
     int16_t yawDErr;
     int16_t yawIErr;
 
+    uint32_t timestampMicrosPrevCycle;
+    uint32_t durationMicrosCycle;
+
     float rollDeg;
     float pitchDeg;
 
@@ -102,6 +105,8 @@ private:
     void send2Motors();
     void calcRollPitchAccel();
     void calcRollPitch();
+    void setKRollPitch();
+    void setKYaw();
 
     static RangeFloat INTEGRAL_RANGE;
     static RangeFloat ALTITUDE_RANGE;

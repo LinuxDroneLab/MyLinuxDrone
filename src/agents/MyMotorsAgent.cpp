@@ -13,7 +13,6 @@
 #include <thread>
 #include <chrono>
 
-#define MYMOTORSAGENT_MAX_BUFFER_SIZE         64
 unsigned char MyMotorsAgent::readBuf[MYMOTORSAGENT_MAX_BUFFER_SIZE] = { 0 };
 #define MYMOTORSAGENT_DEVICE_NAME             "/dev/rpmsg_pru30"
 #define MYMOTORSAGENT_MIN_DUTY 3125
@@ -158,7 +157,7 @@ bool MyMotorsAgent::receiveData()
     }
     else
     {
-        if ((uint8_t) readBuf[3] != 1)
+        if ((uint8_t) readBuf[3] != 1) // readBuf[3] == 1 se e solo se il comando richiesto è stato eseguito
         {
             syslog(LOG_INFO,
                    "mydrone: MyMotorsAgent ERROR: PWMSSs response=%d:%d:%d:%d\n",
