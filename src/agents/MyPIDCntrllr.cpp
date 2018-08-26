@@ -236,12 +236,12 @@ void MyPIDCntrllr::calcRollPitch() {
 
 
     this->pitchDeg -= this->rollDeg * sin(imuData.gyroDegxSec.z * 0.000069813); // 0.0000611 * (2pi)/360
-    this->rollDeg += this->pitchDeg * sin(imuData.gyroDegxSec.z * 0.000069813);
+    this->rollDeg -= this->pitchDeg * sin(imuData.gyroDegxSec.z * 0.000069813);
 
     this->pitchDeg = this->pitchDeg * 0.9996 + this->pitchDegAcc * 0.0004;
     this->rollDeg = this->rollDeg * 0.9996 + this->rollDegAcc * 0.0004;
 
-//    syslog(LOG_INFO, "RPAcc(%3.2f, %3.2f), RP(%3.2f, %3.2f), Acc(%d,%d)", this->rollDegAcc, this->pitchDegAcc, this->rollDeg, this->pitchDeg, imuData.accel.x, imuData.accel.y);
+    // syslog(LOG_INFO, "ROLL(%5.5f, %5.5f) - PITCH(%5.5f, %5.5f)", this->rollDegAcc, this->rollDeg, this->pitchDegAcc, this->pitchDeg);
 
 }
 void MyPIDCntrllr::calcPID() {
