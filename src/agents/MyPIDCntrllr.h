@@ -15,6 +15,7 @@
 #include <agents/MyIMUAgent.h>
 #include <agents/MyMotorsAgent.h>
 #include <agents/MyRCAgent.h>
+#include <baro/BMP085.h>
 
 #define MYPIDCNTRLLR_MAX_DEG_PER_SEC       200.0f
 #define MYPIDCNTRLLR_MAX_DEG_PER_SEC_YAW   200.0f
@@ -95,6 +96,7 @@ private:
     float rollDegAcc;
     float pitchDegAcc;
 
+
 	void disarm();
 	void arm();
 	void clean();
@@ -111,9 +113,11 @@ private:
     static RangeFloat INTEGRAL_RANGE;
     static RangeFloat ALTITUDE_RANGE;
 
+
     MyMotorsAgent motorsAgent;
     MyIMUAgent imuAgent;
     MyRCAgent rcAgent;
+    BMP085 barometer;
 };
 
 #endif /* AGENTS_MYPIDCNTRLLR_H_ */

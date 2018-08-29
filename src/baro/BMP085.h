@@ -57,7 +57,9 @@
 #define BMP085_PRESSUREDATA      0xF6
 #define BMP085_READTEMPCMD          0x2E
 #define BMP085_READPRESSURECMD            0x34
-#define BMP085__SEALEVEL_PRESSURE 101600
+#define BMP085__SEALEVEL_PRESSURE 101500
+#define BMP085_MAX_PRESSURE_CYCLES 20
+
 class BMP085 {
 public:
 	BMP085();
@@ -66,7 +68,7 @@ public:
 		uint16_t rawTemperature;
 		uint32_t rawPressure;
 		float temperature; // gradi centigradi
-		int32_t pressure; // Pa
+		float pressure; // Pa
 		int32_t seaLevelPressure; // Pa
 		float altitude; // meters
 		float estimatedAltitude; //meters
@@ -80,7 +82,7 @@ public:
 	bool pulse();
 
 private:
-	typedef enum {none, waitStartup, waitTemperature, waitPressure} SensorStatus;
+	typedef enum {none, waitStartup, requireTemperature, waitTemperature, requirePressure, waitPressure} SensorStatus;
 
 	bool initialized = false;
 	SensorData data;
@@ -89,7 +91,15 @@ private:
 	std::chrono::time_point<std::chrono::system_clock>  cycleAtTime;
 	boost::posix_time::ptime pulseAtTime;
 	uint64_t calcMillisFrom(std::chrono::time_point<std::chrono::system_clock> since);
+	uint8_t pressureCycles;
 
+    int32_t pressureBuffer[BMP085_MAX_PRESSURE_CYCLES];
+    uint8_t pressureBufferPosition;
+    float pressureValueSlow;
+    float pressureValueFast;
+    void pushPressure(int32_t pressure);
+    void calcPressureSlow();
+    void calcPressureFast();
 
 	void startCycle();
 	void changeStatus(SensorStatus s);
@@ -99,7 +109,7 @@ private:
 	void loadRawPressure(void);
 	void calcTemperature(void);
 	void calcPressure(void);
-	void calcAltitude(float sealevelPressure = BMP085__SEALEVEL_PRESSURE); // std atmosphere
+	void calcAltitude(int32_t sealevelPressure = BMP085__SEALEVEL_PRESSURE); // std atmosphere
 	void calcSealevelPressure();
 	int32_t computeB5(int32_t UT);
 	uint8_t read8(uint8_t addr);
