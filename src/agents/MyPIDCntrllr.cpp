@@ -240,8 +240,8 @@ void MyPIDCntrllr::calcRollPitch() {
     this->rollDeg += imuData.gyroDegxSec.x * 0.004f;
 
 
-    this->pitchDeg -= this->rollDeg * sin(imuData.gyroDegxSec.z * 0.000069813); // 0.0000611 * (2pi)/360
-    this->rollDeg -= this->pitchDeg * sin(imuData.gyroDegxSec.z * 0.000069813);
+    this->pitchDeg -= this->rollDeg * sin(imuData.gyroDegxSec.z * 0.000069813); // (2pi)/360/250
+    this->rollDeg += this->pitchDeg * sin(imuData.gyroDegxSec.z * 0.000069813);
 
     this->pitchDeg = this->pitchDeg * 0.9996 + this->pitchDegAcc * 0.0004;
     this->rollDeg = this->rollDeg * 0.9996 + this->rollDegAcc * 0.0004;
@@ -275,12 +275,14 @@ void MyPIDCntrllr::calcPID() {
         this->targetData.pitch += pitchLevelAdjust;
     }
 
-    this->inputData.thrust = this->targetData.thrust;
+    // compensa il thrust in base alla inclinazione per mantenere la stessa risultante
+    // altrimenti l'inclinazione causa una discesa
+    this->inputData.thrust = this->targetData.thrust*(0.85f + 0.15f/(cos(rollDeg*0.017453293f)*cos(pitchDeg*0.017453293f)));
     this->inputData.roll = std::min<int16_t>(PID_CNTRLLR_MAX_ROLL, std::max<int16_t>(this->inputData.roll, -PID_CNTRLLR_MAX_ROLL));
     this->inputData.pitch = std::min<int16_t>(PID_CNTRLLR_MAX_ROLL, std::max<int16_t>(this->inputData.pitch, -PID_CNTRLLR_MAX_ROLL));
     this->inputData.yaw = std::min<int16_t>(PID_CNTRLLR_MAX_YAW, std::max<int16_t>(this->inputData.yaw, -PID_CNTRLLR_MAX_YAW));
 
-    // syslog(LOG_INFO, "RP(%5.5f, %5.5f), RPYAcc(%5.5f, %5.5f), Adj(%5.5f, %5.5f)", this->rollDeg, this->pitchDeg, this->rollDegAcc, this->pitchDegAcc, rollLevelAdjust, pitchLevelAdjust);
+    // syslog(LOG_INFO, "RP(%5.5f, %5.5f), RPYAcc(%5.5f, %5.5f), Thr(%d)", this->rollDeg, this->pitchDeg, this->rollDegAcc, this->pitchDegAcc, this->inputData.thrust);
 
     // syslog(LOG_INFO, "inputData: RPY(%d,%d,%d)", this->inputData.roll, this->inputData.pitch, this->inputData.yaw);
 
