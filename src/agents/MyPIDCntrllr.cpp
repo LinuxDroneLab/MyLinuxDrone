@@ -81,10 +81,10 @@ bool MyPIDCntrllr::pulse()
 
 
     if(durationMicrosCycle >= 4000 && durationMicrosCycle < 40000 ) {
-        bool baroChanged = this->barometer.pulse();
-        if(baroChanged) {
-//            syslog(LOG_INFO, "pressure=%5.5f, altitude=%5.5f, temperature=%5.5f, seaLevelPressure=%d", this->barometer.getData().pressure, this->barometer.getData().altitude, this->barometer.getData().temperature, this->barometer.getData().seaLevelPressure);
-        }
+//        bool baroChanged = this->barometer.pulse();
+//        if(baroChanged) {
+////            syslog(LOG_INFO, "pressure=%5.5f, altitude=%5.5f, temperature=%5.5f, seaLevelPressure=%d", this->barometer.getData().pressure, this->barometer.getData().altitude, this->barometer.getData().temperature, this->barometer.getData().seaLevelPressure);
+//        }
         bool imuChanged = this->imuAgent.loadData();
         if(imuChanged) {
             timestampMicrosPrevCycle = now;
@@ -94,7 +94,8 @@ bool MyPIDCntrllr::pulse()
         if(durationMicrosCycle > 10500) {
             syslog(LOG_INFO, "mydrone: COUNTER=%d", durationMicrosCycle);
         }
-        return imuChanged | rcChanged | baroChanged;
+//        return imuChanged | rcChanged | baroChanged;
+        return imuChanged | rcChanged;
     } else if(durationMicrosCycle >= 40000) {
         bool isArmed = motorsAgent.isArmed();
         syslog(LOG_INFO, "mydrone: ALARM!! Imu does not responds!! I'm trying to reset it ...");

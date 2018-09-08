@@ -117,7 +117,7 @@ private:
     MyMotorsAgent motorsAgent;
     MyIMUAgent imuAgent;
     MyRCAgent rcAgent;
-    BMP085 barometer;
+//    BMP085 barometer;
 };
 
 #endif /* AGENTS_MYPIDCNTRLLR_H_ */
