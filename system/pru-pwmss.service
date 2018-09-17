@@ -1,0 +1,12 @@
+[Unit]
+ConditionPathExists=/sys/class/remoteproc/remoteproc1/firmware
+Requires=multi-user.target
+After=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/bin/pru-pwmss-start.sh
+
+[Install]
+WantedBy=default.target

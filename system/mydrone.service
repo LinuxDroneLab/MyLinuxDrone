@@ -1,0 +1,14 @@
+[Unit]
+ConditionPathExists=/sys/class/remoteproc/remoteproc2/firmware
+ConditionPathExists=/sys/class/remoteproc/remoteproc1/firmware
+Requires=pru-rc.service pru-pwmss.service
+After=pru-rc.service pru-pwmss.service
+
+[Service]
+Type=forking
+RemainAfterExit=true
+ExecStart=/usr/local/bin/mydrone-start.sh 
+#ExecStart=/bin/bash -c /root/MyDrone/MyDrone
+
+[Install]
+WantedBy=default.target
