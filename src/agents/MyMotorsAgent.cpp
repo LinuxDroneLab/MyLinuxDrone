@@ -143,6 +143,7 @@ bool MyMotorsAgent::sendDuty(uint16_t du1A, uint16_t du1B, uint16_t du2A, uint16
     data2[0] = MYMOTORSAGENT_PERIOD;
     data2[1] = du2A;
     data2[2] = du2B;
+//    syslog(LOG_INFO, "pwm0A/B[%d/%d] - pwm2A/B[%d/%d]", du1A, du1B, du2A, du2B);
     return (write(pruDevice.fd, readBuf, 16) > 0) && this->receiveData();
 }
 

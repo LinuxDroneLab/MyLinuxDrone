@@ -37,9 +37,9 @@ MyPIDCntrllr::MyPIDCntrllr(): initialized(false), firstCycle(true)
     keDPitch  = 7.98f;
     keIPitch  = 0.0f;
 
-    keYaw   = 43.3;
-    keDYaw  = 12.4f;
-    keIYaw  = 1.0f;
+    keYaw   = 0.0f; //43.3;
+    keDYaw  = 0.0f; //12.4f;
+    keIYaw  = 0.0f; //1.0f;
 
     rollDeg = 0.0f;
     pitchDeg = 0.0f;
@@ -47,6 +47,7 @@ MyPIDCntrllr::MyPIDCntrllr(): initialized(false), firstCycle(true)
     pitchDegAcc = 0.0f;
 
     timestampMicrosPrevCycle = 0;
+    counter = 0;
 
 }
 
@@ -98,14 +99,14 @@ bool MyPIDCntrllr::pulse()
         return imuChanged | rcChanged;
     } else if(durationMicrosCycle >= 40000) {
         bool isArmed = motorsAgent.isArmed();
-        syslog(LOG_INFO, "mydrone: ALARM!! Imu does not responds!! I'm trying to reset it ...");
-        this->disarm();
-        this->imuAgent.reset();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));;
-        this->imuAgent.initialize();
-        if(isArmed) {
-            this->arm();
-        }
+        syslog(LOG_INFO, "mydrone: ALARM!! Cycle too long!! micros[%d] ...", durationMicrosCycle);
+//        this->disarm();
+//        this->imuAgent.reset();
+//        std::this_thread::sleep_for(std::chrono::milliseconds(10));;
+//        this->imuAgent.initialize();
+//        if(isArmed) {
+//            this->arm();
+//        }
         timestampMicrosPrevCycle = now;
     }
     return false;
@@ -278,7 +279,8 @@ void MyPIDCntrllr::calcPID() {
 
     // compensa il thrust in base alla inclinazione per mantenere la stessa risultante
     // altrimenti l'inclinazione causa una discesa
-    this->inputData.thrust = this->targetData.thrust*(0.85f + 0.15f/(cos(rollDeg*0.017453293f)*cos(pitchDeg*0.017453293f)));
+//    this->inputData.thrust = this->targetData.thrust*(0.85f + 0.15f/(cos(rollDeg*0.017453293f)*cos(pitchDeg*0.017453293f)));
+    this->inputData.thrust = this->targetData.thrust;
     this->inputData.roll = std::min<int16_t>(PID_CNTRLLR_MAX_ROLL, std::max<int16_t>(this->inputData.roll, -PID_CNTRLLR_MAX_ROLL));
     this->inputData.pitch = std::min<int16_t>(PID_CNTRLLR_MAX_ROLL, std::max<int16_t>(this->inputData.pitch, -PID_CNTRLLR_MAX_ROLL));
     this->inputData.yaw = std::min<int16_t>(PID_CNTRLLR_MAX_YAW, std::max<int16_t>(this->inputData.yaw, -PID_CNTRLLR_MAX_YAW));

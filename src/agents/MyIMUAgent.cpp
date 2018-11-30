@@ -15,24 +15,29 @@ MyIMUAgent::MyIMUAgent() :
     data.gyroLSB = 65.5;
     data.accelLSB = 8192;
 
-    /*
+    /* old
      * AxisFactors(1.04191, 1.0508, 1.01568)
      * Accel AxisFactors(1.04191, 1.0508, 1.01568)
      * Accel K=(0.00232558, 0.00206612. 0.00163934)
      * Gyro Offsets(-171, -93, -26)
      *
+     * new: 30/11/2018 (nuova mpu6050)
+     * AxisFactors(1.03861, 1.00961, 0.987404)
+     * AxisOffset(0.000488281, 0, -0)
+     *
+     *
      */
-    data.gyroCal.x = -171;
-    data.gyroCal.y = -93;
-    data.gyroCal.z = -26;
+    data.gyroCal.x = -387;
+    data.gyroCal.y = -65;
+    data.gyroCal.z = 5;
 
     data.accelKX = 0.00232558f;
     data.accelKY = 0.00206612f;
     data.accelKZ = 0.00163934f;
 
-    data.accelAxisFactorX = 1.04191f;
-    data.accelAxisFactorY = 1.0508f;
-    data.accelAxisFactorZ = 1.01568f;
+    data.accelAxisFactorX = 1.03861f;
+    data.accelAxisFactorY = 1.00961f;
+    data.accelAxisFactorZ = 0.987404f;
 
     data.accel.x = 0;
     data.accel.y = 0;

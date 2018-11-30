@@ -56,6 +56,7 @@ private:
 
 	bool initialized;
 	bool firstCycle;
+	uint16_t counter;
 
 	float keRoll;
     float keDRoll;

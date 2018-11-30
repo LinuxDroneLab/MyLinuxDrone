@@ -213,13 +213,14 @@ bool MyRCAgent::loadData()
     {
         if (this->receiveData())
         {
+            //syslog(LOG_INFO, "T[%d], P[%d]", rcSample.thrust, rcSample.pitch);
             this->minThrustMaxPitch = false;
             this->minThrustMinPitch = false;
-            if (rcSample.thrust <= -490 && rcSample.pitch >= 490)
+            if (rcSample.thrust <= MYRCAGENT_MIN_LIMIT_THRUST && rcSample.pitch >= MYRCAGENT_MAX_LIMIT_PITCH)
             {
                 this->minThrustMaxPitch = true;
             }
-            else if (rcSample.thrust <= -490 && rcSample.pitch <= -490)
+            else if (rcSample.thrust <= MYRCAGENT_MIN_LIMIT_THRUST && rcSample.pitch <= MYRCAGENT_MIN_LIMIT_PITCH)
             {
                 this->minThrustMinPitch = true;
             }
