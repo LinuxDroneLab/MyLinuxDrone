@@ -37,9 +37,9 @@ MyPIDCntrllr::MyPIDCntrllr(): initialized(false), firstCycle(true)
     keDPitch  = 7.98f;
     keIPitch  = 0.0f;
 
-    keYaw   = 0.0f; //43.3;
-    keDYaw  = 0.0f; //12.4f;
-    keIYaw  = 0.0f; //1.0f;
+    keYaw   = 43.3;
+    keDYaw  = 12.4f;
+    keIYaw  = 1.0f;
 
     rollDeg = 0.0f;
     pitchDeg = 0.0f;
